@@ -84,7 +84,7 @@ fun UserScreen(
         }
 
         TextFieldComponent(
-            placeHolderText = "Nombre", value = name,isEnable = true,
+            placeHolderText = "Nombre", value = name,isTextFieldEnable = true,
             onTextFieldChanged = {
                 userViewModel.updateUserData(
                     it,
@@ -94,13 +94,13 @@ fun UserScreen(
                 )
             })
         TextFieldComponent(
-            placeHolderText = "Apellido", value = lastname,isEnable = true,
+            placeHolderText = "Apellido", value = lastname, isTextFieldEnable = true,
             onTextFieldChanged = { userViewModel.updateUserData(name, it, documentType, idNumber) })
         TextFieldComponent(
-            placeHolderText = "Tipo de documento", value = documentType,isEnable = true,
+            placeHolderText = "Tipo de documento", value = documentType,isTextFieldEnable = true,
             onTextFieldChanged = { userViewModel.updateUserData(name, lastname, it, idNumber) })
         TextFieldComponent(
-            placeHolderText = "Numero de documento", value = idNumber,isEnable = true,
+            placeHolderText = "Numero de documento", value = idNumber,isTextFieldEnable = true,
             onTextFieldChanged = { userViewModel.updateUserData(name, lastname, documentType, it) })
 
         CheckBoxes(

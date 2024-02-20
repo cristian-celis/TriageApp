@@ -27,35 +27,39 @@ class AdminViewModel @Inject constructor(
     val userList: StateFlow<List<StaffMemberDto>> = _userList
 
     private val _userData =
-        MutableStateFlow(StaffMemberDto(0, "", "", "", "", ""))
+        MutableStateFlow(StaffMemberDto(0, "", "", "", "", "","",""))
     val userData: StateFlow<StaffMemberDto> = _userData
 
-    private val _error = MutableStateFlow<String>("")
-    val error: StateFlow<String> = _error
+    private val _apiResult = MutableStateFlow<String>("")
+    val apiResult: StateFlow<String> = _apiResult
 
     private val _isThereChange = MutableStateFlow(false)
     val isThereChange: StateFlow<Boolean> = _isThereChange
+
+    private val _clickOnAddButton = MutableStateFlow(false)
+    val clickOnAddButton: StateFlow<Boolean> = _clickOnAddButton
 
     fun getUserList() {
         isGettingData = true
         Log.d("prueba", "API CALL")
         viewModelScope.launch {
-            when (val result = repositoryImpl.callToUserList()) {
+            when (val result = repositoryImpl.getStaff()) {
                 is APIResult.Success -> {
-                    _error.value = ""
+                    _apiResult.value = ""
                     _userList.value = result.data
                 }
 
-                is APIResult.Error -> _error.value = result.exception.message!!
+                is APIResult.Error -> _apiResult.value = result.exception.message!!
             }
             isGettingData = false
         }
     }
 
-    fun setUserDataDetails(userData: StaffMemberDto? = null) {
-        if(userData == null){
-            _userData.value = StaffMemberDto(0,"","","","","")
-        }
-        else _userData.value = userData
+    fun setClickOnAddButton(isClicked: Boolean){
+        _clickOnAddButton.value = isClicked
+    }
+
+    fun setUserDataDetails(userData: StaffMemberDto) {
+        _userData.value = userData
     }
 }

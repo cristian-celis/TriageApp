@@ -36,7 +36,7 @@ fun UserDataCard(
 ) {
 
     val iconUser: Int =
-        if (medicalStaff.type_person == "medico") R.drawable.stethoscope_icon else R.drawable.supervisor_icon
+        if (medicalStaff.role == "Doctor") R.drawable.stethoscope_icon else R.drawable.supervisor_icon
 
     val interactionSource = remember { MutableInteractionSource() }
 
@@ -70,7 +70,7 @@ fun UserDataCard(
                 )
                 Box(contentAlignment = Alignment.BottomStart, modifier = Modifier.padding(top = 7.dp)) {
                     Text(
-                        text = medicalStaff.type_person,
+                        text = medicalStaff.role,
                         style = TextStyle(fontSize = 16.sp),
                         color = Color(0xFF4F7396)
                     )

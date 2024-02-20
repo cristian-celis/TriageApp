@@ -12,3 +12,11 @@ data class PatientDto(
     @SerializedName("patient_status") val status: String,
     @SerializedName("document_type") val documentType: String
 )
+
+data class AddPatient(
+    val idNumber: String,
+    val name: String,
+    val lastname: String,
+    val status: String,
+    val documentType: String
+)

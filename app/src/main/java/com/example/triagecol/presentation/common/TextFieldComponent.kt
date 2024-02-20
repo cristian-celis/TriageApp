@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -28,15 +29,17 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.traigecol.R
+import com.example.triagecol.presentation.admin.details.DetailCardViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextFieldComponent(
     placeHolderText: String,
     value: String,
-    isEnable: Boolean,
+    isTextFieldEnable: Boolean,
     onTextFieldChanged: (String) -> Unit
 ) {
+
     Box(
         modifier = Modifier
             .padding(bottom = 10.dp).fillMaxWidth()
@@ -61,7 +64,7 @@ fun TextFieldComponent(
             ),
             singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-            enabled = isEnable
+            enabled = !isTextFieldEnable
         )
     }
 }

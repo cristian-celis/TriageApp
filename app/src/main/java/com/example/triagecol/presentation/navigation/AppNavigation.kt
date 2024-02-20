@@ -11,6 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.triagecol.MainViewModel
 import com.example.triagecol.presentation.admin.AdminViewModel
 import com.example.triagecol.domain.UserPage
+import com.example.triagecol.domain.models.dto.StaffMemberDto
 import com.example.triagecol.presentation.SplashScreen
 import com.example.triagecol.presentation.admin.AdminMainScreen
 import com.example.triagecol.presentation.admin.details.DetailState
@@ -39,9 +40,8 @@ fun AppNavigation(mainViewModel: MainViewModel) {
             UserScreen(navController)
         }
         composable(route = AppScreens.AdminScreen.route) {
-            if (mainViewModel.currentScreen.value.route != AppScreens.AdminScreen.route) {
-                if (detailCardViewModel.detailState.value == DetailState.ENTERING)
-                    mainViewModel.writeSaveLogin(UserPage.ADMIN, AppScreens.AdminScreen)
+            if (mainViewModel.currentScreen.value.route != AppScreens.AdminScreen.route && detailCardViewModel.detailState.value == DetailState.ENTERING) {
+                mainViewModel.writeSaveLogin(UserPage.ADMIN, AppScreens.AdminScreen)
             }
             if (detailCardViewModel.detailState.value == DetailState.ENTERING) {
                 adminViewModel.getUserList()
@@ -50,9 +50,10 @@ fun AppNavigation(mainViewModel: MainViewModel) {
             AdminMainScreen(navController)
         }
         composable(route = AppScreens.DetailCard.route) {
-            if (detailCardViewModel.userData.value != adminViewModel.userData.value) {
+            if(!adminViewModel.clickOnAddButton.value)
                 detailCardViewModel.setUserData(adminViewModel.userData.value)
-            }
+            else detailCardViewModel.clearBoxes()
+
             DetailCard(navController, detailCardViewModel)
         }
         composable(route = AppScreens.SplashScreen.route) {

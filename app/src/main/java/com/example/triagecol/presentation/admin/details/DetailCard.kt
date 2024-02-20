@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -46,22 +48,17 @@ fun DetailCard(
     detailCardViewModel: DetailCardViewModel
 ) {
 
-    val saveEnable: Boolean by detailCardViewModel.saveEnable.observeAsState(initial = false)
+    val saveEnable: Boolean by detailCardViewModel.saveEnable.collectAsState()
     val detailState: DetailState by detailCardViewModel.detailState.collectAsState()
-    val isLoading: Boolean by detailCardViewModel.isAddingOrEditingUsers.collectAsState()
+    val isLoading: Boolean by detailCardViewModel.isApiRequestPending.collectAsState()
 
     var screenTitle by rememberSaveable { mutableStateOf("Agregar Personal") }
 
-    Log.d("prueba", "--------------- DETAIL CARD")
-
-    if(detailCardViewModel.detailMode.value == DetailMode.NONE){
-        Log.d("prueba", "Reevalua?: ${detailCardViewModel.userData.value.id}")
+    if (detailCardViewModel.detailMode.value == DetailMode.NONE) {
         if (detailCardViewModel.userData.value.id != 0) {
-            Log.d("prueba", "Edit Mode")
             screenTitle = "Editar Personal"
             detailCardViewModel.setEditMode()
-        } else{
-            Log.d("prueba", "Add Mode")
+        } else {
             detailCardViewModel.setAddMode()
             screenTitle = "Agregar Personal"
         }
@@ -74,59 +71,61 @@ fun DetailCard(
         navController.navigate(AppScreens.AdminScreen.route)
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
-        ) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
 
-            Row(
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(80.dp)
+                .padding(10.dp), verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_go_back),
+                contentDescription = null,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(80.dp)
-                    .padding(10.dp), verticalAlignment = Alignment.CenterVertically
-            ) {
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = {
+                            detailCardViewModel.setDetailMode(DetailMode.NONE)
+                            navController.navigate(route = AppScreens.AdminScreen.route)
+                        })
+                    .size(25.dp)
+            )
+
+            Box {
+                Text(
+                    text = screenTitle,
+                    style = TextStyle(fontSize = 25.sp, fontWeight = FontWeight.Bold),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+
+        TextBoxesForData(modifier = Modifier.fillMaxWidth(), detailCardViewModel)
+
+        if (isLoading) {
+            Box {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_go_back),
+                    painter = painterResource(id = R.drawable.ic_time),
                     contentDescription = null,
                     modifier = Modifier
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null,
-                            onClick = {detailCardViewModel.setDetailMode(DetailMode.NONE)
-                                navController.navigate(route = AppScreens.AdminScreen.route)})
-                        .size(25.dp))
-
-                Box {
-                    Text(
-                        text = screenTitle,
-                        style = TextStyle(fontSize = 25.sp, fontWeight = FontWeight.Bold),
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
+                        .size(80.dp)
+                        .zIndex(1f)
+                        .align(Alignment.Center),
+                    tint = Color(0xC3C0C0C0)
+                )
             }
-
-            TextBoxesForData(modifier = Modifier.fillMaxWidth(), detailCardViewModel)
-
-            if(isLoading){
-                Box{
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_time),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(80.dp).zIndex(1f)
-                            .align(Alignment.Center),
-                        tint = Color(0xC3C0C0C0)
-                    )
-                }
-            }else{
-                SaveUserButton(loginEnable = saveEnable, detailCardViewModel)
-                if (detailCardViewModel.editMode.value) {
-                    DeleteUserButton(detailCardViewModel, detailCardViewModel.userData.value.id)
-                }
+        } else {
+            SaveUserButton(loginEnable = saveEnable, detailCardViewModel)
+            if (detailCardViewModel.editMode.value) {
+                DeleteUserButton(detailCardViewModel, detailCardViewModel.userData.value.id)
             }
         }
     }

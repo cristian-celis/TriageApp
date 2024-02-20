@@ -1,79 +1,99 @@
 package com.example.triagecol.presentation.admin.details
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.traigecol.R
 import com.example.triagecol.presentation.common.PasswordTextField
 import com.example.triagecol.presentation.common.TextFieldComponent
 
 @Composable
 fun TextBoxesForData(modifier: Modifier = Modifier, detailCardViewModel: DetailCardViewModel) {
-    val name: String by detailCardViewModel.name.observeAsState(initial = "")
-    val lastname: String by detailCardViewModel.lastname.observeAsState(initial = "")
-    val password: String by detailCardViewModel.password.observeAsState(initial = "")
-    val idNumber: String by detailCardViewModel.idNumber.observeAsState(initial = "")
+    val name: String by detailCardViewModel.name.collectAsState()
+    val lastname: String by detailCardViewModel.lastname.collectAsState()
+    val idNumber: String by detailCardViewModel.idNumber.collectAsState()
+    val password: String by detailCardViewModel.password.collectAsState()
+    val phoneNumber: String by detailCardViewModel.phoneNumber.collectAsState()
 
-    val isTextFieldEnable: Boolean = detailCardViewModel.isAddingOrEditingUsers.value
+    val isTextFieldEnable: Boolean by detailCardViewModel.isApiRequestPending.collectAsState()
 
     Column(modifier = modifier.padding(start = 16.dp, end = 16.dp)) {
         NameLabelTextField(modifier, "Nombre")
         TextFieldComponent(
-            placeHolderText = "Nombre", value = name, isEnable = !isTextFieldEnable,
+            placeHolderText = "Nombre", value = name, isTextFieldEnable = isTextFieldEnable,
             onTextFieldChanged = {
                 detailCardViewModel.onUserDataChanged(
-                    it, lastname, idNumber, password
+                    idNumber, it, lastname, password, phoneNumber
                 )
             })
 
         NameLabelTextField(modifier, "Apellido")
         TextFieldComponent(
-            placeHolderText = "Apellido", value = lastname,isEnable = !isTextFieldEnable,
+            placeHolderText = "Apellido", value = lastname, isTextFieldEnable = isTextFieldEnable,
             onTextFieldChanged = {
                 detailCardViewModel.onUserDataChanged(
-                    name, it, idNumber, password
+                    idNumber, name, it, password, phoneNumber
                 )
             })
 
-        NameLabelTextField(modifier, "Numero de identificacion")
+        NameLabelTextField(modifier, "Numero de telefono")
         TextFieldComponent(
-            placeHolderText = "Numero de identificacion", value = idNumber,isEnable = !isTextFieldEnable,
+            placeHolderText = "Numero de Telefono",
+            value = phoneNumber,
+            isTextFieldEnable = isTextFieldEnable,
             onTextFieldChanged = {
                 detailCardViewModel.onUserDataChanged(
-                    name, lastname, it, password
+                    idNumber, name, lastname, password, it
+                )
+            })
+
+        NameLabelTextField(modifier, "Numero de Identificacion")
+        TextFieldComponent(
+            placeHolderText = "Numero de Identificacion",
+            value = idNumber,
+            isTextFieldEnable = isTextFieldEnable,
+            onTextFieldChanged = {
+                detailCardViewModel.onUserDataChanged(
+                    it, name, lastname, password, phoneNumber
                 )
             })
 
         NameLabelTextField(modifier, "Usuario")
-        TextFieldComponent(
-            placeHolderText = "Usuario", value = idNumber,isEnable = !isTextFieldEnable,
+        Text(
+            text = idNumber,
+            style = MaterialTheme.typography.bodyLarge,
+            color = colorResource(id = R.color.placeholder),
+            modifier = Modifier.fillMaxWidth().padding(10.dp)
+        )
+
+        NameLabelTextField(modifier, "Contraseña")
+        PasswordTextField(
+            placeHolderText = "Contraseña",
+            value = password,
+            isEnable = !isTextFieldEnable,
             onTextFieldChanged = {
                 detailCardViewModel.onUserDataChanged(
-                    name, lastname, it, password
+                    idNumber, name, lastname, it, phoneNumber
                 )
             })
 
-        NameLabelTextField(modifier, "Contraseña")
-        PasswordTextField(placeHolderText = "Contraseña", value = password,isEnable = !isTextFieldEnable, onTextFieldChanged = {
-            detailCardViewModel.onUserDataChanged(
-                name, lastname, idNumber, it
-            )
-        })
-
-        ToggleOptionComponent(detailCardViewModel, modifier, !isTextFieldEnable)
+        ToggleOptionComponent(detailCardViewModel, modifier, isTextFieldEnable)
     }
 }
 
@@ -90,17 +110,25 @@ fun NameLabelTextField(modifier: Modifier = Modifier, nameLabel: String) {
 }
 
 @Composable
-fun ToggleOptionComponent(detailCardViewModel: DetailCardViewModel, modifier: Modifier = Modifier, isEnable: Boolean) {
-    val typePerson by detailCardViewModel.typePerson.collectAsState()
-    val options = listOf("medico", "asistente")
+fun ToggleOptionComponent(
+    detailCardViewModel: DetailCardViewModel,
+    modifier: Modifier = Modifier,
+    isTextFieldEnable: Boolean
+) {
+    val options = listOf("Doctor", "Supervisor")
+    val role: String by detailCardViewModel.role.collectAsState()
 
-    Row(modifier = modifier.fillMaxWidth().padding(top = 20.dp, bottom = 7.dp), horizontalArrangement = Arrangement.Center) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(top = 20.dp, bottom = 7.dp), horizontalArrangement = Arrangement.Center
+    ) {
         options.forEach { option ->
             Row {
                 RadioButton(
-                    selected = typePerson == option,
-                    onClick = { detailCardViewModel.setTypePerson(option) },
-                    enabled = isEnable
+                    selected = role == option,
+                    onClick = { detailCardViewModel.setRole(option) },
+                    enabled = !isTextFieldEnable
                 )
                 Text(
                     text = option,

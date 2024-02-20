@@ -77,7 +77,7 @@ fun LoginScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.size(14.dp))
 
-        TextFieldComponent("Usuario", user, isEnable = true) { loginViewModel.onLoginChanged(it, password) }
+        TextFieldComponent(placeHolderText = "Usuario", value = user, isTextFieldEnable = false) { loginViewModel.onLoginChanged(it, password) }
 
         Spacer(modifier = Modifier.size(8.dp))
 

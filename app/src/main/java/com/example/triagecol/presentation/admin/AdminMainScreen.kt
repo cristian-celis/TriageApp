@@ -45,7 +45,6 @@ fun AdminMainScreen(navController: NavController) {
     val adminViewModel: AdminViewModel = hiltViewModel()
 
     val userList by adminViewModel.userList.collectAsState()
-    val error by adminViewModel.error.collectAsState()
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -82,13 +81,13 @@ fun AdminMainScreen(navController: NavController) {
 
             if (adminViewModel.isGettingData) {
                 ShimmerEffect()
-            } else if (error.isNotBlank()) {
+            } else if (adminViewModel.apiResult.value.isNotBlank()) {
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(text = adminViewModel.error.value)
+                    Text(text = adminViewModel.apiResult.value)
                     RefreshButton(onRefresh = {
                         adminViewModel.getUserList()
                     })
@@ -106,6 +105,7 @@ fun AdminMainScreen(navController: NavController) {
                             medicalStaff = user,
                             onClick = {
                                 adminViewModel.setUserDataDetails(user)
+                                adminViewModel.setClickOnAddButton(false)
                                 navController.navigate(AppScreens.DetailCard.route)
                             })
                         Spacer(modifier = Modifier.height(5.dp))
@@ -136,7 +136,7 @@ fun AddStaff(
 ) {
     Button(
         onClick = {
-            adminViewModel.setUserDataDetails()
+            adminViewModel.setClickOnAddButton(true)
             navController.navigate(AppScreens.DetailCard.route)
         },
         modifier = modifier

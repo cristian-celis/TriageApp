@@ -7,9 +7,9 @@ object EnumClasses {
         "Desconectado" to "Disconnected"
     )
 
-    val doctorStates: Map<String, String> = mapOf(
-        "DOCTOR" to "Doctor",
-        "SUPERVISOR" to "Supervisor"
+    val doctorStates: Map<Int, String> = mapOf(
+        1 to "Doctor",
+        2 to "Supervisor"
     )
 
     val patientStates: Map<String, String> = mapOf(

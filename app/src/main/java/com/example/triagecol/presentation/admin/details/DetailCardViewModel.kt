@@ -1,13 +1,11 @@
 package com.example.triagecol.presentation.admin.details
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.triagecol.domain.usecases.RepositoryImpl
-import com.example.triagecol.domain.models.dto.AddUserDtoItem
 import com.example.triagecol.domain.models.dto.ApiResponse
+import com.example.triagecol.domain.models.dto.StaffMember
 import com.example.triagecol.domain.models.dto.StaffMemberDto
 import com.example.triagecol.domain.usecases.APIResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,25 +19,26 @@ class DetailCardViewModel @Inject constructor(
     private val repositoryImpl: RepositoryImpl
 ) : ViewModel() {
 
-    private val _name = MutableLiveData<String>()
-    val name: LiveData<String> = _name
+    private val _name = MutableStateFlow("")
+    val name: StateFlow<String> = _name
 
-    private val _lastname = MutableLiveData<String>()
-    val lastname: LiveData<String> = _lastname
+    private val _lastname = MutableStateFlow<String>("")
+    val lastname: StateFlow<String> = _lastname
 
-    private val _idNumber = MutableLiveData<String>()
-    val idNumber: LiveData<String> = _idNumber
+    private val _idNumber = MutableStateFlow<String>("")
+    val idNumber: StateFlow<String> = _idNumber
 
-    private val _password = MutableLiveData<String>()
-    val password: LiveData<String> = _password
+    private val _password = MutableStateFlow<String>("")
+    val password: StateFlow<String> = _password
 
-    private val _typePerson = MutableStateFlow<String>("medico")
-    val typePerson: StateFlow<String> = _typePerson
+    private val _phoneNumber = MutableStateFlow("")
+    val phoneNumber: StateFlow<String> = _phoneNumber
 
-    private val _username = MutableLiveData<String>()
+    private val _role = MutableStateFlow("Medico")
+    val role: StateFlow<String> = _role
 
-    private val _saveEnable = MutableLiveData<Boolean>()
-    val saveEnable: LiveData<Boolean> = _saveEnable
+    private val _saveEnable = MutableStateFlow<Boolean>(false)
+    val saveEnable: StateFlow<Boolean> = _saveEnable
 
     private val _editMode = MutableStateFlow(false)
     val editMode: StateFlow<Boolean> = _editMode
@@ -51,7 +50,7 @@ class DetailCardViewModel @Inject constructor(
     val detailMode: StateFlow<DetailMode> = _detailMode
 
     private val _userData =
-        MutableStateFlow(StaffMemberDto(0, "", "", "", "medico", ""))
+        MutableStateFlow(StaffMemberDto(0, "", "", "", "Medico", "", "", ""))
     val userData: StateFlow<StaffMemberDto> = _userData
 
     private val _detailState = MutableStateFlow(DetailState.ENTERING)
@@ -61,114 +60,143 @@ class DetailCardViewModel @Inject constructor(
         MutableStateFlow<APIResult<ApiResponse?>>(APIResult.Error(Exception("Initial value")))
     val responseAPI: StateFlow<APIResult<ApiResponse?>> = _responseAPI
 
-    private val _isAddingOrEditingUsers = MutableStateFlow(false)
-    val isAddingOrEditingUsers: StateFlow<Boolean> = _isAddingOrEditingUsers
+    private val _isApiRequestPending = MutableStateFlow(false)
+    val isApiRequestPending: StateFlow<Boolean> = _isApiRequestPending
 
     fun onUserDataChanged(
-        name: String, lastname: String, idNumber: String, password: String,
+        idNumber: String,
+        name: String,
+        lastname: String,
+        password: String,
+        phoneNumber: String,
     ) {
+        _idNumber.value = idNumber
         _name.value = name
         _lastname.value = lastname
         _password.value = password
-        _idNumber.value = idNumber
-        _username.value = idNumber
-        _saveEnable.value = validCredentials(name, lastname, password)
+        _phoneNumber.value = phoneNumber
+        _saveEnable.value = validCredentials()
     }
 
-    fun setTypePerson(typePerson: String){ _typePerson.value = typePerson }
-
     fun setUserData(userData: StaffMemberDto) {
+        Log.d("prueba", "Llega: $userData")
         _name.value = userData.name
         _lastname.value = userData.lastname
-        _password.value = userData.password
-        _typePerson.value = userData.type_person
+        _idNumber.value = userData.idNumber
+        _phoneNumber.value = userData.phoneNumber
+        _role.value = userData.role
         _userData.value = userData
 
         _detailMode.value = DetailMode.NONE
     }
 
-    private fun validNewUserData(): Boolean {
-        return (_name.value != _userData.value.name ||
+    private fun validDataHasChanged(): Boolean {
+        return (_idNumber.value != _userData.value.idNumber ||
+                _name.value != _userData.value.name ||
                 _lastname.value != _userData.value.lastname ||
                 _password.value != _userData.value.password ||
-                _typePerson.value != _userData.value.type_person
+                _phoneNumber.value != _userData.value.phoneNumber ||
+                _role.value != _userData.value.role
                 )
     }
 
-    private fun validCredentials(name: String, lastname: String, password: String): Boolean {
-        return if (_editMode.value) validNewUserData() else name.isNotBlank() && password.isNotBlank() && lastname.isNotBlank()
+    private fun validCredentials(): Boolean {
+        return if (_editMode.value) validDataHasChanged()
+        else {
+            _idNumber.value.isNotBlank()
+                    && _name.value.isNotBlank()
+                    && _lastname.value.isNotBlank()
+                    && _password.value.isNotBlank()
+                    && _phoneNumber.value.isNotBlank()
+                    && _role.value.isNotBlank()
+        }
     }
 
     fun editUser() {
-        if (!_isAddingOrEditingUsers.value) {
-            Log.d("prueba", "Editando...")
-            _isAddingOrEditingUsers.value = true
-            _userData.value.name = _name.value!!
-            _userData.value.lastname = _lastname.value!!
-            _userData.value.password = _password.value!!
-            _userData.value.type_person = _typePerson.value
-
+        if (!_isApiRequestPending.value) {
+            _isApiRequestPending.value = true
             viewModelScope.launch {
-                repositoryImpl.editUser(_userData.value).let {
+                repositoryImpl.editStaff(
+                    StaffMemberDto(
+                        _userData.value.id,
+                        _idNumber.value,
+                        _name.value,
+                        _lastname.value,
+                        _idNumber.value,
+                        _password.value,
+                        _phoneNumber.value,
+                        _role.value
+                    )
+                ).let {
                     _detailState.value = DetailState.SAVED
                     _responseAPI.value = it
-                    _isAddingOrEditingUsers.value = false
+                    _isApiRequestPending.value = false
                 }
             }
         }
     }
 
     fun addUser() {
-        if (!_isAddingOrEditingUsers.value) {
-            Log.d("prueba", "Agregando...")
-            _isAddingOrEditingUsers.value = true
+        if (!_isApiRequestPending.value) {
+            _isApiRequestPending.value = true
 
             viewModelScope.launch {
-                repositoryImpl.addUser(
-                    AddUserDtoItem(
-                        _lastname.value!!,
-                        _name.value!!,
-                        _password.value!!,
-                        _typePerson.value,
-                        _username.value!!
+                repositoryImpl.addStaff(
+                    StaffMember(
+                        _idNumber.value,
+                        _name.value,
+                        _lastname.value,
+                        _idNumber.value,
+                        _password.value,
+                        _phoneNumber.value,
+                        _role.value
                     )
                 ).let {
                     _detailState.value = DetailState.SAVED
                     _responseAPI.value = it
-                    _isAddingOrEditingUsers.value = false
+                    _isApiRequestPending.value = false
                 }
             }
         }
     }
 
-    fun setDetailState(detailState: DetailState) { _detailState.value = detailState }
+    fun setDetailState(detailState: DetailState) {
+        _detailState.value = detailState
+    }
 
     fun deleteUser(idUser: String) {
-        if(!_isAddingOrEditingUsers.value){
-            Log.d("prueba", "Eliminando $idUser...")
-            _isAddingOrEditingUsers.value = true
+        if (!_isApiRequestPending.value) {
+            _isApiRequestPending.value = true
             viewModelScope.launch {
-                repositoryImpl.deleteUser(idUser).let {
+                repositoryImpl.deleteStaffMember(idUser).let {
                     _detailState.value = DetailState.SAVED
                     _responseAPI.value = it
-                    _isAddingOrEditingUsers.value = false
+                    _isApiRequestPending.value = false
                 }
             }
         }
     }
 
-    fun setEditMode(){
+    fun setRole(role: String){
+        _role.value = role
+        _saveEnable.value = validCredentials()
+    }
+
+    fun setEditMode() {
         _editMode.value = true
         _addMode.value = false
     }
 
-    fun setAddMode(){
+    fun setAddMode() {
         _addMode.value = true
         _editMode.value = false
     }
 
-    fun setDetailMode(detailMode: DetailMode){
-        Log.d("prueba", "Set DetailMode ${detailMode}")
+    fun setDetailMode(detailMode: DetailMode) {
         _detailMode.value = detailMode
+    }
+
+    fun clearBoxes(){
+        setUserData(StaffMemberDto(0, "", "", "", "Medico", "", "", ""))
     }
 }
