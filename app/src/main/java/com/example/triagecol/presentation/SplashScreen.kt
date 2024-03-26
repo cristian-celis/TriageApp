@@ -7,33 +7,33 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.traigecol.R
 import com.example.triagecol.MainViewModel
+import com.example.triagecol.presentation.doctor.DoctorViewModel
 import com.example.triagecol.presentation.navigation.AppScreens
 import kotlinx.coroutines.delay
 
 @Composable
-fun SplashScreen(navController: NavController, mainViewModel: MainViewModel) {
+fun SplashScreen(navController: NavController) {
+
+    val mainViewModel: MainViewModel = hiltViewModel()
 
     LaunchedEffect(key1 = true) {
-        delay(2000)
+        delay(1000)
         navController.popBackStack()
 
-        var nextScreen: AppScreens = AppScreens.LoginScreen
-
-        when (mainViewModel.savedLogin.value) {
-            "ADMIN" -> nextScreen = AppScreens.AdminScreen
-            "LOGIN" -> nextScreen = AppScreens.LoginScreen
-            "ASSISTANT" -> nextScreen = AppScreens.UserScreen
-            "DOCTOR" -> nextScreen = AppScreens.AdminScreen
+        val nextScreen = when (mainViewModel.savedLogin.value) {
+            "ADMIN" ->  AppScreens.AdminScreen
+            "LOGIN" ->  AppScreens.LoginScreen
+            "ASSISTANT" ->  AppScreens.SupervisorScreen
+            "DOCTOR" ->  AppScreens.AdminScreen
+            else -> {AppScreens.LoginScreen}
         }
-
-        mainViewModel.setCurrentScreen(nextScreen)
 
         navController.navigate(nextScreen.route)
     }

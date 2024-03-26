@@ -1,5 +1,5 @@
 package com.example.triagecol.domain
 
 enum class UserPage {
-    ADMIN, LOGIN, ASSISTANT, DOCTOR
+    ADMIN, LOGIN, SUPERVISOR, DOCTOR
 }

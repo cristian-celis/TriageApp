@@ -1,6 +1,7 @@
 package com.example.triagecol.presentation.admin
 
 import ArticleCardShimmerEffect
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -40,9 +41,7 @@ import com.example.triagecol.presentation.common.RefreshButton
 import com.example.triagecol.presentation.navigation.AppScreens
 
 @Composable
-fun AdminMainScreen(navController: NavController) {
-
-    val adminViewModel: AdminViewModel = hiltViewModel()
+fun AdminMainScreen(navController: NavController, adminViewModel: AdminViewModel) {
 
     val userList by adminViewModel.userList.collectAsState()
 
@@ -65,7 +64,14 @@ fun AdminMainScreen(navController: NavController) {
                         .clickable (
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
-                            onClick = {navController.navigate(route = AppScreens.LoginScreen.route)}
+                            onClick = {
+                                navController.navigate(AppScreens.LoginScreen.route) {
+                                    popUpTo(AppScreens.AdminScreen.route) { inclusive = true }
+                                    launchSingleTop = true
+                                }
+                                /*navController.popBackStack()
+                                navController.navigate(route = AppScreens.LoginScreen.route)*/
+                            }
                         )
                         .size(25.dp))
 
@@ -79,7 +85,7 @@ fun AdminMainScreen(navController: NavController) {
                 }
             }
 
-            if (adminViewModel.isGettingData) {
+            if (adminViewModel.isFetchingStaff) {
                 ShimmerEffect()
             } else if (adminViewModel.apiResult.value.isNotBlank()) {
                 Column(
@@ -94,7 +100,7 @@ fun AdminMainScreen(navController: NavController) {
                 }
             } else {
                 //SearchBar()
-                if(userList.isNullOrEmpty()){
+                if(userList.isEmpty()){
                     Text(text = "No hay personal registrado.")
                 }
 

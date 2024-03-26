@@ -2,11 +2,13 @@ package com.example.triagecol.presentation.admin.details
 
 import android.util.Log
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,10 +19,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -31,6 +35,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -38,6 +44,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.traigecol.R
 import com.example.triagecol.presentation.navigation.AppScreens
@@ -51,6 +58,8 @@ fun DetailCard(
     val saveEnable: Boolean by detailCardViewModel.saveEnable.collectAsState()
     val detailState: DetailState by detailCardViewModel.detailState.collectAsState()
     val isLoading: Boolean by detailCardViewModel.isApiRequestPending.collectAsState()
+
+    val focusManager = LocalFocusManager.current
 
     var screenTitle by rememberSaveable { mutableStateOf("Agregar Personal") }
 
@@ -66,15 +75,20 @@ fun DetailCard(
     }
 
     if (detailState == DetailState.SAVED) {
+        detailCardViewModel.setIsChanged(true)
         detailCardViewModel.setDetailState(DetailState.ENTERING)
         detailCardViewModel.setDetailMode(DetailMode.NONE)
-        navController.navigate(AppScreens.AdminScreen.route)
+        navController.popBackStack()
+        //navController.navigate(AppScreens.AdminScreen.route)
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
+            .verticalScroll(rememberScrollState())
+            .pointerInput(Unit) {
+                detectTapGestures(onTap = { focusManager.clearFocus() })
+            },
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
 
@@ -111,23 +125,15 @@ fun DetailCard(
         TextBoxesForData(modifier = Modifier.fillMaxWidth(), detailCardViewModel)
 
         if (isLoading) {
-            Box {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_time),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(80.dp)
-                        .zIndex(1f)
-                        .align(Alignment.Center),
-                    tint = Color(0xC3C0C0C0)
-                )
-            }
+            ProgressIndicator()
         } else {
             SaveUserButton(loginEnable = saveEnable, detailCardViewModel)
             if (detailCardViewModel.editMode.value) {
                 DeleteUserButton(detailCardViewModel, detailCardViewModel.userData.value.id)
             }
         }
+
+        Spacer(modifier = Modifier.height(140.dp))
     }
 }
 
@@ -160,8 +166,8 @@ fun DeleteUserButton(
             dismissButton = { Button(onClick = { showDialog = false }) { Text(text = "No") } },
             confirmButton = {
                 Button(onClick = {
-                    detailCardViewModel.setDetailMode(DetailMode.NONE)
                     detailCardViewModel.deleteUser(idUser.toString())
+                    detailCardViewModel.setDetailMode(DetailMode.NONE)
                 }) {
                     Text(
                         text = "Sí"
@@ -187,7 +193,8 @@ fun SaveUserButton(
         }, modifier = Modifier
             .fillMaxWidth()
             .padding(15.dp)
-            .height(48.dp), colors = ButtonDefaults.buttonColors(
+            .height(48.dp),
+        colors = ButtonDefaults.buttonColors(
             containerColor = Color(0xFF1A80E5),
             disabledContainerColor = Color(0xFFAACBEB),
             contentColor = Color.White,
@@ -197,4 +204,15 @@ fun SaveUserButton(
     ) {
         Text(text = "Guardar")
     }
+}
+
+@Composable
+fun ProgressIndicator() {
+    CircularProgressIndicator(
+        modifier = Modifier
+            .size(75.dp)
+            .padding(10.dp),
+        color = Color.Black,
+        strokeWidth = 3.dp
+    )
 }

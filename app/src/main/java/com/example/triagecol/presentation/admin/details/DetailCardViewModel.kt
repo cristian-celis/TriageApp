@@ -3,7 +3,7 @@ package com.example.triagecol.presentation.admin.details
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.triagecol.domain.usecases.RepositoryImpl
+import com.example.triagecol.domain.usecases.StaffRepositoryImpl
 import com.example.triagecol.domain.models.dto.ApiResponse
 import com.example.triagecol.domain.models.dto.StaffMember
 import com.example.triagecol.domain.models.dto.StaffMemberDto
@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DetailCardViewModel @Inject constructor(
-    private val repositoryImpl: RepositoryImpl
+    private val staffRepositoryImpl: StaffRepositoryImpl
 ) : ViewModel() {
 
     private val _name = MutableStateFlow("")
@@ -56,12 +56,14 @@ class DetailCardViewModel @Inject constructor(
     private val _detailState = MutableStateFlow(DetailState.ENTERING)
     val detailState: StateFlow<DetailState> = _detailState
 
-    private val _responseAPI =
-        MutableStateFlow<APIResult<ApiResponse?>>(APIResult.Error(Exception("Initial value")))
-    val responseAPI: StateFlow<APIResult<ApiResponse?>> = _responseAPI
+    private val _isChanged = MutableStateFlow(false)
+    val isChanged: StateFlow<Boolean> = _isChanged
 
     private val _isApiRequestPending = MutableStateFlow(false)
     val isApiRequestPending: StateFlow<Boolean> = _isApiRequestPending
+
+    private val _errorMessage = MutableStateFlow("")
+    val errorMessage: StateFlow<String> = _errorMessage
 
     fun onUserDataChanged(
         idNumber: String,
@@ -116,7 +118,7 @@ class DetailCardViewModel @Inject constructor(
         if (!_isApiRequestPending.value) {
             _isApiRequestPending.value = true
             viewModelScope.launch {
-                repositoryImpl.editStaff(
+                staffRepositoryImpl.editStaff(
                     StaffMemberDto(
                         _userData.value.id,
                         _idNumber.value,
@@ -129,7 +131,6 @@ class DetailCardViewModel @Inject constructor(
                     )
                 ).let {
                     _detailState.value = DetailState.SAVED
-                    _responseAPI.value = it
                     _isApiRequestPending.value = false
                 }
             }
@@ -141,7 +142,7 @@ class DetailCardViewModel @Inject constructor(
             _isApiRequestPending.value = true
 
             viewModelScope.launch {
-                repositoryImpl.addStaff(
+                staffRepositoryImpl.addStaff(
                     StaffMember(
                         _idNumber.value,
                         _name.value,
@@ -153,7 +154,6 @@ class DetailCardViewModel @Inject constructor(
                     )
                 ).let {
                     _detailState.value = DetailState.SAVED
-                    _responseAPI.value = it
                     _isApiRequestPending.value = false
                 }
             }
@@ -167,10 +167,20 @@ class DetailCardViewModel @Inject constructor(
     fun deleteUser(idUser: String) {
         if (!_isApiRequestPending.value) {
             _isApiRequestPending.value = true
+
             viewModelScope.launch {
-                repositoryImpl.deleteStaffMember(idUser).let {
-                    _detailState.value = DetailState.SAVED
-                    _responseAPI.value = it
+                staffRepositoryImpl.deleteStaffMember(idUser).let {
+                    when(it){
+                        is APIResult.Success -> {
+                            _detailState.value = DetailState.SAVED
+                            Log.d("prueba", "success")
+                        }
+                        is APIResult.Error -> {
+                            _errorMessage.value =
+                                if(it.exception.message != null) "${it.exception.message}"
+                                else "Hubo un error"
+                        }
+                    }
                     _isApiRequestPending.value = false
                 }
             }
@@ -180,6 +190,10 @@ class DetailCardViewModel @Inject constructor(
     fun setRole(role: String){
         _role.value = role
         _saveEnable.value = validCredentials()
+    }
+
+    fun setIsChanged(isChanged: Boolean){
+        _isChanged.value = isChanged
     }
 
     fun setEditMode() {

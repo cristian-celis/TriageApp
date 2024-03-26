@@ -6,7 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.triagecol.domain.usecases.RepositoryImpl
+import com.example.triagecol.domain.usecases.StaffRepositoryImpl
 import com.example.triagecol.domain.models.dto.StaffDto
 import com.example.triagecol.domain.models.dto.StaffMemberDto
 import com.example.triagecol.domain.usecases.APIResult
@@ -18,10 +18,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AdminViewModel @Inject constructor(
-    private val repositoryImpl: RepositoryImpl
+    private val staffRepositoryImpl: StaffRepositoryImpl
 ) : ViewModel() {
 
-    var isGettingData by mutableStateOf(true)
+    var isFetchingStaff by mutableStateOf(true)
 
     private val _userList = MutableStateFlow<List<StaffMemberDto>>(StaffDto())
     val userList: StateFlow<List<StaffMemberDto>> = _userList
@@ -40,10 +40,10 @@ class AdminViewModel @Inject constructor(
     val clickOnAddButton: StateFlow<Boolean> = _clickOnAddButton
 
     fun getUserList() {
-        isGettingData = true
-        Log.d("prueba", "API CALL")
+        isFetchingStaff = true
+        Log.d("prueba", "Fetching staff")
         viewModelScope.launch {
-            when (val result = repositoryImpl.getStaff()) {
+            when (val result = staffRepositoryImpl.getStaff()) {
                 is APIResult.Success -> {
                     _apiResult.value = ""
                     _userList.value = result.data
@@ -51,7 +51,7 @@ class AdminViewModel @Inject constructor(
 
                 is APIResult.Error -> _apiResult.value = result.exception.message!!
             }
-            isGettingData = false
+            isFetchingStaff = false
         }
     }
 

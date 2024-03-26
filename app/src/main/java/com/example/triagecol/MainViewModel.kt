@@ -38,13 +38,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun setCurrentScreen(currentScreen: AppScreens){
-        Log.d("prueba", "Pantalla actual: ${currentScreen.route}")
-        _currentScreen.value = currentScreen
-    }
-
     fun writeSaveLogin(userPage: UserPage, newCurrentPage: AppScreens) {
-        Log.d("prueba", "Guardando sesion en ${newCurrentPage.route}")
         viewModelScope.launch {
             _currentScreen.value = newCurrentPage
             dataStoreImpl.writeSaveLogin(userPage)

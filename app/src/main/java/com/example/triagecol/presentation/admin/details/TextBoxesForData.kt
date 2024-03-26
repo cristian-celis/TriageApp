@@ -52,7 +52,7 @@ fun TextBoxesForData(modifier: Modifier = Modifier, detailCardViewModel: DetailC
                 )
             })
 
-        NameLabelTextField(modifier, "Numero de telefono")
+        NameLabelTextField(modifier, "Numero de Telefono")
         TextFieldComponent(
             placeHolderText = "Numero de Telefono",
             value = phoneNumber,
@@ -101,7 +101,7 @@ fun TextBoxesForData(modifier: Modifier = Modifier, detailCardViewModel: DetailC
 fun NameLabelTextField(modifier: Modifier = Modifier, nameLabel: String) {
     Text(
         text = nameLabel,
-        style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.W500),
+        style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.W500),
         modifier = modifier
             .fillMaxWidth()
             .padding(bottom = 5.dp, top = 10.dp),
@@ -127,8 +127,7 @@ fun ToggleOptionComponent(
             Row {
                 RadioButton(
                     selected = role == option,
-                    onClick = { detailCardViewModel.setRole(option) },
-                    enabled = !isTextFieldEnable
+                    onClick = { detailCardViewModel.setRole(option) }
                 )
                 Text(
                     text = option,

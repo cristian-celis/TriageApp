@@ -1,9 +1,10 @@
 package com.example.triagecol.di
 
 import android.content.Context
-import com.example.triagecol.presentation.admin.AdminViewModel
-import com.example.triagecol.domain.usecases.RepositoryImpl
+import com.example.triagecol.domain.usecases.StaffRepositoryImpl
 import com.example.triagecol.domain.datastore.DataStoreImpl
+import com.example.triagecol.domain.usecases.DoctorRepository
+import com.example.triagecol.domain.usecases.LoginRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -34,13 +35,19 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideRepositoryImpl(retrofit: Retrofit): RepositoryImpl {
-        return RepositoryImpl(retrofit)
+    fun provideStaffRepositoryImpl(retrofit: Retrofit): StaffRepositoryImpl {
+        return StaffRepositoryImpl(retrofit)
     }
 
     @Singleton
     @Provides
-    fun provideViewModel(dataStoreImpl: DataStoreImpl, repositoryImpl: RepositoryImpl): AdminViewModel {
-        return AdminViewModel(repositoryImpl)
+    fun providePatientRepository(retrofit: Retrofit): LoginRepository{
+        return LoginRepository(retrofit)
+    }
+
+    @Singleton
+    @Provides
+    fun provideDoctorRepository(retrofit: Retrofit): DoctorRepository{
+        return DoctorRepository(retrofit)
     }
 }

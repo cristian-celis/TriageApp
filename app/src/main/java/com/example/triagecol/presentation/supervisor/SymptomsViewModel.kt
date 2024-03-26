@@ -1,27 +1,18 @@
-package com.example.triagecol.presentation.user
+package com.example.triagecol.presentation.supervisor
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class UserViewModel @Inject constructor(): ViewModel() {
+class SymptomsViewModel @Inject constructor(): ViewModel() {
 
-    private val _name = MutableStateFlow<String>("")
-    val name: StateFlow<String> = _name
-
-    private val _lastname = MutableStateFlow<String>("")
-    val lastname: StateFlow<String> = _lastname
-
-    private val _documentType = MutableStateFlow<String>("")
-    val documentType: StateFlow<String> = _documentType
-
-    private val _idNumber = MutableStateFlow<String>("")
-    val idNumber: StateFlow<String> = _idNumber
+    private val _idPatient = MutableStateFlow("")
+    val idPatient: StateFlow<String> = _idPatient
 
     private val _chestPain = MutableStateFlow(false)
     val chestPain: StateFlow<Boolean> = _chestPain
@@ -41,21 +32,6 @@ class UserViewModel @Inject constructor(): ViewModel() {
     private val _sevTrauma = MutableStateFlow(false)
     val sevTrauma: StateFlow<Boolean> = _sevTrauma
 
-    private val _saveEnable = MutableLiveData<Boolean>()
-    val saveEnable: LiveData<Boolean> = _saveEnable
-
-    fun updateUserData(
-        name: String,
-        lastname: String,
-        documentType: String,
-        idNumber: String,
-    ) {
-        _name.value = name
-        _lastname.value = lastname
-        _documentType.value = documentType
-        _idNumber.value = idNumber
-    }
-
     fun updateSymptoms(
         chestPainValue: Boolean,
         breathingDifficultyValue: Boolean,
@@ -72,4 +48,13 @@ class UserViewModel @Inject constructor(): ViewModel() {
         _sevTrauma.value = severeTraumaValue
     }
 
+    fun sendSymptomsData(){
+        viewModelScope.launch {
+
+        }
+    }
+
+    fun setIdPatient(idPatient: String){
+        _idPatient.value = idPatient
+    }
 }

@@ -1,7 +1,7 @@
 package com.example.triagecol.domain.usecases
 
 import android.util.Log
-import com.example.triagecol.data.remote.APIService
+import com.example.triagecol.data.remote.APIServiceStaff
 import com.example.triagecol.domain.models.dto.StaffMember
 import com.example.triagecol.domain.models.dto.ApiResponse
 import com.example.triagecol.domain.models.dto.StaffDto
@@ -11,14 +11,14 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import javax.inject.Inject
 
-class RepositoryImpl @Inject constructor(
+class StaffRepositoryImpl @Inject constructor(
     private val retrofit: Retrofit
 ) {
 
     suspend fun getStaff(): APIResult<StaffDto> {
         return try {
             Log.d("prueba", "Obteniendo usuarios")
-            val call = retrofit.create(APIService::class.java).getStaff()
+            val call = retrofit.create(APIServiceStaff::class.java).getStaff()
             val userList = call.body()
             if (call.isSuccessful) {
                 APIResult.Success(userList!!)
@@ -35,7 +35,7 @@ class RepositoryImpl @Inject constructor(
             Log.d("prueba", "${user}")
             Log.d("prueba", "Agregando nuevo usuario")
             val response: Response<ApiResponse> =
-                retrofit.create(APIService::class.java).addStaff(user)
+                retrofit.create(APIServiceStaff::class.java).addStaff(user)
 
             if (response.isSuccessful) {
                 APIResult.Success(response.body())
@@ -51,7 +51,7 @@ class RepositoryImpl @Inject constructor(
 
     suspend fun editStaff(user: StaffMemberDto): APIResult<ApiResponse?> {
         return try {
-            val response: Response<ApiResponse> = retrofit.create(APIService::class.java)
+            val response: Response<ApiResponse> = retrofit.create(APIServiceStaff::class.java)
                 .editStaffMember(user.id.toString(), user.toStaffMember())
 
             if (response.isSuccessful && response.body() != null) {
@@ -66,16 +66,15 @@ class RepositoryImpl @Inject constructor(
 
     suspend fun deleteStaffMember(idUser: String): APIResult<ApiResponse?> {
         return try {
-            Log.d("prueba", "Eliminando usuario $idUser")
-            val response: Response<ApiResponse> = retrofit.create(APIService::class.java).deleteStaff(idUser)
-
+            Log.d("prueba", "Eliminando usuario Api $idUser")
+            val response: Response<ApiResponse> = retrofit.create(APIServiceStaff::class.java).deleteStaff(idUser)
             if (response.isSuccessful && response.body() != null) {
-                Log.d("prueba", "Usuario eliminado")
                 APIResult.Success(response.body())
             } else {
                 APIResult.Error(java.lang.Exception("No se elimino el usuario"))
             }
         } catch (e: Exception) {
+            Log.d("prueba", e.message!!)
             APIResult.Error(e)
         }
     }
