@@ -5,6 +5,8 @@ import com.example.triagecol.domain.usecases.StaffRepositoryImpl
 import com.example.triagecol.domain.datastore.DataStoreImpl
 import com.example.triagecol.domain.usecases.DoctorRepository
 import com.example.triagecol.domain.usecases.LoginRepository
+import com.example.triagecol.domain.usecases.PatientRepository
+import com.example.triagecol.utils.EndPointConstants
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,12 +20,10 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
-    private const val BASE_URL = "https://triage-api.onrender.com/"
-
     @Singleton
     @Provides
     fun provideRetrofit(): Retrofit {
-        return Retrofit.Builder().baseUrl(BASE_URL)
+        return Retrofit.Builder().baseUrl(EndPointConstants.BASE_URL)
             .addConverterFactory(GsonConverterFactory.create()).build()
     }
 
@@ -41,8 +41,8 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun providePatientRepository(retrofit: Retrofit): LoginRepository{
-        return LoginRepository(retrofit)
+    fun providePatientRepository(retrofit: Retrofit): PatientRepository{
+        return PatientRepository(retrofit)
     }
 
     @Singleton

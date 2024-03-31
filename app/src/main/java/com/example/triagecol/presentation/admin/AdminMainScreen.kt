@@ -34,16 +34,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.traigecol.R
 import com.example.triagecol.presentation.common.RefreshButton
 import com.example.triagecol.presentation.navigation.AppScreens
+import com.example.triagecol.utils.Constants
+import com.example.triagecol.utils.TextConstants
 
 @Composable
 fun AdminMainScreen(navController: NavController, adminViewModel: AdminViewModel) {
 
     val userList by adminViewModel.userList.collectAsState()
+    val fetchingData by adminViewModel.fetchingData.collectAsState()
+    val successCall by adminViewModel.successCall.collectAsState()
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -61,13 +64,12 @@ fun AdminMainScreen(navController: NavController, adminViewModel: AdminViewModel
                     painter = painterResource(id = R.drawable.ic_go_back),
                     contentDescription = null,
                     modifier = Modifier
-                        .clickable (
+                        .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
                             onClick = {
                                 navController.navigate(AppScreens.LoginScreen.route) {
                                     popUpTo(AppScreens.AdminScreen.route) { inclusive = true }
-                                    launchSingleTop = true
                                 }
                                 /*navController.popBackStack()
                                 navController.navigate(route = AppScreens.LoginScreen.route)*/
@@ -77,7 +79,7 @@ fun AdminMainScreen(navController: NavController, adminViewModel: AdminViewModel
 
                 Box {
                     Text(
-                        text = "Administrador",
+                        text = TextConstants.ADMIN_TITLE,
                         style = TextStyle(fontSize = 25.sp, fontWeight = FontWeight.Bold),
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth()
@@ -85,48 +87,50 @@ fun AdminMainScreen(navController: NavController, adminViewModel: AdminViewModel
                 }
             }
 
-            if (adminViewModel.isFetchingStaff) {
+            if (fetchingData) {
                 ShimmerEffect()
-            } else if (adminViewModel.apiResult.value.isNotBlank()) {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(text = adminViewModel.apiResult.value)
-                    RefreshButton(onRefresh = {
-                        adminViewModel.getUserList()
-                    })
-                }
+                adminViewModel.clearError()
+            } else if (!successCall) {
+                ErrorMessage(adminViewModel.error.value) { adminViewModel.getUserList() }
             } else {
-                //SearchBar()
-                if(userList.isEmpty()){
-                    Text(text = "No hay personal registrado.")
-                }
-
-                LazyColumn(modifier = Modifier.padding(7.dp)) {
-                    items(count = userList.size) {
-                        val user = userList[it]
-                        UserDataCard(
-                            medicalStaff = user,
-                            onClick = {
-                                adminViewModel.setUserDataDetails(user)
-                                adminViewModel.setClickOnAddButton(false)
-                                navController.navigate(AppScreens.DetailCard.route)
-                            })
-                        Spacer(modifier = Modifier.height(5.dp))
+                if (userList.isEmpty()) {
+                    Box (modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.8f)){
+                        Text(
+                            text = TextConstants.NO_STAFF_REGISTERED,
+                            modifier = Modifier.align(Alignment.Center),
+                            textAlign = TextAlign.Center,
+                            style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.W500)
+                        )
+                    }
+                } else {
+                    LazyColumn(modifier = Modifier.padding(7.dp)) {
+                        items(count = userList.size) {
+                            val user = userList[it]
+                            UserDataCard(
+                                medicalStaff = user,
+                                onClick = {
+                                    adminViewModel.setUserDataDetails(user)
+                                    adminViewModel.setClickOnAddButton(false)
+                                    navController.navigate(AppScreens.DetailCard.route)
+                                })
+                            Spacer(modifier = Modifier.height(5.dp))
+                        }
                     }
                 }
-                Box (modifier = Modifier
-                    .fillMaxHeight()
-                    .padding(top = 5.dp)){
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .padding(top = 5.dp)
+                ) {
                     AddStaff(
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
                             .padding(16.dp),
-                        adminViewModel,
-                        navController
-                    )
+                        { navController.navigate(AppScreens.DetailCard.route) }
+                    ){adminViewModel.setClickOnAddButton(true)}
                 }
                 Spacer(modifier = Modifier.height(50.dp))
             }
@@ -135,15 +139,33 @@ fun AdminMainScreen(navController: NavController, adminViewModel: AdminViewModel
 }
 
 @Composable
+fun ErrorMessage(error: String, onRefresh: () -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = error,
+            textAlign = TextAlign.Center,
+            style = TextStyle(color = Color(0xFF383838))
+        )
+        RefreshButton(onRefresh = {
+            onRefresh()
+        })
+    }
+}
+
+@Composable
 fun AddStaff(
     modifier: Modifier = Modifier,
-    adminViewModel: AdminViewModel,
-    navController: NavController
+    navigationOnAddClick: () -> Unit,
+    onAddClick: (Boolean) -> Unit
 ) {
     Button(
         onClick = {
-            adminViewModel.setClickOnAddButton(true)
-            navController.navigate(AppScreens.DetailCard.route)
+            onAddClick(true)
+            navigationOnAddClick()
         },
         modifier = modifier
             .fillMaxWidth()
@@ -155,7 +177,7 @@ fun AddStaff(
         ),
         shape = MaterialTheme.shapes.medium
     ) {
-        Text(text = "Agregar", style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold))
+        Text(text = TextConstants.ADD_TEXT, style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold))
     }
 }
 

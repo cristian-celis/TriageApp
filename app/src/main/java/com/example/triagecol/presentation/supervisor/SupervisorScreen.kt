@@ -1,8 +1,8 @@
 package com.example.triagecol.presentation.supervisor
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,9 +19,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
@@ -42,11 +43,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.traigecol.R
-import com.example.triagecol.presentation.admin.details.DetailCardViewModel
 import com.example.triagecol.presentation.common.TextFieldComponent
 import com.example.triagecol.presentation.navigation.AppScreens
+import com.example.triagecol.utils.SupervisorConstants
+import com.example.triagecol.utils.TextConstants
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SupervisorScreen(
     navController: NavController,
@@ -59,13 +60,12 @@ fun SupervisorScreen(
     val age by supervisorViewModel.age.collectAsState()
 
     val isValidData by supervisorViewModel.isDataValid.collectAsState()
-    val isSavingData by supervisorViewModel.isSavingData.collectAsState()
-    val saveEnable by supervisorViewModel.saveEnable.collectAsState()
+    val error by supervisorViewModel.error.collectAsState()
 
     val focusManager = LocalFocusManager.current
 
     if(isValidData){
-        navController.navigate(AppScreens.VitalSignsScreen.route)
+        navController.navigate(AppScreens.SymptomsScreen.route)
         supervisorViewModel.setValidData(false)
     }
 
@@ -102,87 +102,99 @@ fun SupervisorScreen(
                     .size(25.dp))
 
             Text(
-                text = "Paciente",
+                text = SupervisorConstants.PATIENT_TEXT,
                 style = TextStyle(fontSize = 25.sp, fontWeight = FontWeight.Bold),
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
         }
 
-        NameLabelTextField("Numero de Identificacion")
+        NameLabelTextField(SupervisorConstants.NAME)
         TextFieldComponent(
-            placeHolderText = "Numero de Identificacion", value = idNumber, isTextFieldEnable = false,
-            onTextFieldChanged = {
-                supervisorViewModel.updateUserData(
-                    it, name, lastname, age
-                )
-            })
-        NameLabelTextField("Nombre")
-        TextFieldComponent(
-            placeHolderText = "Nombre", value = name, isTextFieldEnable = false,
+            placeHolderText = SupervisorConstants.NAME, value = name, isTextFieldEnable = false,
             onTextFieldChanged = {
                 supervisorViewModel.updateUserData(
                     idNumber, it, lastname, age
                 )
             })
-        NameLabelTextField("Apellido")
+        NameLabelTextField(SupervisorConstants.LAST_NAME)
         TextFieldComponent(
-            placeHolderText = "Apellido", value = lastname, isTextFieldEnable = false,
+            placeHolderText = SupervisorConstants.LAST_NAME, value = lastname, isTextFieldEnable = false,
             onTextFieldChanged = {
                 supervisorViewModel.updateUserData(
                     idNumber, name, it, age
                 )
             })
-        NameLabelTextField("Edad")
+        NameLabelTextField(SupervisorConstants.ID_NUMBER)
         TextFieldComponent(
-            placeHolderText = "Edad",
+            placeHolderText = SupervisorConstants.ID_NUMBER, value = idNumber, isTextFieldEnable = false,
+            onTextFieldChanged = {
+                supervisorViewModel.updateUserData(
+                    it, name, lastname, age
+                )
+            })
+        NameLabelTextField(SupervisorConstants.AGE)
+        TextFieldComponent(
+            placeHolderText = SupervisorConstants.AGE,
             value = age,
             isTextFieldEnable = false,
             onTextFieldChanged = {
                 supervisorViewModel.updateUserData(idNumber, name, lastname, it)
             })
 
-        NameLabelTextField("Genero")
+        NameLabelTextField(SupervisorConstants.GENDER)
+
         SelectGender(supervisorViewModel = supervisorViewModel)
 
         VitalSigns(supervisorViewModel)
 
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .padding(10.dp)){
-            Button(
-                onClick = { supervisorViewModel.sendPatientData() },
+        ContinueButton(supervisorViewModel = supervisorViewModel)
+
+        if (!isValidData) {
+            Text(
+                text = supervisorViewModel.error.value,
+                style = TextStyle(
+                    fontSize = 16.sp,
+                    color = Color(0xFFFF0000)
+                ),
                 modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .height(55.dp).width(180.dp),
-                shape = ShapeDefaults.Medium,
-                enabled = saveEnable && !isSavingData,
-                colors = ButtonColors(
-                    containerColor = Color(0xFF1A80E5),
-                    disabledContainerColor = Color(0xFFAACBEB),
-                    contentColor = Color.White,
-                    disabledContentColor = Color.White
-                )
-            ) {
-                if(supervisorViewModel.isSavingData.value){
-                    ProgressIndicator()
-                }else{
-                    Text(text = "Continuar",
-                        style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.W500))
-                }
-            }
-            if (!isValidData) {
-                Text(
-                    text = supervisorViewModel.errorMessage.value,
-                    style = TextStyle(
-                        fontSize = 18.sp,
-                        color = Color(0xFFFF0000)
-                    ),
-                    modifier = Modifier.padding(20.dp).align(Alignment.CenterStart)
-                )
-            }
+                    .padding(10.dp),
+                textAlign = TextAlign.Center
+            )
         }
-        Spacer(modifier = Modifier.height(70.dp))
+
+        Spacer(modifier = Modifier.height(140.dp))
+    }
+}
+
+@Composable
+fun ContinueButton(supervisorViewModel: SupervisorViewModel) {
+
+    val isSavingData by supervisorViewModel.isSavingData.collectAsState()
+    val saveEnable by supervisorViewModel.saveEnable.collectAsState()
+    val focusManager = LocalFocusManager.current
+
+    Button(
+        onClick = {
+            focusManager.clearFocus()
+            supervisorViewModel.sendPatientData()
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(52.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color(0xFF1A80E5),
+            disabledContainerColor = Color(0xFFB8CBFA),
+            contentColor = Color.White,
+            disabledContentColor = Color.White
+        ),
+        enabled = saveEnable, shape = MaterialTheme.shapes.medium
+    ) {
+        if (isSavingData) ProgressIndicator()
+        else Text(
+            text = SupervisorConstants.CONTINUE_TEXT,
+            style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        )
     }
 }
 
@@ -199,7 +211,7 @@ fun NameLabelTextField(nameLabel: String) {
 }
 
 @Composable
-fun ProgressIndicator() {
+private fun ProgressIndicator() {
     CircularProgressIndicator(
         modifier = Modifier.size(23.dp),
         color = Color.White,
@@ -213,25 +225,25 @@ fun VitalSigns(supervisorViewModel: SupervisorViewModel) {
     val heartRate by supervisorViewModel.heartRate.collectAsState()
     val bloodOxygen by supervisorViewModel.bloodOxygen.collectAsState()
 
-    NameLabelTextField("Temperatura")
+    NameLabelTextField(SupervisorConstants.TEMPERATURE)
     TextFieldComponent(
-        placeHolderText = "Temperatura",
+        placeHolderText = SupervisorConstants.TEMPERATURE,
         value = temperature,
         isTextFieldEnable = false,
         onTextFieldChanged = {
             supervisorViewModel.updateVitalSigns(it, heartRate, bloodOxygen)
         })
-    NameLabelTextField("Frecuencia Cardiaca")
+    NameLabelTextField(SupervisorConstants.HEART_RATE)
     TextFieldComponent(
-        placeHolderText = "Frecuencia Cardiaca",
+        placeHolderText = SupervisorConstants.HEART_RATE,
         value = heartRate,
         isTextFieldEnable = false,
         onTextFieldChanged = {
             supervisorViewModel.updateVitalSigns(temperature, it, bloodOxygen)
         })
-    NameLabelTextField("Oxigenacion Sanguinea")
+    NameLabelTextField(SupervisorConstants.BLOOD_OXYGEN)
     TextFieldComponent(
-        placeHolderText = "Oxigenacion Sanguinea",
+        placeHolderText = SupervisorConstants.BLOOD_OXYGEN,
         value = bloodOxygen,
         isTextFieldEnable = false,
         onTextFieldChanged = {
@@ -243,13 +255,15 @@ fun VitalSigns(supervisorViewModel: SupervisorViewModel) {
 fun SelectGender(
     supervisorViewModel: SupervisorViewModel,
 ) {
-    val options = listOf("Femenino", "Masculino", "Otro")
+    val options = listOf(SupervisorConstants.FEMALE_TEXT,
+        SupervisorConstants.MALE_TEXT,
+        SupervisorConstants.OTHER_TEXT)
     val role: String by supervisorViewModel.gender.collectAsState()
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 10.dp, bottom = 7.dp), horizontalArrangement = Arrangement.Center
+            .padding(top = 10.dp, bottom = 7.dp), horizontalArrangement = Arrangement.SpaceBetween
     ) {
         options.forEach { option ->
             Row {

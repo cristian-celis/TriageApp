@@ -7,6 +7,7 @@ import com.example.triagecol.domain.models.dto.AddPatient
 import com.example.triagecol.domain.models.dto.StaffMemberDto
 import com.example.triagecol.domain.usecases.APIResult
 import com.example.triagecol.domain.usecases.PatientRepository
+import com.example.triagecol.utils.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -51,8 +52,8 @@ class SupervisorViewModel @Inject constructor(
     private val _isSavingData = MutableStateFlow(false)
     val isSavingData: StateFlow<Boolean> = _isSavingData
 
-    private val _errorMessage = MutableStateFlow("")
-    val errorMessage: StateFlow<String> = _errorMessage
+    private val _error = MutableStateFlow("")
+    val error: StateFlow<String> = _error
 
     private val _isValidData = MutableStateFlow(false)
     val isDataValid: StateFlow<Boolean> = _isValidData
@@ -90,17 +91,27 @@ class SupervisorViewModel @Inject constructor(
             _isSavingData.value = true
             val patient = AddPatient(
                 _idNumber.value, _name.value,
-                _lastname.value, _age.value, _gender.value)
+                _lastname.value, _age.value,
+                when(_gender.value){
+                    "Femenino" -> "female"
+                    "Masculino" -> "male"
+                    else -> "other"
+                })
             viewModelScope.launch {
                 patientRepository.savePatientData(patient).let {
                     when(it){
                         is APIResult.Success -> {
                             _isValidData.value = true
+                            _error.value = ""
                         }
                         is APIResult.Error -> {
-                            _errorMessage.value =
-                                if(it.exception.message != null) "${it.exception.message}"
-                                else "Hubo un error"
+                            _error.value =
+                                when(it.exception.message){
+                                    null -> Constants.NULL_ERROR
+                                    Constants.TIMEOUT -> Constants.TIMEOUT_ERROR
+                                    else -> "${it.exception.message}"
+                                }
+                            Log.d(Constants.TAG, _error.value)
                             _isValidData.value = false
                         }
                     }

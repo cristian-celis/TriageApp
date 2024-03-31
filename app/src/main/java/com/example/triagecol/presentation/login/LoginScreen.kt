@@ -30,12 +30,14 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.traigecol.R
 import com.example.triagecol.presentation.common.PasswordTextField
 import com.example.triagecol.presentation.common.TextFieldComponent
+import com.example.triagecol.utils.TextConstants
 
 @Composable
 fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel) {
@@ -51,7 +53,6 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel) {
     val focusManager = LocalFocusManager.current
 
     if (isValidCredentials) {
-        Log.d("prueba", "Credentials are valid")
         loginViewModel.onLoginChanged("","")
         loginViewModel.clearError()
         navController.navigate(loginViewModel.userLoggedIn.value.route)
@@ -85,7 +86,7 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel) {
 
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             Text(
-                text = "Bienvenido",
+                text = TextConstants.WELCOME,
                 style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 28.sp)
             )
         }
@@ -93,7 +94,7 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel) {
         Spacer(modifier = Modifier.size(14.dp))
 
         TextFieldComponent(
-            placeHolderText = "Usuario",
+            placeHolderText = TextConstants.USERNAME,
             value = user,
             isTextFieldEnable = false
         ) { loginViewModel.onLoginChanged(it, password) }
@@ -101,7 +102,7 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel) {
         Spacer(modifier = Modifier.size(8.dp))
 
         PasswordTextField(
-            placeHolderText = "Contraseña",
+            placeHolderText = TextConstants.PASSWORD,
             value = password,
             isEnable = true,
             onTextFieldChanged = { loginViewModel.onLoginChanged(user, it) })
@@ -117,12 +118,13 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel) {
 
         if (authenticatingCredentials || error.isNotEmpty()) {
             Text(
-                text = error.ifEmpty { "Validando..." },
+                text = error.ifEmpty { TextConstants.VALIDATING },
                 style = TextStyle(
-                    fontSize = 18.sp,
+                    fontSize = 16.sp,
                     color = if(error.isEmpty()) Color(0xFF383838) else Color(0xFFFF0000)
                 ),
-                modifier = Modifier.padding(20.dp)
+                modifier = Modifier.padding(10.dp),
+                textAlign = TextAlign.Center
             )
         }
     }
@@ -140,7 +142,6 @@ fun LoginButton(
     Button(
         onClick = {
             focusManager.clearFocus()
-            //loginViewModel.validStaffLogin()
             loginViewModel.login()
         },
         modifier = Modifier
@@ -156,14 +157,14 @@ fun LoginButton(
     ) {
         if (authenticatingCredentials) ProgressIndicator()
         else Text(
-            text = "Iniciar sesión",
+            text = TextConstants.LOGIN,
             style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold)
         )
     }
 }
 
 @Composable
-fun ProgressIndicator() {
+private fun ProgressIndicator() {
     CircularProgressIndicator(
         modifier = Modifier.size(23.dp),
         color = Color.White,

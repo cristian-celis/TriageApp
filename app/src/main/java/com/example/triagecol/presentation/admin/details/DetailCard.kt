@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,10 +23,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -43,11 +40,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.traigecol.R
 import com.example.triagecol.presentation.navigation.AppScreens
+import com.example.triagecol.utils.TextConstants
 
 @Composable
 fun DetailCard(
@@ -56,30 +52,29 @@ fun DetailCard(
 ) {
 
     val saveEnable: Boolean by detailCardViewModel.saveEnable.collectAsState()
-    val detailState: DetailState by detailCardViewModel.detailState.collectAsState()
     val isLoading: Boolean by detailCardViewModel.isApiRequestPending.collectAsState()
+    val successCall: Boolean by detailCardViewModel.successCall.collectAsState()
 
     val focusManager = LocalFocusManager.current
 
-    var screenTitle by rememberSaveable { mutableStateOf("Agregar Personal") }
+    var screenTitle by rememberSaveable { mutableStateOf(TextConstants.ADD_STAFF_TITLE) }
 
-    if (detailCardViewModel.detailMode.value == DetailMode.NONE) {
-        if (detailCardViewModel.userData.value.id != 0) {
-            screenTitle = "Editar Personal"
+    if (detailCardViewModel.detailMode.value == DetailMode.ENTERING) {
+        screenTitle = if (detailCardViewModel.userData.value.id != 0) {
             detailCardViewModel.setEditMode()
+            TextConstants.EDIT_STAFF_TITLE
         } else {
             detailCardViewModel.setAddMode()
-            screenTitle = "Agregar Personal"
+            TextConstants.ADD_STAFF_TITLE
         }
-        detailCardViewModel.setDetailMode(DetailMode.SOME)
+        detailCardViewModel.setDetailMode(DetailMode.ENTERED)
     }
 
-    if (detailState == DetailState.SAVED) {
-        detailCardViewModel.setIsChanged(true)
+    if (successCall) {
         detailCardViewModel.setDetailState(DetailState.ENTERING)
-        detailCardViewModel.setDetailMode(DetailMode.NONE)
+        detailCardViewModel.setDetailMode(DetailMode.ENTERING)
+        detailCardViewModel.resetData()
         navController.popBackStack()
-        //navController.navigate(AppScreens.AdminScreen.route)
     }
 
     Column(
@@ -106,8 +101,8 @@ fun DetailCard(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null,
                         onClick = {
-                            detailCardViewModel.setDetailMode(DetailMode.NONE)
-                            navController.navigate(route = AppScreens.AdminScreen.route)
+                            detailCardViewModel.setDetailMode(DetailMode.ENTERING)
+                            navController.popBackStack()
                         })
                     .size(25.dp)
             )
@@ -127,6 +122,17 @@ fun DetailCard(
         if (isLoading) {
             ProgressIndicator()
         } else {
+            if(!successCall){
+                Text(
+                    text = detailCardViewModel.error.value,
+                    style = TextStyle(
+                        fontSize = 16.sp,
+                        color = Color(0xFFAF1717)
+                    ),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(10.dp)
+                )
+            }
             SaveUserButton(loginEnable = saveEnable, detailCardViewModel)
             if (detailCardViewModel.editMode.value) {
                 DeleteUserButton(detailCardViewModel, detailCardViewModel.userData.value.id)
@@ -152,12 +158,12 @@ fun DeleteUserButton(
             .padding(15.dp)
             .height(48.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFFEE1D1D)
+            containerColor = Color(0xFFFF3939)
         ),
         shape = MaterialTheme.shapes.medium
     ) {
         Text(
-            text = "Eliminar", style = TextStyle(color = Color.White, fontWeight = FontWeight.Bold)
+            text = TextConstants.DELETE_TEXT, style = TextStyle(color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
         )
     }
 
@@ -167,19 +173,19 @@ fun DeleteUserButton(
             confirmButton = {
                 Button(onClick = {
                     detailCardViewModel.deleteUser(idUser.toString())
-                    detailCardViewModel.setDetailMode(DetailMode.NONE)
+                    detailCardViewModel.setDetailMode(DetailMode.ENTERING)
                 }) {
                     Text(
-                        text = "Sí"
+                        text = TextConstants.YES_TEXT
                     )
                 }
             },
             title = {
                 Text(
-                    text = "Eliminar"
+                    text = TextConstants.DELETE_TEXT
                 )
             },
-            text = { Text(text = "¿Estas seguro que desea eliminar al usuario?") })
+            text = { Text(text = TextConstants.CONFIRM_DELETE_USER) })
     }
 }
 
@@ -202,12 +208,12 @@ fun SaveUserButton(
         ), enabled = loginEnable,
         shape = MaterialTheme.shapes.medium
     ) {
-        Text(text = "Guardar")
+        Text(text = TextConstants.SAVE_TEXT, style = TextStyle(fontSize = 18.sp))
     }
 }
 
 @Composable
-fun ProgressIndicator() {
+private fun ProgressIndicator() {
     CircularProgressIndicator(
         modifier = Modifier
             .size(75.dp)

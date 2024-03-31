@@ -35,6 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.traigecol.R
 import com.example.triagecol.presentation.admin.details.DetailCardViewModel
+import com.example.triagecol.utils.SupervisorConstants
+import com.example.triagecol.utils.TextConstants
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -78,8 +80,14 @@ fun TextFieldComponent(
 }
 
 private fun keyboardSelected(boxName: String): KeyboardOptions{
-    return if (boxName.equals("Numero de Identificacion", ignoreCase = true) || boxName.equals("Numero de telefono", ignoreCase = true))
+    return if (boxName.equals(SupervisorConstants.ID_NUMBER, ignoreCase = true)
+        || boxName.equals(TextConstants.PHONE_NUMBER, ignoreCase = true)
+        || boxName.equals(SupervisorConstants.AGE, ignoreCase = true)
+        || boxName.equals(SupervisorConstants.TEMPERATURE, ignoreCase = true)
+        || boxName.equals(SupervisorConstants.HEART_RATE, ignoreCase = true))
         KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next)
+    else if(boxName.equals(SupervisorConstants.BLOOD_OXYGEN, ignoreCase = true))
+        KeyboardOptions(keyboardType = KeyboardType.Number)
     else KeyboardOptions(imeAction = ImeAction.Next)
 }
 

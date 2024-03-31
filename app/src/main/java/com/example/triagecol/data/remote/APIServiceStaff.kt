@@ -9,6 +9,7 @@ import com.example.triagecol.domain.models.dto.PatientsDto
 import com.example.triagecol.domain.models.dto.StaffDto
 import com.example.triagecol.domain.models.dto.StaffMemberDto
 import com.example.triagecol.domain.models.dto.SymptomsPatientDto
+import com.example.triagecol.utils.EndPointConstants
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -21,19 +22,19 @@ interface APIServiceStaff {
 
     // STAFF MEDICAL METHODS
 
-    @GET("staff/")
+    @GET(EndPointConstants.GET_STAFF)
     suspend fun getStaff(): Response<StaffDto>
 
-    @POST("addStaff/")
+    @POST(EndPointConstants.ADD_STAFF)
     suspend fun addStaff(@Body user: StaffMember): Response<ApiResponse>
 
-    @GET("getStaffMember/")
+    @GET(EndPointConstants.GET_STAFF_MEMBER)
     suspend fun getStaffMember(@Body id: String): Response<PatientDto>
 
-    @POST("editStaffMember/{id_staff}")
+    @POST(EndPointConstants.EDIT_STAFF_MEMBER)
     suspend fun editStaffMember(@Path("id_staff") id: String, @Body user: StaffMember): Response<ApiResponse>
 
-    @DELETE("deleteStaffMember/{id_staff}")
+    @DELETE(EndPointConstants.DELETE_STAFF_MEMBER)
     suspend fun deleteStaff(@Path("id_staff") id: String): Response<ApiResponse>
 
     /*

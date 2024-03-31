@@ -4,10 +4,10 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.triagecol.domain.usecases.StaffRepositoryImpl
-import com.example.triagecol.domain.models.dto.ApiResponse
 import com.example.triagecol.domain.models.dto.StaffMember
 import com.example.triagecol.domain.models.dto.StaffMemberDto
 import com.example.triagecol.domain.usecases.APIResult
+import com.example.triagecol.utils.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -46,7 +46,7 @@ class DetailCardViewModel @Inject constructor(
     private val _addMode = MutableStateFlow(true)
     val addMode: StateFlow<Boolean> = _addMode
 
-    private val _detailMode = MutableStateFlow<DetailMode>(DetailMode.NONE)
+    private val _detailMode = MutableStateFlow<DetailMode>(DetailMode.ENTERING)
     val detailMode: StateFlow<DetailMode> = _detailMode
 
     private val _userData =
@@ -56,14 +56,14 @@ class DetailCardViewModel @Inject constructor(
     private val _detailState = MutableStateFlow(DetailState.ENTERING)
     val detailState: StateFlow<DetailState> = _detailState
 
-    private val _isChanged = MutableStateFlow(false)
-    val isChanged: StateFlow<Boolean> = _isChanged
-
     private val _isApiRequestPending = MutableStateFlow(false)
     val isApiRequestPending: StateFlow<Boolean> = _isApiRequestPending
 
-    private val _errorMessage = MutableStateFlow("")
-    val errorMessage: StateFlow<String> = _errorMessage
+    private val _error = MutableStateFlow("")
+    val error: StateFlow<String> = _error
+
+    private val _successCall = MutableStateFlow(false)
+    val successCall: StateFlow<Boolean> = _successCall
 
     fun onUserDataChanged(
         idNumber: String,
@@ -81,15 +81,15 @@ class DetailCardViewModel @Inject constructor(
     }
 
     fun setUserData(userData: StaffMemberDto) {
-        Log.d("prueba", "Llega: $userData")
         _name.value = userData.name
         _lastname.value = userData.lastname
         _idNumber.value = userData.idNumber
         _phoneNumber.value = userData.phoneNumber
+        _password.value = ""
         _role.value = userData.role
         _userData.value = userData
 
-        _detailMode.value = DetailMode.NONE
+        _detailMode.value = DetailMode.ENTERING
     }
 
     private fun validDataHasChanged(): Boolean {
@@ -119,22 +119,41 @@ class DetailCardViewModel @Inject constructor(
             _isApiRequestPending.value = true
             viewModelScope.launch {
                 staffRepositoryImpl.editStaff(
-                    StaffMemberDto(
-                        _userData.value.id,
-                        _idNumber.value,
-                        _name.value,
-                        _lastname.value,
-                        _idNumber.value,
-                        _password.value,
-                        _phoneNumber.value,
-                        _role.value
-                    )
+                    staffMemberObj(),
+                    _userData.value.id
                 ).let {
-                    _detailState.value = DetailState.SAVED
-                    _isApiRequestPending.value = false
+                    when (it) {
+                        is APIResult.Success -> {
+                            _detailState.value = DetailState.SAVED
+                            _successCall.value = true
+                        }
+
+                        is APIResult.Error -> {
+                            _successCall.value = false
+                            _error.value =
+                                when (it.exception.message) {
+                                    null -> Constants.NULL_ERROR
+                                    Constants.TIMEOUT -> Constants.TIMEOUT_ERROR
+                                    else -> "${it.exception.message}"
+                                }
+                        }
+                    }
                 }
+                _isApiRequestPending.value = false
             }
         }
+    }
+
+    private fun staffMemberObj(): StaffMember{
+        return StaffMember(
+            _idNumber.value,
+            _name.value,
+            _lastname.value,
+            _idNumber.value,
+            _password.value,
+            _phoneNumber.value,
+            _role.value
+        )
     }
 
     fun addUser() {
@@ -143,19 +162,26 @@ class DetailCardViewModel @Inject constructor(
 
             viewModelScope.launch {
                 staffRepositoryImpl.addStaff(
-                    StaffMember(
-                        _idNumber.value,
-                        _name.value,
-                        _lastname.value,
-                        _idNumber.value,
-                        _password.value,
-                        _phoneNumber.value,
-                        _role.value
-                    )
+                    staffMemberObj()
                 ).let {
-                    _detailState.value = DetailState.SAVED
-                    _isApiRequestPending.value = false
+                    when (it) {
+                        is APIResult.Success -> {
+                            _successCall.value = true
+                            _detailState.value = DetailState.SAVED
+                        }
+
+                        is APIResult.Error -> {
+                            _successCall.value = false
+                            _error.value =
+                                when (it.exception.message) {
+                                    null -> Constants.NULL_ERROR
+                                    Constants.TIMEOUT -> Constants.TIMEOUT_ERROR
+                                    else -> "${it.exception.message}"
+                                }
+                        }
+                    }
                 }
+                _isApiRequestPending.value = false
             }
         }
     }
@@ -170,15 +196,19 @@ class DetailCardViewModel @Inject constructor(
 
             viewModelScope.launch {
                 staffRepositoryImpl.deleteStaffMember(idUser).let {
-                    when(it){
+                    when (it) {
                         is APIResult.Success -> {
-                            _detailState.value = DetailState.SAVED
-                            Log.d("prueba", "success")
+                            _successCall.value = true
                         }
+
                         is APIResult.Error -> {
-                            _errorMessage.value =
-                                if(it.exception.message != null) "${it.exception.message}"
-                                else "Hubo un error"
+                            _successCall.value = false
+                            _error.value =
+                                when (it.exception.message) {
+                                    null -> Constants.NULL_ERROR
+                                    Constants.TIMEOUT -> Constants.TIMEOUT_ERROR
+                                    else -> "${it.exception.message}"
+                                }
                         }
                     }
                     _isApiRequestPending.value = false
@@ -187,13 +217,9 @@ class DetailCardViewModel @Inject constructor(
         }
     }
 
-    fun setRole(role: String){
+    fun setRole(role: String) {
         _role.value = role
         _saveEnable.value = validCredentials()
-    }
-
-    fun setIsChanged(isChanged: Boolean){
-        _isChanged.value = isChanged
     }
 
     fun setEditMode() {
@@ -210,7 +236,9 @@ class DetailCardViewModel @Inject constructor(
         _detailMode.value = detailMode
     }
 
-    fun clearBoxes(){
+    fun resetData() {
         setUserData(StaffMemberDto(0, "", "", "", "Medico", "", "", ""))
+        _successCall.value = false
+        _error.value = ""
     }
 }

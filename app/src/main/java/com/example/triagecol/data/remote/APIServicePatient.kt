@@ -4,6 +4,7 @@ import com.example.triagecol.domain.models.PatientSymptomsModel
 import com.example.triagecol.domain.models.PatientVitalSigns
 import com.example.triagecol.domain.models.dto.AddPatient
 import com.example.triagecol.domain.models.dto.ApiResponse
+import com.example.triagecol.utils.EndPointConstants
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -15,24 +16,24 @@ interface APIServicePatient {
 
     // PATIENT METHODS
 
-    @POST("assignPatient/")
+    @POST(EndPointConstants.ASSIGN_PATIENT)
     suspend fun assignPatient(): Response<ApiResponse>
 
-    @POST("addPatientSymptoms/")
+    @POST(EndPointConstants.ADD_PATIENT_SYMPTOMS)
     suspend fun addPatientSymptoms(@Body patientSymptomsModel: PatientSymptomsModel): Response<ApiResponse>
 
-    @POST("addVitalSigns")
+    @POST(EndPointConstants.ADD_VITAL_SIGNS)
     suspend fun addVitalSigns(@Body patientVitalSigns: PatientVitalSigns): Response<ApiResponse>
 
-    @PATCH("updatePatientStatus/")
+    @PATCH(EndPointConstants.UPDATE_PATIENT_STATUS)
     suspend fun updatePatientStatus(@Body id: String, @Body status: String): Response<ApiResponse>
 
-    @POST("addPatient/")
+    @POST(EndPointConstants.ADD_PATIENT)
     suspend fun addPatient(@Body patient: AddPatient): Response<ApiResponse>
 
-    @POST("editPatient/{id}")
+    @POST(EndPointConstants.EDIT_PATIENT)
     suspend fun editPatient(@Path("id") id: String, @Body patient: AddPatient): Response<ApiResponse>
 
-    @DELETE("deletePatient/")
+    @DELETE(EndPointConstants.DELETE_PATIENT)
     suspend fun deletePatient(@Path("id") id: String): Response<ApiResponse>
 }

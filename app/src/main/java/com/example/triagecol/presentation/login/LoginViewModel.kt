@@ -11,6 +11,7 @@ import com.example.triagecol.domain.models.dto.toStaffMemberDto
 import com.example.triagecol.domain.usecases.APIResult
 import com.example.triagecol.domain.usecases.LoginRepository
 import com.example.triagecol.presentation.navigation.AppScreens
+import com.example.triagecol.utils.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -55,98 +56,41 @@ class LoginViewModel @Inject constructor(
     private fun validCredentials(user: String, password: String): Boolean =
         user.isNotBlank() && password.isNotBlank()
 
-    fun validStaffLogin() {
-        Log.d("prueba", "Valid")
+    fun login() {
         _authenticatingCredentials.value = true
         viewModelScope.launch {
-            loginRepository.staffLogin(LoginModel(_user.value!!, _password.value!!)).let {
+            loginRepository.login(LoginModel(_user.value!!, _password.value!!)).let {
                 when (it) {
                     is APIResult.Success -> {
-                        Log.d("prueba", "Datos obtenidos. ${it.data}")
-                        _userData.value = it.data
-                        _error.value = ""
-                        _isValidCredentials.value = true
                         _userLoggedIn.value =
-                            when (it.data.role) {
-                                "Supervisor" -> AppScreens.SupervisorScreen
-                                "Doctor" -> AppScreens.DoctorScreen
+                            when (it.data.accountType) {
+                                1 -> {
+                                    _userData.value = it.data.user.toStaffMemberDto()
+                                    when (it.data.user.role) {
+                                        Constants.SUPERVISOR -> AppScreens.SupervisorScreen
+                                        Constants.DOCTOR -> AppScreens.DoctorScreen
+                                        else -> AppScreens.LoginScreen
+                                    }
+                                }
+
+                                2 -> AppScreens.AdminScreen
                                 else -> AppScreens.LoginScreen
                             }
+                        _isValidCredentials.value = true
                     }
 
                     is APIResult.Error -> {
                         _error.value =
-                            when (it.exception.message){
-                                null -> "Hubo un error."
-                                "timeout" -> "Error de Conexion, intentalo de nuevo."
+                            when (it.exception.message) {
+                                null -> Constants.NULL_ERROR
+                                Constants.TIMEOUT -> Constants.TIMEOUT_ERROR
                                 else -> "${it.exception.message}"
                             }
                         _isValidCredentials.value = false
                     }
                 }
-                _authenticatingCredentials.value = false
             }
-        }
-    }
-
-    fun login() {
-        Log.d("prueba", "LoginViewModel Login")
-        _authenticatingCredentials.value = true
-        if (_user.value != null && _password.value != null) {
-            viewModelScope.launch {
-                loginRepository.login(LoginModel(_user.value!!, _password.value!!)).let {
-                    when (it) {
-                        is APIResult.Success -> {
-                            _userLoggedIn.value =
-                                when (it.data.accountType) {
-                                    1 -> {
-                                        _userData.value = it.data.user.toStaffMemberDto()
-                                        when (it.data.user.role) {
-                                            "Supervisor" -> AppScreens.SupervisorScreen
-                                            "Doctor" -> AppScreens.DoctorScreen
-                                            else -> AppScreens.LoginScreen
-                                        }
-                                    }
-
-                                    2 -> AppScreens.AdminScreen
-                                    else -> AppScreens.LoginScreen
-                                }
-                            _isValidCredentials.value = true
-                        }
-
-                        is APIResult.Error -> {
-                            _error.value =
-                                if (it.exception.message != null) "${it.exception.message}" else "Hubo un error."
-                            _isValidCredentials.value = false
-                        }
-                    }
-                    _authenticatingCredentials.value = false
-                }
-            }
-        } else {
-            _error.value = "Debe rellenar el usuario y la contraseña."
-        }
-    }
-
-    fun validAdminLogin() {
-        Log.d("prueba", "ValidAdmin")
-        _authenticatingCredentials.value = true
-        viewModelScope.launch {
-            loginRepository.adminLogin(LoginModel(_user.value!!, _password.value!!)).let {
-                when (it) {
-                    is APIResult.Success -> {
-                        Log.d("prueba", "Cuenta administrador permitida")
-                        _isValidCredentials.value = true
-                        _userLoggedIn.value = AppScreens.AdminScreen
-                    }
-
-                    is APIResult.Error -> {
-                        Log.d("prueba", "Error validacion admin: ${it.exception.message}")
-                        _isValidCredentials.value = false
-                    }
-                }
-                _authenticatingCredentials.value = false
-            }
+            _authenticatingCredentials.value = false
         }
     }
 
@@ -155,7 +99,7 @@ class LoginViewModel @Inject constructor(
         _userLoggedIn.value = AppScreens.LoginScreen
     }
 
-    fun clearError(){
+    fun clearError() {
         _error.value = ""
     }
 }

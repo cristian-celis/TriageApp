@@ -22,6 +22,9 @@ import androidx.compose.ui.unit.sp
 import com.example.traigecol.R
 import com.example.triagecol.presentation.common.PasswordTextField
 import com.example.triagecol.presentation.common.TextFieldComponent
+import com.example.triagecol.utils.Constants
+import com.example.triagecol.utils.SupervisorConstants
+import com.example.triagecol.utils.TextConstants
 
 @Composable
 fun TextBoxesForData(modifier: Modifier = Modifier, detailCardViewModel: DetailCardViewModel) {
@@ -34,27 +37,27 @@ fun TextBoxesForData(modifier: Modifier = Modifier, detailCardViewModel: DetailC
     val isTextFieldEnable: Boolean by detailCardViewModel.isApiRequestPending.collectAsState()
 
     Column(modifier = modifier.padding(start = 16.dp, end = 16.dp)) {
-        NameLabelTextField(modifier, "Nombre")
+        NameLabelTextField(modifier, SupervisorConstants.NAME)
         TextFieldComponent(
-            placeHolderText = "Nombre", value = name, isTextFieldEnable = isTextFieldEnable,
+            placeHolderText = SupervisorConstants.NAME, value = name, isTextFieldEnable = isTextFieldEnable,
             onTextFieldChanged = {
                 detailCardViewModel.onUserDataChanged(
                     idNumber, it, lastname, password, phoneNumber
                 )
             })
 
-        NameLabelTextField(modifier, "Apellido")
+        NameLabelTextField(modifier, SupervisorConstants.LAST_NAME)
         TextFieldComponent(
-            placeHolderText = "Apellido", value = lastname, isTextFieldEnable = isTextFieldEnable,
+            placeHolderText = SupervisorConstants.LAST_NAME, value = lastname, isTextFieldEnable = isTextFieldEnable,
             onTextFieldChanged = {
                 detailCardViewModel.onUserDataChanged(
                     idNumber, name, it, password, phoneNumber
                 )
             })
 
-        NameLabelTextField(modifier, "Numero de Telefono")
+        NameLabelTextField(modifier, TextConstants.PHONE_NUMBER)
         TextFieldComponent(
-            placeHolderText = "Numero de Telefono",
+            placeHolderText = TextConstants.PHONE_NUMBER,
             value = phoneNumber,
             isTextFieldEnable = isTextFieldEnable,
             onTextFieldChanged = {
@@ -63,9 +66,9 @@ fun TextBoxesForData(modifier: Modifier = Modifier, detailCardViewModel: DetailC
                 )
             })
 
-        NameLabelTextField(modifier, "Numero de Identificacion")
+        NameLabelTextField(modifier, SupervisorConstants.ID_NUMBER)
         TextFieldComponent(
-            placeHolderText = "Numero de Identificacion",
+            placeHolderText = SupervisorConstants.ID_NUMBER,
             value = idNumber,
             isTextFieldEnable = isTextFieldEnable,
             onTextFieldChanged = {
@@ -74,7 +77,7 @@ fun TextBoxesForData(modifier: Modifier = Modifier, detailCardViewModel: DetailC
                 )
             })
 
-        NameLabelTextField(modifier, "Usuario")
+        NameLabelTextField(modifier, TextConstants.USERNAME)
         Text(
             text = idNumber,
             style = MaterialTheme.typography.bodyLarge,
@@ -82,9 +85,9 @@ fun TextBoxesForData(modifier: Modifier = Modifier, detailCardViewModel: DetailC
             modifier = Modifier.fillMaxWidth().padding(10.dp)
         )
 
-        NameLabelTextField(modifier, "Contraseña")
+        NameLabelTextField(modifier, TextConstants.PASSWORD)
         PasswordTextField(
-            placeHolderText = "Contraseña",
+            placeHolderText = TextConstants.PASSWORD,
             value = password,
             isEnable = !isTextFieldEnable,
             onTextFieldChanged = {
@@ -115,7 +118,7 @@ fun ToggleOptionComponent(
     modifier: Modifier = Modifier,
     isTextFieldEnable: Boolean
 ) {
-    val options = listOf("Doctor", "Supervisor")
+    val options = listOf(Constants.DOCTOR, Constants.SUPERVISOR)
     val role: String by detailCardViewModel.role.collectAsState()
 
     Row(
