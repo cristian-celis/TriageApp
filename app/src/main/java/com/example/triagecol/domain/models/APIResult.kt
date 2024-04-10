@@ -1,4 +1,4 @@
-package com.example.triagecol.domain.usecases
+package com.example.triagecol.domain.models
 
 import java.lang.Exception
 

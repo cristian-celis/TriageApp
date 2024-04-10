@@ -5,10 +5,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -111,15 +115,10 @@ fun PasswordTextField(
             visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             trailingIcon = {
-                val image =
-                    if (!passwordVisibility) R.drawable.visibility else R.drawable.visibility_off
-
-                IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
-                    Icon(
-                        painter = painterResource(id = image),
+                IconToggleButton(checked = passwordVisibility, onCheckedChange = {passwordVisibility = it}) {
+                    Icon(imageVector = Icons.Default.Visibility,
                         contentDescription = null,
-                        tint = Color.Gray
-                    )
+                        modifier = Modifier.size(37.dp))
                 }
             },
             shape = MaterialTheme.shapes.medium,

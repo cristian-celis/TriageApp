@@ -2,7 +2,7 @@ package com.example.triagecol.presentation.supervisor
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.triagecol.domain.usecases.APIResult
+import com.example.triagecol.domain.models.APIResult
 import com.example.triagecol.domain.usecases.PatientRepository
 import com.example.triagecol.utils.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -45,6 +45,9 @@ class SymptomsViewModel @Inject constructor(
 
     private val _error = MutableStateFlow("")
     val error: StateFlow<String> = _error
+
+    private val _isDialogShown = MutableStateFlow(false)
+    val isDialogShown: StateFlow<Boolean> = _isDialogShown
 
     fun updateSymptoms(
         chestPainValue: Boolean,
@@ -98,7 +101,23 @@ class SymptomsViewModel @Inject constructor(
         }
     }
 
+    fun resetData(){
+        _successCall.value = false
+        _error.value = ""
+
+        _chestPain.value = false
+        _breathingDiff.value = false
+        _consciousnessAlt.value = false
+        _suddenWeakness.value = false
+        _sevAbdPain.value = false
+        _sevTrauma.value = false
+    }
+
     fun setIdNumberPat(idNumberPat: String){
         _idNumberPat.value = idNumberPat
+    }
+
+    fun setIsDialogShown(isDialogShown: Boolean){
+        _isDialogShown.value = isDialogShown
     }
 }

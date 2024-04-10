@@ -24,4 +24,5 @@ object SupervisorConstants {
     const val SEV_TRAUMA = "Traumas severos"
     const val GO_BACK_TEXT = "Volver"
     const val SEND_TEXT = "Enviar"
+    const val CANCEL_TEXT = "Cancelar"
 }

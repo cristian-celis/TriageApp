@@ -2,6 +2,7 @@ package com.example.triagecol.presentation.admin
 
 import ArticleCardShimmerEffect
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -75,7 +77,9 @@ fun AdminMainScreen(navController: NavController, adminViewModel: AdminViewModel
                                 navController.navigate(route = AppScreens.LoginScreen.route)*/
                             }
                         )
-                        .size(25.dp))
+                        .size(34.dp)
+                        .background(color = Color(0xA3FF0000), shape = CircleShape),
+                    tint = Color.White)
 
                 Box {
                     Text(
@@ -148,7 +152,11 @@ fun ErrorMessage(error: String, onRefresh: () -> Unit) {
         Text(
             text = error,
             textAlign = TextAlign.Center,
-            style = TextStyle(color = Color(0xFF383838))
+            style = TextStyle(
+                color = Color(0xFF383838),
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp),
+            modifier = Modifier.padding(10.dp)
         )
         RefreshButton(onRefresh = {
             onRefresh()

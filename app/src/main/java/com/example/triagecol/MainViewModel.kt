@@ -11,6 +11,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.triagecol.domain.UserPage
 import com.example.triagecol.domain.datastore.DataStoreImpl
+import com.example.triagecol.domain.usecases.MainRepository
 import com.example.triagecol.presentation.navigation.AppScreens
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +22,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val dataStoreImpl: DataStoreImpl
+    private val dataStoreImpl: DataStoreImpl,
+    private val mainRepository: MainRepository
 ) : ViewModel() {
 
     private val _savedLogin = MutableStateFlow<String?>(null)
@@ -42,6 +44,12 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             _currentScreen.value = newCurrentPage
             dataStoreImpl.writeSaveLogin(userPage)
+        }
+    }
+
+    fun initBack(){
+        viewModelScope.launch {
+            mainRepository.initBack()
         }
     }
 }

@@ -25,9 +25,6 @@ interface APIServicePatient {
     @POST(EndPointConstants.ADD_VITAL_SIGNS)
     suspend fun addVitalSigns(@Body patientVitalSigns: PatientVitalSigns): Response<ApiResponse>
 
-    @PATCH(EndPointConstants.UPDATE_PATIENT_STATUS)
-    suspend fun updatePatientStatus(@Body id: String, @Body status: String): Response<ApiResponse>
-
     @POST(EndPointConstants.ADD_PATIENT)
     suspend fun addPatient(@Body patient: AddPatient): Response<ApiResponse>
 

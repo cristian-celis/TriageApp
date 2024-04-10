@@ -5,6 +5,7 @@ import com.example.triagecol.domain.usecases.StaffRepositoryImpl
 import com.example.triagecol.domain.datastore.DataStoreImpl
 import com.example.triagecol.domain.usecases.DoctorRepository
 import com.example.triagecol.domain.usecases.LoginRepository
+import com.example.triagecol.domain.usecases.MainRepository
 import com.example.triagecol.domain.usecases.PatientRepository
 import com.example.triagecol.utils.EndPointConstants
 import dagger.Module
@@ -25,6 +26,12 @@ object AppModule {
     fun provideRetrofit(): Retrofit {
         return Retrofit.Builder().baseUrl(EndPointConstants.BASE_URL)
             .addConverterFactory(GsonConverterFactory.create()).build()
+    }
+
+    @Singleton
+    @Provides
+    fun provideMainRepository(retrofit: Retrofit): MainRepository{
+        return MainRepository(retrofit)
     }
 
     @Singleton

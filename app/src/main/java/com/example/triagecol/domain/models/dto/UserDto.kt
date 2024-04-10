@@ -4,20 +4,20 @@ import com.google.gson.annotations.SerializedName
 
 
 data class UserDto(
-    @SerializedName("user") val user: User,
-    @SerializedName("accountType") val accountType: Int
+    @SerializedName("usuario") val user: User,
+    @SerializedName("tipoCuenta") val accountType: Int
 )
 
 data class User(
-    @SerializedName("id_staff") val idStaff: Int?,
-    @SerializedName("id_number_staff") val idNumberStaff: Int?,
+    @SerializedName("id") val idStaff: Int?,
+    @SerializedName("numero_id") val idNumberStaff: Int?,
     @SerializedName("id_admin") val idAdmin: Int?,
-    @SerializedName("name") val name: String?,
-    @SerializedName("lastname") val lastname: String?,
-    @SerializedName("username") val username: String?,
-    @SerializedName("phone_number") val phoneNumber: String?,
-    @SerializedName("role") val role: String?,
-    @SerializedName("doctor_status") val doctorStatus: String?
+    @SerializedName("nombre") val name: String?,
+    @SerializedName("apellido") val lastname: String?,
+    @SerializedName("usuario") val username: String?,
+    @SerializedName("telefono") val phoneNumber: String?,
+    @SerializedName("rol") val role: String?,
+    @SerializedName("estado") val doctorStatus: String?
 )
 
 

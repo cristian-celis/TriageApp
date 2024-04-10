@@ -2,13 +2,11 @@ package com.example.triagecol.domain.usecases
 
 import android.util.Log
 import com.example.triagecol.data.remote.APIServiceStaff
+import com.example.triagecol.domain.models.APIResult
 import com.example.triagecol.domain.models.dto.StaffMember
 import com.example.triagecol.domain.models.dto.ApiResponse
 import com.example.triagecol.domain.models.dto.StaffDto
-import com.example.triagecol.domain.models.dto.StaffMemberDto
-import com.example.triagecol.domain.models.dto.toStaffMember
 import com.google.gson.Gson
-import retrofit2.HttpException
 import retrofit2.Response
 import retrofit2.Retrofit
 import javax.inject.Inject

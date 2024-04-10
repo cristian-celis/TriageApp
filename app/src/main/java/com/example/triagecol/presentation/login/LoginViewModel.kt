@@ -1,6 +1,5 @@
 package com.example.triagecol.presentation.login
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -8,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.triagecol.domain.models.LoginModel
 import com.example.triagecol.domain.models.dto.StaffMemberDto
 import com.example.triagecol.domain.models.dto.toStaffMemberDto
-import com.example.triagecol.domain.usecases.APIResult
+import com.example.triagecol.domain.models.APIResult
 import com.example.triagecol.domain.usecases.LoginRepository
 import com.example.triagecol.presentation.navigation.AppScreens
 import com.example.triagecol.utils.Constants

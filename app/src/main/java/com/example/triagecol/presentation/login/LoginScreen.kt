@@ -53,7 +53,6 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel) {
     val focusManager = LocalFocusManager.current
 
     if (isValidCredentials) {
-        loginViewModel.onLoginChanged("","")
         loginViewModel.clearError()
         navController.navigate(loginViewModel.userLoggedIn.value.route)
         loginViewModel.setValidCredentials(false)
@@ -143,6 +142,7 @@ fun LoginButton(
         onClick = {
             focusManager.clearFocus()
             loginViewModel.login()
+            loginViewModel.onLoginChanged("","")
         },
         modifier = Modifier
             .fillMaxWidth()

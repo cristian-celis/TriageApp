@@ -29,6 +29,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             TraigeColTheme {
                 Box(modifier = Modifier.background(color = Color.White)) {
+                    viewModel.initBack()
                     AppNavigation(viewModel)
                 }
             }

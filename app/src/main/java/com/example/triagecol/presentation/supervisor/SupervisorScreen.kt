@@ -1,11 +1,11 @@
 package com.example.triagecol.presentation.supervisor
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,17 +14,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -45,8 +43,8 @@ import androidx.navigation.NavController
 import com.example.traigecol.R
 import com.example.triagecol.presentation.common.TextFieldComponent
 import com.example.triagecol.presentation.navigation.AppScreens
+import com.example.triagecol.utils.Constants
 import com.example.triagecol.utils.SupervisorConstants
-import com.example.triagecol.utils.TextConstants
 
 @Composable
 fun SupervisorScreen(
@@ -61,12 +59,24 @@ fun SupervisorScreen(
 
     val isValidData by supervisorViewModel.isDataValid.collectAsState()
     val error by supervisorViewModel.error.collectAsState()
+    val isDialogShown by supervisorViewModel.isDialogShown.collectAsState()
 
     val focusManager = LocalFocusManager.current
 
-    if(isValidData){
+    if (isValidData) {
         navController.navigate(AppScreens.SymptomsScreen.route)
-        supervisorViewModel.setValidData(false)
+        supervisorViewModel.resetData()
+    }
+
+    if (isDialogShown) {
+        SupervisorDialog(
+            onDismiss = { supervisorViewModel.setIsDialogShown(false) },
+            onConfirm = {
+                supervisorViewModel.setIsDialogShown(false)
+                supervisorViewModel.sendPatientData()
+            },
+            supervisorViewModel = supervisorViewModel
+        )
     }
 
     Column(
@@ -99,7 +109,10 @@ fun SupervisorScreen(
                             navController.navigate(route = AppScreens.LoginScreen.route)
                         }
                     )
-                    .size(25.dp))
+                    .size(34.dp)
+                    .background(color = Color(0xA3FF0000), shape = CircleShape),
+                tint = Color.White
+            )
 
             Text(
                 text = SupervisorConstants.PATIENT_TEXT,
@@ -119,7 +132,9 @@ fun SupervisorScreen(
             })
         NameLabelTextField(SupervisorConstants.LAST_NAME)
         TextFieldComponent(
-            placeHolderText = SupervisorConstants.LAST_NAME, value = lastname, isTextFieldEnable = false,
+            placeHolderText = SupervisorConstants.LAST_NAME,
+            value = lastname,
+            isTextFieldEnable = false,
             onTextFieldChanged = {
                 supervisorViewModel.updateUserData(
                     idNumber, name, it, age
@@ -127,7 +142,9 @@ fun SupervisorScreen(
             })
         NameLabelTextField(SupervisorConstants.ID_NUMBER)
         TextFieldComponent(
-            placeHolderText = SupervisorConstants.ID_NUMBER, value = idNumber, isTextFieldEnable = false,
+            placeHolderText = SupervisorConstants.ID_NUMBER,
+            value = idNumber,
+            isTextFieldEnable = false,
             onTextFieldChanged = {
                 supervisorViewModel.updateUserData(
                     it, name, lastname, age
@@ -150,18 +167,17 @@ fun SupervisorScreen(
 
         ContinueButton(supervisorViewModel = supervisorViewModel)
 
-        if (!isValidData) {
-            Text(
-                text = supervisorViewModel.error.value,
-                style = TextStyle(
-                    fontSize = 16.sp,
-                    color = Color(0xFFFF0000)
-                ),
-                modifier = Modifier
-                    .padding(10.dp),
-                textAlign = TextAlign.Center
-            )
-        }
+        Text(
+            text = if (error.isNotEmpty() && !isValidData) error else "",
+            style = TextStyle(
+                fontSize = 16.sp,
+                color = Color(0xFFFF0000)
+            ),
+            modifier = Modifier
+                .padding(10.dp)
+                .fillMaxWidth(),
+            textAlign = TextAlign.Center
+        )
 
         Spacer(modifier = Modifier.height(140.dp))
     }
@@ -177,7 +193,7 @@ fun ContinueButton(supervisorViewModel: SupervisorViewModel) {
     Button(
         onClick = {
             focusManager.clearFocus()
-            supervisorViewModel.sendPatientData()
+            supervisorViewModel.setIsDialogShown(true)
         },
         modifier = Modifier
             .fillMaxWidth()
@@ -255,9 +271,11 @@ fun VitalSigns(supervisorViewModel: SupervisorViewModel) {
 fun SelectGender(
     supervisorViewModel: SupervisorViewModel,
 ) {
-    val options = listOf(SupervisorConstants.FEMALE_TEXT,
+    val options = listOf(
+        SupervisorConstants.FEMALE_TEXT,
         SupervisorConstants.MALE_TEXT,
-        SupervisorConstants.OTHER_TEXT)
+        SupervisorConstants.OTHER_TEXT
+    )
     val role: String by supervisorViewModel.gender.collectAsState()
 
     Row(

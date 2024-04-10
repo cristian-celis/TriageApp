@@ -2,6 +2,7 @@ package com.example.triagecol.domain.usecases
 
 import android.util.Log
 import com.example.triagecol.data.remote.APIServicePatient
+import com.example.triagecol.domain.models.APIResult
 import com.example.triagecol.domain.models.PatientSymptomsModel
 import com.example.triagecol.domain.models.dto.AddPatient
 import com.example.triagecol.domain.models.dto.ApiResponse
@@ -41,7 +42,6 @@ class PatientRepository @Inject constructor(
     ): APIResult<ApiResponse> {
         return try {
             val patient = PatientSymptomsModel(idNumberPat.toInt(), symptomsList)
-            Log.d("prueba", "patient: $patient")
             val call = retrofit.create(APIServicePatient::class.java).addPatientSymptoms(patient)
             Log.d("prueba", "Que paso?: ${call.body()}")
             if (call.isSuccessful) {

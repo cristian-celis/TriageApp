@@ -16,7 +16,7 @@ interface APIServiceDoctor {
     @PATCH(EndPointConstants.UPDATE_DOCTOR_STATUS)
     suspend fun updateStaffMemberStates(@Body id: String, @Body status: String): Response<ApiResponse>
 
-    @GET(EndPointConstants.GET_PATIENT)
+    @GET(EndPointConstants.GET_PATIENT_LIST)
     suspend fun getPatients(): Response<PatientsDto>
 
     @GET(EndPointConstants.GET_PAT_SYMPTOMS)

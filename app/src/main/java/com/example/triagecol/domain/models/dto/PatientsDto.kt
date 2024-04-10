@@ -5,26 +5,29 @@ import com.google.gson.annotations.SerializedName
 class PatientsDto : ArrayList<PatientDto>()
 
 data class PatientDto(
-    @SerializedName("id_patient") val id: Int,
-    @SerializedName("id_number_pat") val idNumber: String,
-    @SerializedName("name_pat") val name: String,
-    @SerializedName("lastname_pat") val lastname: String,
-    @SerializedName("age_pat") val age: String,
-    @SerializedName("gender_pat") val gender: String,
-    @SerializedName("temperature") val temperature: String,
-    @SerializedName("heart_rate") val heartRate: String,
-    @SerializedName("blood_oxygenation") val bloodOxygen: String
+    @SerializedName("id") val id: Int,
+    @SerializedName("numero_id") val idNumber: String,
+    @SerializedName("nombre") val name: String,
+    @SerializedName("apellido") val lastname: String,
+    @SerializedName("edad") val age: String,
+    @SerializedName("genero") val gender: String,
+    @SerializedName("temperatura") val temperature: String,
+    @SerializedName("frecuencia_cardiaca") val heartRate: String,
+    @SerializedName("oxigenacion_sangre") val bloodOxygen: String
 )
 
 data class AddPatient(
-    @SerializedName("id_number_pat") val idNumber: String,
-    @SerializedName("name_pat") val name: String,
-    @SerializedName("lastname_pat") val lastname: String,
-    @SerializedName("age_pat") val age: String,
-    @SerializedName("gender_pat") val gender: String
+    @SerializedName("numero_id") val idNumber: String,
+    @SerializedName("nombre") val name: String,
+    @SerializedName("apellido") val lastname: String,
+    @SerializedName("edad") val age: String,
+    @SerializedName("genero") val gender: String,
+    @SerializedName("temperatura") val temperature: String,
+    @SerializedName("frecuencia_cardiaca") val heartRate: String,
+    @SerializedName("oxigenacion_sangre") val bloodOxygen: String
 )
 
 data class AddPatientSymptoms(
-    @SerializedName("id_patient") val idNumber: String,
-    @SerializedName("id_symptom") val idSymptom: String
+    @SerializedName("id_paciente") val idNumber: String,
+    @SerializedName("id_sintoma") val idSymptom: String
 )

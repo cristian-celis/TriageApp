@@ -1,11 +1,14 @@
 package com.example.triagecol.presentation.supervisor
 
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.triagecol.domain.models.dto.AddPatient
 import com.example.triagecol.domain.models.dto.StaffMemberDto
-import com.example.triagecol.domain.usecases.APIResult
+import com.example.triagecol.domain.models.APIResult
 import com.example.triagecol.domain.usecases.PatientRepository
 import com.example.triagecol.utils.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -58,6 +61,9 @@ class SupervisorViewModel @Inject constructor(
     private val _isValidData = MutableStateFlow(false)
     val isDataValid: StateFlow<Boolean> = _isValidData
 
+    private val _isDialogShown = MutableStateFlow(false)
+    val isDialogShown: StateFlow<Boolean> = _isDialogShown
+
     fun updateUserData(
         idNumber: String,
         name: String,
@@ -92,11 +98,8 @@ class SupervisorViewModel @Inject constructor(
             val patient = AddPatient(
                 _idNumber.value, _name.value,
                 _lastname.value, _age.value,
-                when(_gender.value){
-                    "Femenino" -> "female"
-                    "Masculino" -> "male"
-                    else -> "other"
-                })
+                _gender.value, _temperature.value,
+                _heartRate.value, _bloodOxygen.value)
             viewModelScope.launch {
                 patientRepository.savePatientData(patient).let {
                     when(it){
@@ -135,11 +138,10 @@ class SupervisorViewModel @Inject constructor(
         _userData.value = userData
     }
 
-    fun setValidData(isValidData: Boolean){
-        _isValidData.value = isValidData
-    }
+    fun resetData(){
+        _error.value = ""
+        _isValidData.value = false
 
-    fun clearTextBoxes(){
         _idNumber.value = ""
         _name.value = ""
         _lastname.value = ""
@@ -149,5 +151,9 @@ class SupervisorViewModel @Inject constructor(
         _heartRate.value = ""
         _bloodOxygen.value = ""
         _isValidData.value = false
+    }
+
+    fun setIsDialogShown(isDialogShown: Boolean){
+        _isDialogShown.value = isDialogShown
     }
 }

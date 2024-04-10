@@ -32,10 +32,10 @@ interface APIServiceStaff {
     suspend fun getStaffMember(@Body id: String): Response<PatientDto>
 
     @POST(EndPointConstants.EDIT_STAFF_MEMBER)
-    suspend fun editStaffMember(@Path("id_staff") id: String, @Body user: StaffMember): Response<ApiResponse>
+    suspend fun editStaffMember(@Path("id") id: String, @Body user: StaffMember): Response<ApiResponse>
 
     @DELETE(EndPointConstants.DELETE_STAFF_MEMBER)
-    suspend fun deleteStaff(@Path("id_staff") id: String): Response<ApiResponse>
+    suspend fun deleteStaff(@Path("id") id: String): Response<ApiResponse>
 
     /*
     https://triage-api.onrender.com/

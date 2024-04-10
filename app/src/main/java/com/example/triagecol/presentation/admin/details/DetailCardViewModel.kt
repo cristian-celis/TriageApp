@@ -1,12 +1,11 @@
 package com.example.triagecol.presentation.admin.details
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.triagecol.domain.usecases.StaffRepositoryImpl
 import com.example.triagecol.domain.models.dto.StaffMember
 import com.example.triagecol.domain.models.dto.StaffMemberDto
-import com.example.triagecol.domain.usecases.APIResult
+import com.example.triagecol.domain.models.APIResult
 import com.example.triagecol.utils.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
