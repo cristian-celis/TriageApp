@@ -3,8 +3,8 @@ package com.example.triagecol.domain.usecases
 import android.util.Log
 import com.example.triagecol.data.remote.APIServiceLogin
 import com.example.triagecol.domain.models.APIResult
-import com.example.triagecol.domain.models.LoginModel
-import com.example.triagecol.domain.models.dto.ApiResponse
+import com.example.triagecol.domain.models.dto.LoginModel
+import com.example.triagecol.domain.models.ApiResponse
 import com.example.triagecol.domain.models.dto.UserDto
 import com.google.gson.Gson
 import retrofit2.Retrofit

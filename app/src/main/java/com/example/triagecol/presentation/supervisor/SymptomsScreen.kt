@@ -53,9 +53,15 @@ fun SymptomsScreen(
 
     val focusManager = LocalFocusManager.current
 
+    /*
+    * CUANDO SE INICIA EL SYMPTOM SCREEN SE SETEA EL NUMERO DE DOCUMENTO DEL PACIENTE AGREGADO.
+    * DESPUES DE AGREGAR UN PACIENTE Y SETEAR LOS SINTOMAS, AL AGREGAR OTRO PACIENTE EL
+    * NUMERO DE DOCUMENTO SE SETEA MAL!!!
+    * */
+
     if (successCall) {
-        symptomsViewModel.resetData()
         navController.popBackStack()
+        symptomsViewModel.resetData()
         Toast.makeText(
             LocalContext.current,
             "Paciente registrado en lista de espera.",

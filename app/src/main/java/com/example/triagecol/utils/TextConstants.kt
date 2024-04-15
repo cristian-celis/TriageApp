@@ -18,5 +18,7 @@ object TextConstants {
     const val DELETE_TEXT = "Eliminar"
     const val YES_TEXT = "Si"
     const val CONFIRM_DELETE_USER = "¿Esta seguro de eliminar al usuario?"
+    const val CONFIRM_CHANGE_ONLINE_STATE = "¿Desea cambiar de estado ?"
+    const val CONFIRM_DELETE_ALL_PATIENTS = "¿Esta seguro que desea eliminar a TODOS los pacientes registrados?"
     const val SAVE_TEXT = "Guardar"
 }

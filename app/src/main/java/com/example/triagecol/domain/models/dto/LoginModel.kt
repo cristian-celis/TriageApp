@@ -1,4 +1,4 @@
-package com.example.triagecol.domain.models
+package com.example.triagecol.domain.models.dto
 
 import com.google.gson.annotations.SerializedName
 

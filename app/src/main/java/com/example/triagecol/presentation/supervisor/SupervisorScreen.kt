@@ -1,6 +1,5 @@
 package com.example.triagecol.presentation.supervisor
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -43,7 +42,6 @@ import androidx.navigation.NavController
 import com.example.traigecol.R
 import com.example.triagecol.presentation.common.TextFieldComponent
 import com.example.triagecol.presentation.navigation.AppScreens
-import com.example.triagecol.utils.Constants
 import com.example.triagecol.utils.SupervisorConstants
 
 @Composable
@@ -73,7 +71,7 @@ fun SupervisorScreen(
             onDismiss = { supervisorViewModel.setIsDialogShown(false) },
             onConfirm = {
                 supervisorViewModel.setIsDialogShown(false)
-                supervisorViewModel.sendPatientData()
+                supervisorViewModel.savePatient()
             },
             supervisorViewModel = supervisorViewModel
         )

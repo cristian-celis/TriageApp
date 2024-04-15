@@ -1,8 +1,6 @@
 package com.example.triagecol.data.remote
 
-import com.example.triagecol.domain.models.LoginModel
-import com.example.triagecol.domain.models.dto.ApiResponse
-import com.example.triagecol.domain.models.dto.StaffMemberDto
+import com.example.triagecol.domain.models.dto.LoginModel
 import com.example.triagecol.domain.models.dto.UserDto
 import com.example.triagecol.utils.EndPointConstants
 import retrofit2.Response

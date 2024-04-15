@@ -46,6 +46,7 @@ class AdminViewModel @Inject constructor(
                         _successCall.value = true
                         _userList.value = it.data
                     }
+
                     is APIResult.Error -> {
                         _successCall.value = false
                         _error.value =
@@ -61,7 +62,31 @@ class AdminViewModel @Inject constructor(
         }
     }
 
-    fun clearError(){
+    fun deleteAllPatients() {
+        _fetchingData.value = true
+        viewModelScope.launch {
+            staffRepositoryImpl.deleteAllPatients().let {
+                when (it) {
+                    is APIResult.Success -> {
+                        _successCall.value = true
+                    }
+
+                    is APIResult.Error -> {
+                        _successCall.value = false
+                        _error.value =
+                            when (it.exception.message) {
+                                null -> Constants.NULL_ERROR
+                                Constants.TIMEOUT -> Constants.TIMEOUT_ERROR
+                                else -> "${it.exception.message}"
+                            }
+                    }
+                }
+            }
+            _fetchingData.value = false
+        }
+    }
+
+    fun clearError() {
         _error.value = ""
     }
 

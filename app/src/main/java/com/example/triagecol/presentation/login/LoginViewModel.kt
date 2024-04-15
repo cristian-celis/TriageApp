@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.triagecol.domain.models.LoginModel
+import com.example.triagecol.domain.models.dto.LoginModel
 import com.example.triagecol.domain.models.dto.StaffMemberDto
 import com.example.triagecol.domain.models.dto.toStaffMemberDto
 import com.example.triagecol.domain.models.APIResult

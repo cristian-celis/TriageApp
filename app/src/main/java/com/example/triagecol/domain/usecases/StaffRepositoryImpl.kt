@@ -4,7 +4,7 @@ import android.util.Log
 import com.example.triagecol.data.remote.APIServiceStaff
 import com.example.triagecol.domain.models.APIResult
 import com.example.triagecol.domain.models.dto.StaffMember
-import com.example.triagecol.domain.models.dto.ApiResponse
+import com.example.triagecol.domain.models.ApiResponse
 import com.example.triagecol.domain.models.dto.StaffDto
 import com.google.gson.Gson
 import retrofit2.Response
@@ -83,6 +83,22 @@ class StaffRepositoryImpl @Inject constructor(
             }
         } catch (e: Exception) {
             Log.d("prueba", e.message!!)
+            APIResult.Error(e)
+        }
+    }
+
+    suspend fun deleteAllPatients(): APIResult<ApiResponse?>{
+        return try {
+            val response: Response<ApiResponse> = retrofit.create(APIServiceStaff::class.java).deleteAllPatients()
+            if (response.isSuccessful && response.body() != null) {
+                APIResult.Success(response.body())
+            } else {
+                val errorBody = response.errorBody()?.string()
+                val gson = Gson()
+                val errorResponse = gson.fromJson(errorBody, ApiResponse::class.java)
+                APIResult.Error(Exception(errorResponse.message))
+            }
+        } catch (e: Exception) {
             APIResult.Error(e)
         }
     }

@@ -3,9 +3,9 @@ package com.example.triagecol.domain.usecases
 import android.util.Log
 import com.example.triagecol.data.remote.APIServicePatient
 import com.example.triagecol.domain.models.APIResult
-import com.example.triagecol.domain.models.PatientSymptomsModel
 import com.example.triagecol.domain.models.dto.AddPatient
-import com.example.triagecol.domain.models.dto.ApiResponse
+import com.example.triagecol.domain.models.dto.AddSymptoms
+import com.example.triagecol.domain.models.ApiResponse
 import com.google.gson.Gson
 import retrofit2.HttpException
 import retrofit2.Retrofit
@@ -41,7 +41,7 @@ class PatientRepository @Inject constructor(
         symptomsList: ArrayList<Int>
     ): APIResult<ApiResponse> {
         return try {
-            val patient = PatientSymptomsModel(idNumberPat.toInt(), symptomsList)
+            val patient = AddSymptoms(idNumberPat.toInt(), symptomsList)
             val call = retrofit.create(APIServicePatient::class.java).addPatientSymptoms(patient)
             Log.d("prueba", "Que paso?: ${call.body()}")
             if (call.isSuccessful) {

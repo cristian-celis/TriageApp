@@ -25,3 +25,8 @@ data class StaffMember(
     @SerializedName("rol") val role: String,
     @SerializedName("estado") val doctorStatus: String? = null
 )
+
+data class DoctorStatus(
+    @SerializedName("id") val id: Int,
+    @SerializedName("estado") val doctorStatus: String
+)

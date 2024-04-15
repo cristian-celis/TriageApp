@@ -16,6 +16,21 @@ data class PatientDto(
     @SerializedName("oxigenacion_sangre") val bloodOxygen: String
 )
 
+data class AddSymptoms(
+    @SerializedName("id") val id: Int,
+    @SerializedName("listaSintomas") val symptomsList: ArrayList<Int>
+)
+
+data class SymptomDto(
+    @SerializedName("id") val id: Int,
+    @SerializedName("nombre_sintoma") val symptomName: String
+)
+
+data class PriorityPatientDto(
+    @SerializedName("pacientePrioritario") val priorityPatient: PatientDto,
+    @SerializedName("sintomasPaciente") val patientSymptoms: List<SymptomDto> = emptyList()
+)
+
 data class AddPatient(
     @SerializedName("numero_id") val idNumber: String,
     @SerializedName("nombre") val name: String,
@@ -25,9 +40,4 @@ data class AddPatient(
     @SerializedName("temperatura") val temperature: String,
     @SerializedName("frecuencia_cardiaca") val heartRate: String,
     @SerializedName("oxigenacion_sangre") val bloodOxygen: String
-)
-
-data class AddPatientSymptoms(
-    @SerializedName("id_paciente") val idNumber: String,
-    @SerializedName("id_sintoma") val idSymptom: String
 )

@@ -1,9 +1,6 @@
 package com.example.triagecol.presentation.supervisor
 
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.triagecol.domain.models.dto.AddPatient
@@ -24,6 +21,9 @@ class SupervisorViewModel @Inject constructor(
 
     private val _userData = MutableStateFlow(StaffMemberDto(0,"","","","","","","Supervisor"))
     val userData: StateFlow<StaffMemberDto> = _userData
+
+    private val _id = MutableStateFlow("")
+    val id: StateFlow<String> = _id
 
     private val _idNumber = MutableStateFlow<String>("")
     val idNumber: StateFlow<String> = _idNumber
@@ -92,7 +92,7 @@ class SupervisorViewModel @Inject constructor(
         _saveEnable.value = checkDataEntered()
     }
 
-    fun sendPatientData(){
+    fun savePatient(){
         if(!_isSavingData.value){
             _isSavingData.value = true
             val patient = AddPatient(
@@ -104,6 +104,7 @@ class SupervisorViewModel @Inject constructor(
                 patientRepository.savePatientData(patient).let {
                     when(it){
                         is APIResult.Success -> {
+                            _id.value = it.data.message
                             _isValidData.value = true
                             _error.value = ""
                         }

@@ -1,5 +1,6 @@
 package com.example.triagecol.presentation.supervisor
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.triagecol.domain.models.APIResult
@@ -16,8 +17,8 @@ class SymptomsViewModel @Inject constructor(
     private val patientRepository: PatientRepository
 ): ViewModel() {
 
-    private val _idNumberPat = MutableStateFlow("")
-    val idNumberPat: StateFlow<String> = _idNumberPat
+    private val _id = MutableStateFlow("")
+    val id: StateFlow<String> = _id
 
     private val _chestPain = MutableStateFlow(false)
     val chestPain: StateFlow<Boolean> = _chestPain
@@ -78,9 +79,10 @@ class SymptomsViewModel @Inject constructor(
 
     fun sendSymptomsData(){
         if(!_isSavingSymptoms.value){
+            val symptomsList = createSymptomsList()
             _isSavingSymptoms.value = true
             viewModelScope.launch {
-                patientRepository.saveSymptomsPat(_idNumberPat.value, createSymptomsList()).let {
+                patientRepository.saveSymptomsPat(_id.value, createSymptomsList()).let {
                     when(it){
                         is APIResult.Success -> {
                             _successCall.value = true
@@ -96,7 +98,7 @@ class SymptomsViewModel @Inject constructor(
                         }
                     }
                 }
-                _isSavingSymptoms
+                _isSavingSymptoms.value= false
             }
         }
     }
@@ -113,8 +115,8 @@ class SymptomsViewModel @Inject constructor(
         _sevTrauma.value = false
     }
 
-    fun setIdNumberPat(idNumberPat: String){
-        _idNumberPat.value = idNumberPat
+    fun setIdPatient(idPatient: String){
+        _id.value = idPatient
     }
 
     fun setIsDialogShown(isDialogShown: Boolean){

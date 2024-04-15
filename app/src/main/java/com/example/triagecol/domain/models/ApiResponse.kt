@@ -1,4 +1,4 @@
-package com.example.triagecol.domain.models.dto
+package com.example.triagecol.domain.models
 
 data class ApiResponse(
      val success: Boolean,

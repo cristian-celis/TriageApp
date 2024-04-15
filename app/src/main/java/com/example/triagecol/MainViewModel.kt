@@ -1,18 +1,13 @@
 package com.example.triagecol
 
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.triagecol.domain.UserPage
 import com.example.triagecol.domain.datastore.DataStoreImpl
 import com.example.triagecol.domain.usecases.MainRepository
 import com.example.triagecol.presentation.navigation.AppScreens
+import com.example.triagecol.utils.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -49,7 +44,7 @@ class MainViewModel @Inject constructor(
 
     fun initBack(){
         viewModelScope.launch {
-            mainRepository.initBack()
+            mainRepository.initApi()
         }
     }
 }
