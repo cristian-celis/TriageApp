@@ -59,8 +59,8 @@ fun DoctorScreen(navController: NavController, doctorViewModel: DoctorViewModel)
     if(showDialog){
         ConfirmScreenDialog(mainText = TextConstants.CONFIRM_SIGN_OFF,
             onDismiss = {doctorViewModel.setDialog(false)}) {
+            doctorViewModel.resetPatientData()
             doctorViewModel.setDialog(false)
-            doctorViewModel.updateDoctorStatus(false)
             navController.navigate(AppScreens.LoginScreen.route) {
                 popUpTo(AppScreens.DoctorScreen.route) { inclusive = true }
             }
@@ -128,20 +128,20 @@ fun DoctorData(doctorViewModel: DoctorViewModel, modifier: Modifier = Modifier) 
 
     Row(
         modifier = modifier,
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceAround
     ) {
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.Start,
-            modifier = Modifier.padding(start = 10.dp)
+            modifier = Modifier.padding(start = 10.dp, top = 7.dp)
         ) {
             Text(
-                text = "${doctorData.name} ${doctorData.lastname}", style = TextStyle(
+                text = "Dr. ${doctorData.name} ${doctorData.lastname}", style = TextStyle(
                     fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = Color.Black
                 )
             )
             Text(
-                text = "Id: ${doctorData.idNumber}", style = TextStyle(fontSize = 14.sp)
+                text = "Numero de Identificacion: ${doctorData.idNumber}", style = TextStyle(fontSize = 14.sp)
             )
         }
 
@@ -160,7 +160,7 @@ fun GetAndEndPatientConsultBtt(doctorViewModel: DoctorViewModel, modifier: Modif
 
     Button(
         onClick = {
-            if (doctorInConsultation) doctorViewModel.setDoctorInConsultation(false)
+            if (doctorInConsultation) doctorViewModel.resetPatientData()
             else doctorViewModel.assignPatient()
         },
         modifier = modifier
@@ -213,7 +213,7 @@ private fun OnlineSwitch(doctorViewModel: DoctorViewModel, onCheckedChange: (Boo
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             if (changingDoctorState) ProgressIndicator(
-                size = 25.dp,
+                size = 28.dp,
                 color = Color(0xFF1A80E5),
                 strokeWidth = 5.dp,
                 padding = 5.dp

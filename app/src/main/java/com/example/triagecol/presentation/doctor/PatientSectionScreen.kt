@@ -55,9 +55,11 @@ fun PatientSectionScreen(doctorViewModel: DoctorViewModel, modifier: Modifier = 
             )
         }
 
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 10.dp)) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 12.dp)
+        ) {
             Icon(
                 painter = painterResource(id = R.drawable.patient_icon),
                 contentDescription = null,
@@ -66,20 +68,21 @@ fun PatientSectionScreen(doctorViewModel: DoctorViewModel, modifier: Modifier = 
                     .background(Color(0xFFDAD9D9), shape = ShapeDefaults.Small)
                     .padding(5.dp)
             )
-            if(doctorInConsultation){
+            if (doctorInConsultation) {
                 Text(
-                    text = "${patient.name} ${patient.lastname}",
-                    style = TextStyle(fontWeight = FontWeight.SemiBold, fontSize = 18.sp),
+                    text = "Paciente: ${patient.name} ${patient.lastname}",
+                    style = TextStyle(fontWeight = FontWeight.SemiBold, fontSize = 16.sp),
                     modifier = Modifier
                         .padding(5.dp)
                         .align(Alignment.CenterVertically)
                 )
-            }else{
-                Text(text = DoctorConstants.NO_PATIENT_MESSAGE,
-                    style = TextStyle(fontSize = 18.sp, color = Color(0xFF7C7C7C)),
+            } else {
+                Text(
+                    text = DoctorConstants.NO_PATIENT_MESSAGE,
+                    style = TextStyle(fontSize = 16.sp, color = Color(0xFF7C7C7C)),
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp),
+                        .fillMaxWidth().padding(12.dp)
+                        .height(38.dp),
                     textAlign = TextAlign.Center
                 )
             }
@@ -88,8 +91,8 @@ fun PatientSectionScreen(doctorViewModel: DoctorViewModel, modifier: Modifier = 
                 horizontalAlignment = Alignment.End,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = patient.idNumber)
-                Text(text = patient.age)
+                Text(text = "Numero de identificacion: ${patient.idNumber}")
+                Text(text = "Edad: ${patient.age}")
             }
         }
 
@@ -99,10 +102,16 @@ fun PatientSectionScreen(doctorViewModel: DoctorViewModel, modifier: Modifier = 
             textAlign = TextAlign.Start,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 15.dp)
+                .padding(vertical = 18.dp)
         )
-        if (!symptoms.isNullOrEmpty()) {
-            LazyColumn(modifier = Modifier.padding(7.dp).height(180.dp)) {
+        if (symptoms.isNotEmpty()) {
+            LazyColumn(
+                modifier = Modifier
+                    .height(160.dp)
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 items(count = symptoms.size) {
                     val symptom = symptoms[it]
                     SymptomsCard(symptomName = symptom.symptomName)
@@ -110,13 +119,7 @@ fun PatientSectionScreen(doctorViewModel: DoctorViewModel, modifier: Modifier = 
                 }
             }
         } else {
-            Text(
-                text = DoctorConstants.NO_SYMPTOMS_MESSAGE,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 30.dp),
-                textAlign = TextAlign.Center
-            )
+            Spacer(modifier = Modifier.height(30.dp))
         }
         Text(
             text = DoctorConstants.VITAL_SIGNS,
@@ -124,27 +127,33 @@ fun PatientSectionScreen(doctorViewModel: DoctorViewModel, modifier: Modifier = 
             textAlign = TextAlign.Start,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 15.dp)
+                .padding(vertical = 17.dp)
         )
         Column(
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Box(modifier = Modifier
-                    .fillMaxWidth(0.5f)
-                    .height(60.dp)) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.5f)
+                        .height(60.dp)
+                ) {
                     VitalSignsCards(
                         iconResource = painterResource(id = R.drawable.temperature_icon),
                         vitalSignName = SupervisorConstants.TEMPERATURE,
                         vitalSignValue = patient.temperature
                     )
                 }
-                Spacer(modifier = Modifier
-                    .width(9.dp))
-                Box(modifier = Modifier
-                    .fillMaxWidth(1f)
-                    .height(60.dp)) {
+                Spacer(
+                    modifier = Modifier
+                        .width(9.dp)
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(1f)
+                        .height(60.dp)
+                ) {
                     VitalSignsCards(
                         iconResource = painterResource(id = R.drawable.blood_oxygen_icon),
                         vitalSignName = SupervisorConstants.BLOOD_OXYGEN,
@@ -153,9 +162,11 @@ fun PatientSectionScreen(doctorViewModel: DoctorViewModel, modifier: Modifier = 
                 }
             }
             Spacer(modifier = Modifier.height(9.dp))
-            Box(modifier = Modifier
-                .fillMaxWidth(0.5f)
-                .height(60.dp)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.5f)
+                    .height(60.dp)
+            ) {
                 VitalSignsCards(
                     iconResource = painterResource(id = R.drawable.heart_rate_icon),
                     vitalSignName = SupervisorConstants.HEART_RATE,
@@ -182,9 +193,11 @@ fun VitalSignsCards(iconResource: Painter, vitalSignName: String, vitalSignValue
             .fillMaxWidth()
             .fillMaxHeight()
     ) {
-        Box(modifier = Modifier
-            .fillMaxHeight()
-            .padding(5.dp)) {
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .padding(5.dp)
+        ) {
             Icon(
                 painter = iconResource,
                 contentDescription = null,

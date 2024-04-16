@@ -127,18 +127,13 @@ class DoctorViewModel @Inject constructor(
         }
     }
 
-    fun endConsultation() {
+    fun resetPatientData() {
         _doctorInConsultation.value = false
         _patientData.value = PriorityPatientDto(
             PatientDto(0, "", "", "", "", "", "", "", ""),
             emptyList()
         )
     }
-
-    fun setDoctorInConsultation(doctorInConsultation: Boolean) {
-        _doctorInConsultation.value = doctorInConsultation
-    }
-
     private fun getDoctorStatus(): String {
         return if (_isDoctorOnline.value) "Conectado" else "Desconectado"
     }
