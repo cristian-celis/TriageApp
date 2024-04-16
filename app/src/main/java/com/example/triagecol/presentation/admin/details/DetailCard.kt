@@ -123,6 +123,7 @@ fun DetailCard(
             ProgressIndicator()
         } else {
             if(!successCall){
+                SaveUserButton(loginEnable = saveEnable, detailCardViewModel)
                 Text(
                     text = detailCardViewModel.error.value,
                     style = TextStyle(
@@ -133,13 +134,12 @@ fun DetailCard(
                     modifier = Modifier.padding(10.dp)
                 )
             }
-            SaveUserButton(loginEnable = saveEnable, detailCardViewModel)
             if (detailCardViewModel.editMode.value) {
                 DeleteUserButton(detailCardViewModel, detailCardViewModel.userData.value.id)
             }
         }
 
-        Spacer(modifier = Modifier.height(140.dp))
+        Spacer(modifier = Modifier.height(100.dp))
     }
 }
 

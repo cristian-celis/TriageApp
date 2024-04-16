@@ -24,6 +24,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -167,7 +168,7 @@ fun SupervisorScreen(
                 color = Color(0xFFFF0000)
             ),
             modifier = Modifier
-                .padding(10.dp)
+                .padding(7.dp)
                 .fillMaxWidth(),
             textAlign = TextAlign.Center
         )
@@ -214,7 +215,7 @@ fun NameLabelTextField(nameLabel: String) {
         style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.W500),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 5.dp, top = 10.dp),
+            .padding(bottom = 5.dp, top = 7.dp),
         textAlign = TextAlign.Start
     )
 }
@@ -274,13 +275,16 @@ fun SelectGender(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 10.dp, bottom = 7.dp), horizontalArrangement = Arrangement.SpaceBetween
+            .padding(top = 5.dp, bottom = 2.dp), horizontalArrangement = Arrangement.SpaceBetween
     ) {
         options.forEach { option ->
             Row {
                 RadioButton(
                     selected = role == option,
-                    onClick = { supervisorViewModel.setGender(option) }
+                    onClick = { supervisorViewModel.setGender(option) },
+                    colors = RadioButtonDefaults.colors(
+                        selectedColor = Color(0xFF1A80E5)
+                    )
                 )
                 Text(
                     text = option,

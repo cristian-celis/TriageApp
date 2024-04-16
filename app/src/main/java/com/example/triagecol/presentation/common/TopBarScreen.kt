@@ -45,7 +45,7 @@ fun TopBarScreen(modifier: Modifier = Modifier, titleText: String, onClick: () -
                     }
                 )
                 .size(34.dp)
-                .background(color = Color(0xA3FF0000), shape = CircleShape),
+                .background(color = Color(0xA3FF4D4D), shape = CircleShape),
             tint = Color.White
         )
 

@@ -1,5 +1,7 @@
 package com.example.triagecol.presentation.admin.details
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,11 +10,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -82,7 +87,9 @@ fun TextBoxesForData(modifier: Modifier = Modifier, detailCardViewModel: DetailC
             text = idNumber,
             style = MaterialTheme.typography.bodyLarge,
             color = colorResource(id = R.color.placeholder),
-            modifier = Modifier.fillMaxWidth().padding(10.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp)
         )
 
         NameLabelTextField(modifier, TextConstants.PASSWORD)
@@ -96,7 +103,10 @@ fun TextBoxesForData(modifier: Modifier = Modifier, detailCardViewModel: DetailC
                 )
             })
 
-        ToggleOptionComponent(detailCardViewModel, modifier, isTextFieldEnable)
+        NameLabelTextField(modifier.padding(top = 7.dp), TextConstants.ACCOUNT_TYPE)
+        ToggleOptionComponent(detailCardViewModel, modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 10.dp, bottom = 4.dp))
     }
 }
 
@@ -115,27 +125,27 @@ fun NameLabelTextField(modifier: Modifier = Modifier, nameLabel: String) {
 @Composable
 fun ToggleOptionComponent(
     detailCardViewModel: DetailCardViewModel,
-    modifier: Modifier = Modifier,
-    isTextFieldEnable: Boolean
+    modifier: Modifier = Modifier
 ) {
     val options = listOf(Constants.DOCTOR, Constants.SUPERVISOR)
     val role: String by detailCardViewModel.role.collectAsState()
 
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(top = 20.dp, bottom = 7.dp), horizontalArrangement = Arrangement.Center
+        modifier = modifier, horizontalArrangement = Arrangement.Center
     ) {
         options.forEach { option ->
             Row {
                 RadioButton(
                     selected = role == option,
-                    onClick = { detailCardViewModel.setRole(option) }
+                    onClick = { detailCardViewModel.setRole(option) },
+                    colors = RadioButtonDefaults.colors(
+                        selectedColor = Color(0xFF1A80E5)
+                    )
                 )
                 Text(
                     text = option,
                     modifier = Modifier
-                        .padding(top = 13.dp)
+                        .padding(top = 12.dp)
                 )
             }
         }

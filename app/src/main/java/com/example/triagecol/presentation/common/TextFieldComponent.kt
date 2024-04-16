@@ -70,7 +70,7 @@ fun TextFieldComponent(
                     color = colorResource(id = R.color.placeholder)
                 )
             },
-            shape = MaterialTheme.shapes.medium,
+            shape = MaterialTheme.shapes.extraSmall,
             colors = TextFieldDefaults.textFieldColors(
                 containerColor = Color(0xFFE8EDF2),
                 focusedIndicatorColor = Color.Transparent,
@@ -121,7 +121,7 @@ fun PasswordTextField(
                         modifier = Modifier.size(37.dp))
                 }
             },
-            shape = MaterialTheme.shapes.medium,
+            shape = MaterialTheme.shapes.extraSmall,
             colors = TextFieldDefaults.textFieldColors(
                 containerColor = Color(0xFFE8EDF2),
                 focusedIndicatorColor = Color.Transparent,

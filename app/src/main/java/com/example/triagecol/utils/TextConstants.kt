@@ -6,6 +6,8 @@ object TextConstants {
     const val WELCOME = "Bienvenido"
     const val VALIDATING = "Validando..."
 
+    const val ACCOUNT_TYPE = "Tipo de Cuenta"
+
     const val PHONE_NUMBER = "Numero de Telefono"
 
     const val LOGIN = "Iniciar Sesion"
