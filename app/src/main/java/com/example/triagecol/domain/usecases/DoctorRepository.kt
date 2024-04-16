@@ -13,39 +13,40 @@ import javax.inject.Inject
 
 class DoctorRepository @Inject constructor(
     private val retrofit: Retrofit
-){
+) {
 
-    suspend fun assignPatient(): APIResult<PriorityPatientDto>{
+    suspend fun assignPatient(): APIResult<PriorityPatientDto> {
         return try {
             val call = retrofit.create(APIServiceDoctor::class.java).assignPatient()
 
-            if(call.isSuccessful){
+            if (call.isSuccessful) {
                 APIResult.Success(call.body()!!)
-            }else{
+            } else {
                 val errorBody = call.errorBody()?.string()
                 val gson = Gson()
                 val errorResponse = gson.fromJson(errorBody, ApiResponse::class.java)
                 APIResult.Error(Exception(errorResponse.message))
             }
-        }catch (e:Exception){
+        } catch (e: Exception) {
             APIResult.Error(e)
         }
     }
 
-    suspend fun updateDoctorStatus(doctorStatus: DoctorStatus): APIResult<ApiResponse>{
+    suspend fun updateDoctorStatus(doctorStatus: DoctorStatus): APIResult<ApiResponse> {
         return try {
             Log.d(Constants.TAG, "Cambiando estado del doctor a: $doctorStatus")
-            val call = retrofit.create(APIServiceDoctor::class.java).updateDoctorStatus(doctorStatus)
+            val call =
+                retrofit.create(APIServiceDoctor::class.java).updateDoctorStatus(doctorStatus)
 
-            if(call.isSuccessful){
+            if (call.isSuccessful) {
                 APIResult.Success(call.body()!!)
-            }else{
+            } else {
                 val errorBody = call.errorBody()?.string()
                 val gson = Gson()
                 val errorResponse = gson.fromJson(errorBody, ApiResponse::class.java)
                 APIResult.Error(Exception(errorResponse.message))
             }
-        }catch (e:Exception){
+        } catch (e: Exception) {
             APIResult.Error(e)
         }
     }

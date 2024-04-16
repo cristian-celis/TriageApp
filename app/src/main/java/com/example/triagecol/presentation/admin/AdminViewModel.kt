@@ -37,6 +37,13 @@ class AdminViewModel @Inject constructor(
     private val _successCall = MutableStateFlow(false)
     val successCall: StateFlow<Boolean> = _successCall
 
+    private val _showDialog = MutableStateFlow(false)
+    val showDialog: StateFlow<Boolean> = _showDialog
+
+    fun setDialog(showDialog: Boolean){
+        _showDialog.value = showDialog
+    }
+
     fun getUserList() {
         _fetchingData.value = true
         viewModelScope.launch {

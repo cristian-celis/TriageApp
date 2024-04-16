@@ -1,25 +1,18 @@
 package com.example.triagecol.presentation.doctor
 
-import android.content.Context
 import android.widget.Toast
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -41,7 +34,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -52,52 +44,42 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.traigecol.R
+import com.example.triagecol.presentation.common.ConfirmScreenDialog
+import com.example.triagecol.presentation.common.TopBarScreen
 import com.example.triagecol.presentation.navigation.AppScreens
 import com.example.triagecol.utils.DoctorConstants
-import com.example.triagecol.utils.SupervisorConstants
+import com.example.triagecol.utils.TextConstants
 
 @Composable
 fun DoctorScreen(navController: NavController, doctorViewModel: DoctorViewModel) {
 
     val error by doctorViewModel.error.collectAsState()
+    val showDialog by doctorViewModel.showDialog.collectAsState()
+
+    if(showDialog){
+        ConfirmScreenDialog(mainText = TextConstants.CONFIRM_SIGN_OFF,
+            onDismiss = {doctorViewModel.setDialog(false)}) {
+            doctorViewModel.setDialog(false)
+            doctorViewModel.updateDoctorStatus(false)
+            navController.navigate(AppScreens.LoginScreen.route) {
+                popUpTo(AppScreens.DoctorScreen.route) { inclusive = true }
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        Row(
+
+        TopBarScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight(0.09f)
                 .padding(10.dp),
-            verticalAlignment = Alignment.CenterVertically
+            titleText = DoctorConstants.DOCTOR_SCREE
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_go_back),
-                contentDescription = null,
-                modifier = Modifier
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = {
-                            doctorViewModel.updateDoctorStatus(false)
-                            navController.navigate(AppScreens.LoginScreen.route) {
-                                popUpTo(AppScreens.DoctorScreen.route) { inclusive = true }
-                            }
-                        }
-                    )
-                    .size(34.dp)
-                    .background(color = Color(0xA3FF0000), shape = CircleShape),
-                tint = Color.White)
-
-            Box {
-                Text(
-                    text = DoctorConstants.DOCTOR_SCREE,
-                    style = TextStyle(fontSize = 25.sp, fontWeight = FontWeight.Bold),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
+            doctorViewModel.setDialog(true)
         }
 
         DoctorData(
@@ -219,7 +201,9 @@ private fun OnlineSwitch(doctorViewModel: DoctorViewModel, onCheckedChange: (Boo
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.End,
-        modifier = Modifier.fillMaxWidth().padding(end = 10.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(end = 10.dp)
     ) {
         Text(
             text = if (isDoctorOnline) DoctorConstants.ONLINE else DoctorConstants.OFFLINE,

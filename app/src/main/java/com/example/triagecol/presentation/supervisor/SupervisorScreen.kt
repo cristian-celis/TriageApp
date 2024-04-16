@@ -5,9 +5,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -40,9 +42,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.traigecol.R
+import com.example.triagecol.presentation.common.ConfirmScreenDialog
 import com.example.triagecol.presentation.common.TextFieldComponent
+import com.example.triagecol.presentation.common.TopBarScreen
 import com.example.triagecol.presentation.navigation.AppScreens
 import com.example.triagecol.utils.SupervisorConstants
+import com.example.triagecol.utils.TextConstants
 
 @Composable
 fun SupervisorScreen(
@@ -58,12 +63,24 @@ fun SupervisorScreen(
     val isValidData by supervisorViewModel.isDataValid.collectAsState()
     val error by supervisorViewModel.error.collectAsState()
     val isDialogShown by supervisorViewModel.isDialogShown.collectAsState()
+    val showDialogForSignOff by supervisorViewModel.showDialogForSignOff.collectAsState()
 
     val focusManager = LocalFocusManager.current
 
     if (isValidData) {
         navController.navigate(AppScreens.SymptomsScreen.route)
         supervisorViewModel.resetData()
+    }
+
+    if (showDialogForSignOff) {
+        ConfirmScreenDialog(
+            mainText = TextConstants.CONFIRM_SIGN_OFF,
+            onDismiss = {supervisorViewModel.setDialogForSignOff(false)}
+        ) {
+            supervisorViewModel.setDialogForSignOff(false)
+            navController.popBackStack()
+            navController.navigate(route = AppScreens.LoginScreen.route)
+        }
     }
 
     if (isDialogShown) {
@@ -88,36 +105,14 @@ fun SupervisorScreen(
                 )
             }
     ) {
-        Row(
+
+        TopBarScreen(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(80.dp)
-                .padding(top = 10.dp, bottom = 10.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .fillMaxHeight(0.09f)
+                .padding(top = 15.dp, bottom = 12.dp), titleText = SupervisorConstants.PATIENT_TEXT
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_go_back),
-                contentDescription = null,
-                modifier = Modifier
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = {
-                            navController.popBackStack()
-                            navController.navigate(route = AppScreens.LoginScreen.route)
-                        }
-                    )
-                    .size(34.dp)
-                    .background(color = Color(0xA3FF0000), shape = CircleShape),
-                tint = Color.White
-            )
-
-            Text(
-                text = SupervisorConstants.PATIENT_TEXT,
-                style = TextStyle(fontSize = 25.sp, fontWeight = FontWeight.Bold),
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
+            supervisorViewModel.setDialogForSignOff(true)
         }
 
         NameLabelTextField(SupervisorConstants.NAME)

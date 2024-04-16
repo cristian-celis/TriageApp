@@ -55,7 +55,9 @@ fun PatientSectionScreen(doctorViewModel: DoctorViewModel, modifier: Modifier = 
             )
         }
 
-        Row(modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp)) {
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 10.dp)) {
             Icon(
                 painter = painterResource(id = R.drawable.patient_icon),
                 contentDescription = null,
@@ -75,7 +77,9 @@ fun PatientSectionScreen(doctorViewModel: DoctorViewModel, modifier: Modifier = 
             }else{
                 Text(text = DoctorConstants.NO_PATIENT_MESSAGE,
                     style = TextStyle(fontSize = 18.sp, color = Color(0xFF7C7C7C)),
-                    modifier = Modifier.fillMaxWidth().height(50.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
                     textAlign = TextAlign.Center
                 )
             }
@@ -98,11 +102,10 @@ fun PatientSectionScreen(doctorViewModel: DoctorViewModel, modifier: Modifier = 
                 .padding(vertical = 15.dp)
         )
         if (!symptoms.isNullOrEmpty()) {
-            LazyColumn(modifier = Modifier.padding(7.dp)) {
+            LazyColumn(modifier = Modifier.padding(7.dp).height(180.dp)) {
                 items(count = symptoms.size) {
                     val symptom = symptoms[it]
-                    Text(text = symptoms[it].symptomName)
-                    //SymptomsCard(symptomName = symptom.symptomName)
+                    SymptomsCard(symptomName = symptom.symptomName)
                     Spacer(modifier = Modifier.height(5.dp))
                 }
             }
@@ -161,6 +164,11 @@ fun PatientSectionScreen(doctorViewModel: DoctorViewModel, modifier: Modifier = 
             }
         }
     }
+}
+
+@Composable
+fun SymptomsCard(symptomName: String) {
+    Text(text = symptomName)
 }
 
 @Composable

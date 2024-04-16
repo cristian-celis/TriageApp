@@ -82,7 +82,7 @@ class SymptomsViewModel @Inject constructor(
             val symptomsList = createSymptomsList()
             _isSavingSymptoms.value = true
             viewModelScope.launch {
-                patientRepository.saveSymptomsPat(_id.value, createSymptomsList()).let {
+                patientRepository.saveSymptomsPat(_id.value, symptomsList).let {
                     when(it){
                         is APIResult.Success -> {
                             _successCall.value = true

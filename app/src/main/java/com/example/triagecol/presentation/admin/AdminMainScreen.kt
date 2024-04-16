@@ -44,9 +44,12 @@ import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.example.traigecol.R
 import com.example.triagecol.presentation.admin.details.DetailMode
+import com.example.triagecol.presentation.common.ConfirmScreenDialog
 import com.example.triagecol.presentation.common.RefreshButton
+import com.example.triagecol.presentation.common.TopBarScreen
 import com.example.triagecol.presentation.navigation.AppScreens
 import com.example.triagecol.utils.Constants
+import com.example.triagecol.utils.SupervisorConstants
 import com.example.triagecol.utils.TextConstants
 
 @Composable
@@ -55,6 +58,17 @@ fun AdminMainScreen(navController: NavController, adminViewModel: AdminViewModel
     val userList by adminViewModel.userList.collectAsState()
     val fetchingData by adminViewModel.fetchingData.collectAsState()
     val successCall by adminViewModel.successCall.collectAsState()
+    val showDialog by adminViewModel.showDialog.collectAsState()
+
+    if(showDialog){
+        ConfirmScreenDialog(mainText = TextConstants.CONFIRM_SIGN_OFF,
+            onDismiss = {adminViewModel.setDialog(false)}) {
+            adminViewModel.setDialog(false)
+            navController.navigate(AppScreens.LoginScreen.route) {
+                popUpTo(AppScreens.AdminScreen.route) { inclusive = true }
+            }
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -62,38 +76,15 @@ fun AdminMainScreen(navController: NavController, adminViewModel: AdminViewModel
                 .fillMaxSize()
                 .align(Alignment.TopCenter)
         ) {
-            Row(
+
+            TopBarScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight(0.09f)
-                    //.height(80.dp)
-                    .padding(10.dp), verticalAlignment = Alignment.CenterVertically
+                    .padding(10.dp),
+                titleText = TextConstants.ADMIN_TITLE
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_go_back),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null,
-                            onClick = {
-                                navController.navigate(AppScreens.LoginScreen.route) {
-                                    popUpTo(AppScreens.AdminScreen.route) { inclusive = true }
-                                }
-                            }
-                        )
-                        .size(34.dp)
-                        .background(color = Color(0xA3FF0000), shape = CircleShape),
-                    tint = Color.White)
-
-                Box {
-                    Text(
-                        text = TextConstants.ADMIN_TITLE,
-                        style = TextStyle(fontSize = 25.sp, fontWeight = FontWeight.Bold),
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
+                adminViewModel.setDialog(true)
             }
 
             if (fetchingData) {

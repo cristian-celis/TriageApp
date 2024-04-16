@@ -64,6 +64,13 @@ class SupervisorViewModel @Inject constructor(
     private val _isDialogShown = MutableStateFlow(false)
     val isDialogShown: StateFlow<Boolean> = _isDialogShown
 
+    private val _showDialogForSignOff = MutableStateFlow(false)
+    val showDialogForSignOff: StateFlow<Boolean> = _showDialogForSignOff
+
+    fun setDialogForSignOff(showDialog: Boolean){
+        _showDialogForSignOff.value = showDialog
+    }
+
     fun updateUserData(
         idNumber: String,
         name: String,

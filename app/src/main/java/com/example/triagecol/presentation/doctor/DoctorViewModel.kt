@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.triagecol.domain.models.APIResult
 import com.example.triagecol.domain.models.dto.DoctorStatus
 import com.example.triagecol.domain.models.dto.PatientDto
-import com.example.triagecol.domain.models.dto.PatientsDto
 import com.example.triagecol.domain.models.dto.PriorityPatientDto
 import com.example.triagecol.domain.models.dto.StaffMemberDto
 import com.example.triagecol.domain.usecases.DoctorRepository
@@ -29,7 +28,7 @@ class DoctorViewModel @Inject constructor(
     private val _patientData = MutableStateFlow(
         PriorityPatientDto(
             PatientDto(0, "", "", "", "", "", "", "", ""),
-            patientSymptoms()
+            emptyList()
         )
     )
     val patientData: StateFlow<PriorityPatientDto> = _patientData
@@ -52,6 +51,13 @@ class DoctorViewModel @Inject constructor(
     private val _error = MutableStateFlow("")
     val error: StateFlow<String> = _error
 
+    private val _showDialog = MutableStateFlow(false)
+    val showDialog: StateFlow<Boolean> = _showDialog
+
+    fun setDialog(showDialog: Boolean){
+        _showDialog.value = showDialog
+    }
+
     fun assignPatient() {
         _isFetchingPatients.value = true
         Log.d(Constants.TAG, "Llamado API asignar paciente")
@@ -60,10 +66,18 @@ class DoctorViewModel @Inject constructor(
                 when (it) {
                     is APIResult.Success -> {
                         Log.d(Constants.TAG, "Llamada Exitosa: ${it.data}")
-                        _patientData.value = it.data
-                        _doctorInConsultation.value = true
-                        _isSuccessData.value = true
-                        _error.value = ""
+                        try {
+                            _patientData.value = it.data
+                            Log.d(Constants.TAG, "1")
+                            _doctorInConsultation.value = true
+                            Log.d(Constants.TAG, "2")
+                            _isSuccessData.value = true
+                            Log.d(Constants.TAG, "3")
+                            _error.value = ""
+                        }catch (e:Exception){
+                            _error.value = "Error al intentar setear los resultados del paciente. Paciente obtenido: ${it.data}. Error en cuestion: ${e.message}"
+                        }
+                        Log.d(Constants.TAG, "4")
                     }
 
                     is APIResult.Error -> {
