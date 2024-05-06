@@ -1,4 +1,4 @@
-package com.example.triagecol.presentation.supervisor
+package com.example.triagecol.presentation.supervisor.addPatient
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -27,12 +27,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.example.triagecol.utils.SupervisorConstants
 
 @Composable
-fun SymptomsDialog(
+fun SupervisorDialog(
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
-    symptomsViewModel: SymptomsViewModel
+    patientViewModel: PatientViewModel
 ) {
     Dialog(
         onDismissRequest = {
@@ -74,6 +75,46 @@ fun SymptomsDialog(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(15.dp)
                 ) {
+                    PatientSummary(
+                        label = SupervisorConstants.NAME,
+                        value = patientViewModel.name.value,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    PatientSummary(
+                        label = SupervisorConstants.LAST_NAME,
+                        value = patientViewModel.lastname.value,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    PatientSummary(
+                        label = SupervisorConstants.ID_NUMBER,
+                        value = patientViewModel.idNumber.value,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    PatientSummary(
+                        label = SupervisorConstants.GENDER,
+                        value = patientViewModel.gender.value,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    PatientSummary(
+                        label = SupervisorConstants.AGE,
+                        value = patientViewModel.age.value,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    PatientSummary(
+                        label = SupervisorConstants.TEMPERATURE,
+                        value = patientViewModel.temperature.value,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    PatientSummary(
+                        label = SupervisorConstants.HEART_RATE,
+                        value = patientViewModel.heartRate.value,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    PatientSummary(
+                        label = SupervisorConstants.BLOOD_OXYGEN,
+                        value = patientViewModel.bloodOxygen.value,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                     HorizontalDivider()
                 }
                 Row(
@@ -126,10 +167,10 @@ fun SymptomsDialog(
 }
 
 @Composable
-fun SymptomsSummary(label: String, value: String, modifier: Modifier = Modifier) {
+fun PatientSummary(label: String, value: String, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier,
-        horizontalArrangement = Arrangement.SpaceEvenly
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(text = label)
         Text(text = value)

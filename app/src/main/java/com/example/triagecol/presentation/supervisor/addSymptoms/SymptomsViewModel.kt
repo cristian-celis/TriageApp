@@ -1,6 +1,5 @@
-package com.example.triagecol.presentation.supervisor
+package com.example.triagecol.presentation.supervisor.addSymptoms
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.triagecol.domain.models.APIResult

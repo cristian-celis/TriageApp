@@ -18,10 +18,12 @@ import com.example.triagecol.presentation.doctor.DoctorScreen
 import com.example.triagecol.presentation.doctor.DoctorViewModel
 import com.example.triagecol.presentation.login.LoginScreen
 import com.example.triagecol.presentation.login.LoginViewModel
-import com.example.triagecol.presentation.supervisor.SupervisorScreen
-import com.example.triagecol.presentation.supervisor.SupervisorViewModel
-import com.example.triagecol.presentation.supervisor.SymptomsViewModel
-import com.example.triagecol.presentation.supervisor.SymptomsScreen
+import com.example.triagecol.presentation.supervisor.addPatient.PatientScreen
+import com.example.triagecol.presentation.supervisor.addPatient.PatientViewModel
+import com.example.triagecol.presentation.supervisor.addSymptoms.SymptomsViewModel
+import com.example.triagecol.presentation.supervisor.addSymptoms.SymptomsScreen
+import com.example.triagecol.presentation.supervisor.main.MainSupervisorScreen
+import com.example.triagecol.presentation.supervisor.main.MainSupervisorViewModel
 import com.example.triagecol.utils.Constants
 
 @Composable
@@ -29,7 +31,9 @@ fun AppNavigation(mainViewModel: MainViewModel) {
     val loginViewModel: LoginViewModel = hiltViewModel()
     val adminViewModel: AdminViewModel = hiltViewModel()
     val detailCardViewModel: DetailCardViewModel = hiltViewModel()
-    val supervisorViewModel: SupervisorViewModel = hiltViewModel()
+
+    val mainSupervisorViewModel: MainSupervisorViewModel = hiltViewModel()
+    val patientViewModel: PatientViewModel = hiltViewModel()
     val doctorViewModel: DoctorViewModel = hiltViewModel()
     val symptomsViewModel: SymptomsViewModel = hiltViewModel()
 
@@ -49,8 +53,13 @@ fun AppNavigation(mainViewModel: MainViewModel) {
             Log.d(Constants.TAG, "Supervisor screen")
             if (mainViewModel.currentScreen.value.route != AppScreens.SupervisorScreen.route)
                 mainViewModel.writeSaveLogin(UserPage.SUPERVISOR, AppScreens.SupervisorScreen)
-            supervisorViewModel.setUserData(loginViewModel.userData.value)
-            SupervisorScreen(navController, supervisorViewModel)
+            mainSupervisorViewModel.updateUserData(loginViewModel.userData.value)
+            if(!mainSupervisorViewModel.fetchingData.value) mainSupervisorViewModel.getPatientList()
+            MainSupervisorScreen(navController, mainSupervisorViewModel)
+        }
+        composable(route = AppScreens.PatientScreen.route){
+            Log.d(Constants.TAG, "Patient Screen")
+            PatientScreen(navController = navController, patientViewModel = patientViewModel)
         }
         composable(route = AppScreens.DoctorScreen.route) {
             Log.d(Constants.TAG, "Doctor screen")
@@ -61,7 +70,7 @@ fun AppNavigation(mainViewModel: MainViewModel) {
         }
         composable(route = AppScreens.SymptomsScreen.route) {
             Log.d(Constants.TAG, "Vital Signs Screen")
-            symptomsViewModel.setIdPatient(supervisorViewModel.id.value)
+            symptomsViewModel.setIdPatient(patientViewModel.id.value)
             SymptomsScreen(navController = navController, symptomsViewModel = symptomsViewModel)
         }
         composable(route = AppScreens.AdminScreen.route) {

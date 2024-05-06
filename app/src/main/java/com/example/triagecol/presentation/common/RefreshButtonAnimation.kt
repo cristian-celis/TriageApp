@@ -10,19 +10,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.Dp
 import com.example.traigecol.R
 
 @Composable
-fun RefreshButton(onRefresh:() -> Unit) {
-    var isRefreshing by remember {mutableStateOf(false)}
+fun RefreshButtonAnimation(isRefreshing: Boolean, refreshIconSize: Dp, onRefresh:() -> Unit) {
 
     val rotation by animateFloatAsState(
         targetValue = if(isRefreshing) 360f else 0f,
@@ -34,16 +30,15 @@ fun RefreshButton(onRefresh:() -> Unit) {
 
     IconButton(
         onClick = {
-            isRefreshing = !isRefreshing
             onRefresh()
         },
         modifier = Modifier
-            .rotate(rotation).size(70.dp)
+            .rotate(rotation).size(refreshIconSize)
     ) {
         Icon(
             painterResource(id = R.drawable.ic_refresh), // Usa el ícono de recarga
             contentDescription = "Refresh",
-            modifier = Modifier.size(70.dp),
+            modifier = Modifier.size(refreshIconSize),
             tint = Color.LightGray
         )
     }

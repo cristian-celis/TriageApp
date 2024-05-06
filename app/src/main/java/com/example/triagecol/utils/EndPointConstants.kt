@@ -18,4 +18,6 @@ object EndPointConstants {
     const val EDIT_STAFF_MEMBER = "personal/editarMiembro/{id}" // /personal/editarMiembro/:id
     const val DELETE_STAFF_MEMBER = "personal/eliminarMiembro/{id}" // /personal/eliminarMiembro/:id
     const val UPDATE_DOCTOR_STATUS = "personal/actualizarEstadoMedico" // /personal/actualizarEstadoMedico
+
+    const val GET_PATIENTS_WAITING_COUNT = "paciente/cantidadPacientes" //paciente/cantidadPacientes
 }

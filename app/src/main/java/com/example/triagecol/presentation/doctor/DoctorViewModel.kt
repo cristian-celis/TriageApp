@@ -11,6 +11,7 @@ import com.example.triagecol.domain.models.dto.StaffMemberDto
 import com.example.triagecol.domain.usecases.DoctorRepository
 import com.example.triagecol.utils.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -22,7 +23,7 @@ class DoctorViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _doctorData =
-        MutableStateFlow(StaffMemberDto(0, "", "", "", "", "", "", "Supervisor"))
+        MutableStateFlow(StaffMemberDto(0, "", "", "", "", "", "", "Doctor"))
     val doctorData: StateFlow<StaffMemberDto> = _doctorData
 
     private val _patientData = MutableStateFlow(
@@ -51,10 +52,16 @@ class DoctorViewModel @Inject constructor(
     private val _error = MutableStateFlow("")
     val error: StateFlow<String> = _error
 
+    private val _patientsWaitingCount = MutableStateFlow<Int>(0)
+    val patientsWaitingCount: StateFlow<Int> = _patientsWaitingCount
+
     private val _showDialog = MutableStateFlow(false)
     val showDialog: StateFlow<Boolean> = _showDialog
 
-    fun setDialog(showDialog: Boolean){
+    private val _updatingPatientList = MutableStateFlow(false)
+    val updatingPatientList: StateFlow<Boolean> = _updatingPatientList
+
+    fun setShowDialog(showDialog: Boolean){
         _showDialog.value = showDialog
     }
 
@@ -68,11 +75,8 @@ class DoctorViewModel @Inject constructor(
                         Log.d(Constants.TAG, "Llamada Exitosa: ${it.data}")
                         try {
                             _patientData.value = it.data
-                            Log.d(Constants.TAG, "1")
                             _doctorInConsultation.value = true
-                            Log.d(Constants.TAG, "2")
                             _isSuccessData.value = true
-                            Log.d(Constants.TAG, "3")
                             _error.value = ""
                         }catch (e:Exception){
                             _error.value = "Error al intentar setear los resultados del paciente. Paciente obtenido: ${it.data}. Error en cuestion: ${e.message}"
@@ -110,6 +114,10 @@ class DoctorViewModel @Inject constructor(
                         _isDoctorOnline.value = doctorOnline
                         _isSuccessData.value = true
                         _error.value = ""
+                        _updatingPatientList.value = doctorOnline
+                        viewModelScope.launch {
+                            if(doctorOnline) getPatientsWaitingCount()
+                        }
                     }
 
                     is APIResult.Error -> {
@@ -127,19 +135,61 @@ class DoctorViewModel @Inject constructor(
         }
     }
 
-    fun resetPatientData() {
+    private suspend fun getPatientsWaitingCount(){
+        while(_updatingPatientList.value){
+            viewModelScope.launch {
+                doctorRepository.getPatientsWaitingCount().let {
+                    when(it){
+                        is APIResult.Success -> {
+                            _isSuccessData.value = true
+                            _patientsWaitingCount.value = it.data
+                            _error.value = ""
+                        }
+                        is APIResult.Error -> {
+                            _error.value =
+                                when (it.exception.message) {
+                                    null -> Constants.NULL_ERROR
+                                    Constants.TIMEOUT -> Constants.TIMEOUT_ERROR
+                                    else -> "${it.exception.message}"
+                                }
+                            _isSuccessData.value = false
+                        }
+                    }
+                }
+            }
+            Log.d(Constants.TAG, "1.4")
+            delay(120000L)
+        }
+    }
+
+    fun clearAll(){
+        setShowDialog(false)
+        _doctorInConsultation.value = false
+        _patientData.value = PriorityPatientDto(
+            PatientDto(0, "", "", "", "", "", "", "", ""),
+            emptyList()
+        )
+        if(_isDoctorOnline.value) updateDoctorStatus(false)
+        _updatingPatientList.value = false
+    }
+
+    fun endMedicalConsultation() {
+        _updatingPatientList.value = true
+        viewModelScope.launch {
+            getPatientsWaitingCount()
+        }
         _doctorInConsultation.value = false
         _patientData.value = PriorityPatientDto(
             PatientDto(0, "", "", "", "", "", "", "", ""),
             emptyList()
         )
     }
+
     private fun getDoctorStatus(): String {
         return if (_isDoctorOnline.value) "Conectado" else "Desconectado"
     }
 
     fun setDoctorData(userData: StaffMemberDto) {
-        Log.d(Constants.TAG, "$userData")
         _doctorData.value = userData
     }
 }

@@ -1,4 +1,4 @@
-package com.example.triagecol.presentation.supervisor
+package com.example.triagecol.presentation.supervisor.addSymptoms
 
 import android.widget.Toast
 import androidx.compose.foundation.clickable
@@ -60,7 +60,9 @@ fun SymptomsScreen(
     * */
 
     if (successCall) {
-        navController.popBackStack()
+        navController.navigate(AppScreens.SupervisorScreen.route) {
+            popUpTo(AppScreens.SymptomsScreen.route) { inclusive = true }
+        }
         symptomsViewModel.resetData()
         Toast.makeText(
             LocalContext.current,

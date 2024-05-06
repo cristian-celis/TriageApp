@@ -146,8 +146,8 @@ class DetailCardViewModel @Inject constructor(
     private fun staffMemberObj(): StaffMember{
         return StaffMember(
             _idNumber.value,
-            _name.value,
-            _lastname.value,
+            _name.value.uppercase(),
+            _lastname.value.uppercase(),
             _idNumber.value,
             _password.value,
             _phoneNumber.value,

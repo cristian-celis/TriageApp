@@ -35,8 +35,7 @@ class DoctorRepository @Inject constructor(
     suspend fun updateDoctorStatus(doctorStatus: DoctorStatus): APIResult<ApiResponse> {
         return try {
             Log.d(Constants.TAG, "Cambiando estado del doctor a: $doctorStatus")
-            val call =
-                retrofit.create(APIServiceDoctor::class.java).updateDoctorStatus(doctorStatus)
+            val call = retrofit.create(APIServiceDoctor::class.java).updateDoctorStatus(doctorStatus)
 
             if (call.isSuccessful) {
                 APIResult.Success(call.body()!!)
@@ -47,6 +46,20 @@ class DoctorRepository @Inject constructor(
                 APIResult.Error(Exception(errorResponse.message))
             }
         } catch (e: Exception) {
+            APIResult.Error(e)
+        }
+    }
+
+    suspend fun getPatientsWaitingCount(): APIResult<Int>{
+        return try {
+            Log.d(Constants.TAG, "Obteniendo el numero de pacientes en espera.")
+            val call = retrofit.create(APIServiceDoctor::class.java).getPatientsWaitingCount()
+            if(call.isSuccessful){
+                APIResult.Success(call.body()!!)
+            }else{
+                APIResult.Error(Exception("Error Desconocido"))
+            }
+        }catch (e: Exception){
             APIResult.Error(e)
         }
     }

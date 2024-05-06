@@ -1,4 +1,4 @@
-package com.example.triagecol.presentation.supervisor
+package com.example.triagecol.presentation.supervisor.addPatient
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -15,12 +15,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SupervisorViewModel @Inject constructor(
+class PatientViewModel @Inject constructor(
     private val patientRepository: PatientRepository
 ): ViewModel() {
-
-    private val _userData = MutableStateFlow(StaffMemberDto(0,"","","","","","","Supervisor"))
-    val userData: StateFlow<StaffMemberDto> = _userData
 
     private val _id = MutableStateFlow("")
     val id: StateFlow<String> = _id
@@ -64,13 +61,6 @@ class SupervisorViewModel @Inject constructor(
     private val _isDialogShown = MutableStateFlow(false)
     val isDialogShown: StateFlow<Boolean> = _isDialogShown
 
-    private val _showDialogForSignOff = MutableStateFlow(false)
-    val showDialogForSignOff: StateFlow<Boolean> = _showDialogForSignOff
-
-    fun setDialogForSignOff(showDialog: Boolean){
-        _showDialogForSignOff.value = showDialog
-    }
-
     fun updateUserData(
         idNumber: String,
         name: String,
@@ -103,8 +93,8 @@ class SupervisorViewModel @Inject constructor(
         if(!_isSavingData.value){
             _isSavingData.value = true
             val patient = AddPatient(
-                _idNumber.value, _name.value,
-                _lastname.value, _age.value,
+                _idNumber.value, _name.value.uppercase(),
+                _lastname.value.uppercase(), _age.value,
                 _gender.value, _temperature.value,
                 _heartRate.value, _bloodOxygen.value)
             viewModelScope.launch {
@@ -140,10 +130,6 @@ class SupervisorViewModel @Inject constructor(
             && _temperature.value.isNotBlank()
             && _heartRate.value.isNotBlank()
             && _bloodOxygen.value.isNotBlank()
-    }
-
-    fun setUserData(userData: StaffMemberDto){
-        _userData.value = userData
     }
 
     fun resetData(){

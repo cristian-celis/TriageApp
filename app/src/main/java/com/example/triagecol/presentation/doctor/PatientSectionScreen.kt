@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
@@ -29,11 +31,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.traigecol.R
 import com.example.triagecol.utils.DoctorConstants
 import com.example.triagecol.utils.SupervisorConstants
+import java.util.Locale
 
 @Composable
 fun PatientSectionScreen(doctorViewModel: DoctorViewModel, modifier: Modifier = Modifier) {
@@ -43,135 +47,137 @@ fun PatientSectionScreen(doctorViewModel: DoctorViewModel, modifier: Modifier = 
     val patient = patientData.priorityPatient
     val symptoms = patientData.patientSymptoms
 
-    Column(modifier = modifier) {
-        Box {
+    Box(modifier = modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp)) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .background(Color.White)
+                .padding(7.dp)
+        ) {
+
             Text(
                 text = DoctorConstants.PATIENT_INFORMATION,
                 style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.SemiBold),
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 10.dp)
             )
-        }
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 12.dp)
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.patient_icon),
-                contentDescription = null,
+            Row(
                 modifier = Modifier
-                    .size(50.dp)
-                    .background(Color(0xFFDAD9D9), shape = ShapeDefaults.Small)
-                    .padding(5.dp)
-            )
-            if (doctorInConsultation) {
-                Text(
-                    text = "Paciente: ${patient.name} ${patient.lastname}",
-                    style = TextStyle(fontWeight = FontWeight.SemiBold, fontSize = 16.sp),
+                    .fillMaxWidth()
+                    .padding(vertical = 12.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.patient_icon),
+                    contentDescription = null,
                     modifier = Modifier
+                        .size(50.dp)
+                        .background(Color(0xFFDAD9D9), shape = ShapeDefaults.Small)
                         .padding(5.dp)
-                        .align(Alignment.CenterVertically)
                 )
-            } else {
-                Text(
-                    text = DoctorConstants.NO_PATIENT_MESSAGE,
-                    style = TextStyle(fontSize = 16.sp, color = Color(0xFF7C7C7C)),
-                    modifier = Modifier
-                        .fillMaxWidth().padding(12.dp)
-                        .height(38.dp),
-                    textAlign = TextAlign.Center
-                )
-            }
-
-            Column(
-                horizontalAlignment = Alignment.End,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = "Numero de identificacion: ${patient.idNumber}")
-                Text(text = "Edad: ${patient.age}")
-            }
-        }
-
-        Text(
-            text = DoctorConstants.SYMPTOMS,
-            style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.SemiBold),
-            textAlign = TextAlign.Start,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 18.dp)
-        )
-        if (symptoms.isNotEmpty()) {
-            LazyColumn(
-                modifier = Modifier
-                    .height(160.dp)
-                    .fillMaxWidth(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                items(count = symptoms.size) {
-                    val symptom = symptoms[it]
-                    SymptomsCard(symptomName = symptom.symptomName)
-                    Spacer(modifier = Modifier.height(5.dp))
+                if (doctorInConsultation) {
+                    Column(modifier = Modifier.padding(start = 10.dp)) {
+                        Text(
+                            text = "Paciente: ${patient.name} ${patient.lastname}",
+                            style = TextStyle(fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                        )
+                        Text(
+                            text = "Numero de identificacion: ${patient.idNumber}",
+                            style = TextStyle(fontSize = 14.sp)
+                        )
+                        Text(text = "Edad: ${patient.age}", style = TextStyle(fontSize = 14.sp))
+                    }
+                } else {
+                    Text(
+                        text = DoctorConstants.NO_PATIENT_MESSAGE,
+                        style = TextStyle(fontSize = 16.sp, color = Color(0xFF7C7C7C)),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(38.dp),
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
-        } else {
-            Spacer(modifier = Modifier.height(30.dp))
-        }
-        Text(
-            text = DoctorConstants.VITAL_SIGNS,
-            style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.SemiBold),
-            textAlign = TextAlign.Start,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 17.dp)
-        )
-        Column(
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth()
+
+            Text(
+                text = DoctorConstants.SYMPTOMS,
+                style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.SemiBold),
+                textAlign = TextAlign.Start,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 18.dp)
+            )
+            if (symptoms.isNotEmpty()) {
+                LazyColumn(
+                    modifier = Modifier
+                        .height(150.dp)
+                        .fillMaxWidth(),
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    items(count = symptoms.size) {
+                        val symptom = symptoms[it]
+                        SymptomsCard(symptomName = symptom.symptomName)
+                        Spacer(modifier = Modifier.height(5.dp))
+                    }
+                }
+            } else {
+                Spacer(modifier = Modifier.height(30.dp))
+            }
+            Text(
+                text = DoctorConstants.VITAL_SIGNS,
+                style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.SemiBold),
+                textAlign = TextAlign.Start,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 17.dp)
+            )
+            Column(
             ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(0.5f)
+                            .height(60.dp)
+                    ) {
+                        VitalSignsCards(
+                            iconResource = painterResource(id = R.drawable.temperature_icon),
+                            vitalSignName = SupervisorConstants.TEMPERATURE,
+                            vitalSignValue = patient.temperature
+                        )
+                    }
+                    Spacer(
+                        modifier = Modifier
+                            .width(9.dp)
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(1f)
+                            .height(60.dp)
+                    ) {
+                        VitalSignsCards(
+                            iconResource = painterResource(id = R.drawable.blood_oxygen_icon),
+                            vitalSignName = SupervisorConstants.BLOOD_OXYGEN,
+                            vitalSignValue = patient.bloodOxygen
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(9.dp))
                 Box(
                     modifier = Modifier
                         .fillMaxWidth(0.5f)
                         .height(60.dp)
                 ) {
                     VitalSignsCards(
-                        iconResource = painterResource(id = R.drawable.temperature_icon),
-                        vitalSignName = SupervisorConstants.TEMPERATURE,
-                        vitalSignValue = patient.temperature
+                        iconResource = painterResource(id = R.drawable.heart_rate_icon),
+                        vitalSignName = SupervisorConstants.HEART_RATE,
+                        vitalSignValue = patient.heartRate
                     )
                 }
-                Spacer(
-                    modifier = Modifier
-                        .width(9.dp)
-                )
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(1f)
-                        .height(60.dp)
-                ) {
-                    VitalSignsCards(
-                        iconResource = painterResource(id = R.drawable.blood_oxygen_icon),
-                        vitalSignName = SupervisorConstants.BLOOD_OXYGEN,
-                        vitalSignValue = patient.bloodOxygen
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.height(9.dp))
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(0.5f)
-                    .height(60.dp)
-            ) {
-                VitalSignsCards(
-                    iconResource = painterResource(id = R.drawable.heart_rate_icon),
-                    vitalSignName = SupervisorConstants.HEART_RATE,
-                    vitalSignValue = patient.heartRate
-                )
             }
         }
     }

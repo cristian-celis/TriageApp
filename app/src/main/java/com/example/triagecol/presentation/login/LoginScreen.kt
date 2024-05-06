@@ -37,6 +37,7 @@ import androidx.navigation.NavController
 import com.example.traigecol.R
 import com.example.triagecol.presentation.common.PasswordTextField
 import com.example.triagecol.presentation.common.TextFieldComponent
+import com.example.triagecol.presentation.navigation.AppScreens
 import com.example.triagecol.utils.TextConstants
 
 @Composable
@@ -54,7 +55,9 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel) {
 
     if (isValidCredentials) {
         loginViewModel.clearError()
-        navController.navigate(loginViewModel.userLoggedIn.value.route)
+        navController.navigate(loginViewModel.userLoggedIn.value.route) {
+            popUpTo(AppScreens.LoginScreen.route) { inclusive = true }
+        }
         loginViewModel.setValidCredentials(false)
     }
 

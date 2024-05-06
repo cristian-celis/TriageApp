@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,10 +29,16 @@ import com.example.triagecol.presentation.navigation.AppScreens
 import com.example.triagecol.utils.SupervisorConstants
 
 @Composable
-fun TopBarScreen(modifier: Modifier = Modifier, titleText: String, onClick: () -> Unit) {
+fun TopBarScreen(
+    modifier: Modifier = Modifier,
+    titleText: String,
+    backColor: Color,
+    tintColor: Color,
+    onClick: () -> Unit
+) {
     Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically
+        modifier = modifier.padding(start = 10.dp),
+        verticalAlignment = Alignment . CenterVertically
     ) {
         Icon(
             painter = painterResource(id = R.drawable.ic_go_back),
@@ -45,8 +52,8 @@ fun TopBarScreen(modifier: Modifier = Modifier, titleText: String, onClick: () -
                     }
                 )
                 .size(34.dp)
-                .background(color = Color(0xA3FF4D4D), shape = CircleShape),
-            tint = Color.White
+                .background(color = backColor, shape = CircleShape),
+            tint = tintColor
         )
 
         Box {

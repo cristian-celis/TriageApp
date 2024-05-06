@@ -1,6 +1,13 @@
 package com.example.triagecol.utils
 
 object SupervisorConstants {
+
+    const val MAIN_SCREEN_TEXT = "Pantalla Principal"
+    const val SUPERVISOR_TEXT = "Supervisor"
+    const val WAIT_LIST = "Lista de espera pacientes"
+
+    const val ADD_PATIENT = "Agregar Paciente"
+
     const val PATIENT_TEXT = "Paciente"
     const val NAME = "Nombre"
     const val LAST_NAME = "Apellido"

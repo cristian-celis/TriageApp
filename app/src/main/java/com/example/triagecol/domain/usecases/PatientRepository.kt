@@ -6,6 +6,7 @@ import com.example.triagecol.domain.models.APIResult
 import com.example.triagecol.domain.models.dto.AddPatient
 import com.example.triagecol.domain.models.dto.AddSymptoms
 import com.example.triagecol.domain.models.ApiResponse
+import com.example.triagecol.domain.models.dto.PatientsDto
 import com.google.gson.Gson
 import retrofit2.HttpException
 import retrofit2.Retrofit
@@ -53,6 +54,23 @@ class PatientRepository @Inject constructor(
                 APIResult.Error(Exception(errorResponse.message))
             }
         } catch (e: Exception) {
+            APIResult.Error(e)
+        }
+    }
+
+    suspend fun getPatientList(): APIResult<PatientsDto>{
+        return try {
+            val call = retrofit.create(APIServicePatient::class.java).getPatientList()
+
+            if(call.isSuccessful){
+                APIResult.Success(call.body()!!)
+            }else{
+                val errorBody = call.errorBody()?.string()
+                val gson = Gson()
+                val errorResponse = gson.fromJson(errorBody, ApiResponse::class.java)
+                APIResult.Error(Exception(errorResponse.message))
+            }
+        }catch (e: Exception){
             APIResult.Error(e)
         }
     }
