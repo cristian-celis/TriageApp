@@ -2,7 +2,13 @@ package com.example.triagecol.domain.models.dto
 
 import com.google.gson.annotations.SerializedName
 
-class PatientsDto : ArrayList<PatientDto>()
+class PatientsDto : ArrayList<PatientDtoForList>()
+
+data class PatientDtoForList(
+    @SerializedName("nombre") val name: String,
+    @SerializedName("apellido") val lastname: String,
+    @SerializedName("numero_id") val idNumber: String
+)
 
 data class PatientDto(
     @SerializedName("id") val id: Int,

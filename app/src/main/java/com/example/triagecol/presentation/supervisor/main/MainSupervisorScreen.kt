@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.triagecol.domain.models.dto.PatientDto
+import com.example.triagecol.domain.models.dto.PatientDtoForList
 import com.example.triagecol.presentation.common.ConfirmScreenDialog
 import com.example.triagecol.presentation.common.RefreshButtonAnimation
 import com.example.triagecol.presentation.common.TopBarScreen
@@ -42,11 +43,11 @@ fun MainSupervisorScreen(
 ) {
 
     val showDialogForSignOff by mainSupervisorViewModel.showDialogForSignOff.collectAsState()
-    val userData by mainSupervisorViewModel.userData.collectAsState()
     val patientList by mainSupervisorViewModel.patientList.collectAsState()
     val successCall by mainSupervisorViewModel.successCall.collectAsState()
-    val patientListUpdated by mainSupervisorViewModel.patientListUpdated.collectAsState()
     val fetchingData by mainSupervisorViewModel.fetchingData.collectAsState()
+    val error by mainSupervisorViewModel.error.collectAsState()
+    val listUpdated by mainSupervisorViewModel.listUpdated.collectAsState()
 
     if (showDialogForSignOff) {
         ConfirmScreenDialog(
@@ -54,9 +55,15 @@ fun MainSupervisorScreen(
             onDismiss = { mainSupervisorViewModel.setDialogForSignOff(false) }
         ) {
             mainSupervisorViewModel.setDialogForSignOff(false)
-            navController.popBackStack()
-            navController.navigate(route = AppScreens.LoginScreen.route)
+            mainSupervisorViewModel.clearUserData()
+            navController.navigate(AppScreens.LoginScreen.route) {
+                popUpTo(AppScreens.SupervisorScreen.route) { inclusive = true }
+            }
         }
+    }
+
+    if(!fetchingData && error.isEmpty() && !listUpdated){
+        mainSupervisorViewModel.getPatientList()
     }
 
     Column(
@@ -96,10 +103,10 @@ fun MainSupervisorScreen(
                 Spacer(modifier = Modifier.height(15.dp))
 
                 Text(
-                    text = "Nombre: ${userData.name} ${userData.lastname}",
+                    text = "Nombre: ${mainSupervisorViewModel.userData.value.name} ${mainSupervisorViewModel.userData.value.lastname}",
                     style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                 )
-                Text(text = "Numero Documento: ${userData.idNumber}")
+                Text(text = "Numero Documento: ${mainSupervisorViewModel.userData.value.idNumber}")
             }
         }
 
@@ -120,8 +127,10 @@ fun MainSupervisorScreen(
                         .padding(top = 9.dp, bottom = 16.dp)
                 )
 
-                if (successCall && patientListUpdated) {
-                    Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp)) {
+                if (successCall) {
+                    Row(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp)) {
                         Text(
                             text = "Nombre Paciente",
                             style = TextStyle(fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
@@ -201,7 +210,7 @@ fun AddPatient(
 }
 
 @Composable
-fun PatientItemCard(patient: PatientDto) {
+fun PatientItemCard(patient: PatientDtoForList) {
     Row(
         modifier = Modifier
             .fillMaxWidth()

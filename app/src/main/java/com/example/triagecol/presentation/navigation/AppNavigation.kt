@@ -51,10 +51,7 @@ fun AppNavigation(mainViewModel: MainViewModel) {
         }
         composable(route = AppScreens.SupervisorScreen.route) {
             Log.d(Constants.TAG, "Supervisor screen")
-            if (mainViewModel.currentScreen.value.route != AppScreens.SupervisorScreen.route)
-                mainViewModel.writeSaveLogin(UserPage.SUPERVISOR, AppScreens.SupervisorScreen)
             mainSupervisorViewModel.updateUserData(loginViewModel.userData.value)
-            if(!mainSupervisorViewModel.fetchingData.value) mainSupervisorViewModel.getPatientList()
             MainSupervisorScreen(navController, mainSupervisorViewModel)
         }
         composable(route = AppScreens.PatientScreen.route){
@@ -63,8 +60,6 @@ fun AppNavigation(mainViewModel: MainViewModel) {
         }
         composable(route = AppScreens.DoctorScreen.route) {
             Log.d(Constants.TAG, "Doctor screen")
-            if (mainViewModel.currentScreen.value.route != AppScreens.DoctorScreen.route)
-                mainViewModel.writeSaveLogin(UserPage.DOCTOR, AppScreens.DoctorScreen)
             doctorViewModel.setDoctorData(loginViewModel.userData.value)
             DoctorScreen(navController, doctorViewModel)
         }

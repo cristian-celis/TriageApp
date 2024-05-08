@@ -1,7 +1,10 @@
 package com.example.triagecol.presentation.doctor
 
+import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,7 +32,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
@@ -42,6 +44,7 @@ import androidx.navigation.NavController
 import com.example.triagecol.presentation.common.ConfirmScreenDialog
 import com.example.triagecol.presentation.common.TopBarScreen
 import com.example.triagecol.presentation.navigation.AppScreens
+import com.example.triagecol.utils.Constants
 import com.example.triagecol.utils.DoctorConstants
 import com.example.triagecol.utils.TextConstants
 
@@ -112,22 +115,21 @@ fun DoctorScreen(navController: NavController, doctorViewModel: DoctorViewModel)
 @Composable
 fun DoctorData(doctorViewModel: DoctorViewModel, modifier: Modifier = Modifier) {
     val doctorData by doctorViewModel.doctorData.collectAsState()
-    val error by doctorViewModel.error.collectAsState()
 
     Box(
         modifier = modifier
             .padding(start = 7.dp, end = 7.dp, bottom = 10.dp)
-            .shadow(elevation = 3.dp)
+            .border(border = BorderStroke(1.dp, color = Color(0xFFCFCFCF)))
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.White)
-                .padding(7.dp),
+                .padding(10.dp),
             horizontalArrangement = Arrangement.SpaceAround
         ) {
             Column(
-                verticalArrangement = Arrangement.Center,
+                verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.Start,
             ) {
                 Text(
@@ -136,7 +138,7 @@ fun DoctorData(doctorViewModel: DoctorViewModel, modifier: Modifier = Modifier) 
                     )
                 )
                 Text(
-                    text = "Numero de Identificacion: ${doctorData.idNumber}",
+                    text = "Identificacion: ${doctorData.idNumber}",
                     style = TextStyle(fontSize = 14.sp)
                 )
             }
@@ -146,15 +148,6 @@ fun DoctorData(doctorViewModel: DoctorViewModel, modifier: Modifier = Modifier) 
                 doctorViewModel.updateDoctorStatus(it)
             }
         }
-
-        Text(
-            text = error,
-            style = TextStyle(color = Color.Red),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(5.dp),
-            textAlign = TextAlign.Center
-        )
     }
 }
 
@@ -192,7 +185,7 @@ fun GetAndEndPatientConsultBtt(doctorViewModel: DoctorViewModel, modifier: Modif
 @Composable
 private fun OnlineSwitch(doctorViewModel: DoctorViewModel, onCheckedChange: (Boolean) -> Unit) {
     val isDoctorOnline by doctorViewModel.isDoctorOnline.collectAsState()
-    val changingDoctorState by doctorViewModel.changingDoctorState.collectAsState()
+    val changingDoctorState by doctorViewModel.updatingDoctorState.collectAsState()
     val doctorInConsultation by doctorViewModel.doctorInConsultation.collectAsState()
     val context = LocalContext.current
 
@@ -211,9 +204,10 @@ private fun OnlineSwitch(doctorViewModel: DoctorViewModel, onCheckedChange: (Boo
         )
 
         Row(verticalAlignment = Alignment.CenterVertically) {
-            if (changingDoctorState) ProgressIndicator(
-                size = 28.dp, color = Color(0xFF1A80E5), strokeWidth = 5.dp, padding = 5.dp
-            )
+            if (changingDoctorState)
+                Box (modifier = Modifier.padding(top = 2.dp)){
+                    ProgressIndicator(size = 28.dp, color = Color(0xFF1A80E5), strokeWidth = 3.dp, padding = 5.dp)
+                }
             Switch(checked = isDoctorOnline, onCheckedChange = {
                 if (doctorInConsultation) Toast.makeText(
                     context, DoctorConstants.CONSULTATION_IN_PROGRESS_MESSAGE, Toast.LENGTH_LONG
@@ -234,9 +228,9 @@ private fun OnlineSwitch(doctorViewModel: DoctorViewModel, onCheckedChange: (Boo
                 checkedThumbColor = Color(0xFF1A80E5),
                 checkedIconColor = Color.White,
                 checkedBorderColor = Color(0xFFBAD4EE),
-                uncheckedTrackColor = Color(0xFFCFCFCF),
-                uncheckedThumbColor = Color.Gray,
-                uncheckedBorderColor = Color.Gray,
+                uncheckedTrackColor = Color(0xFFD8D8D8),
+                uncheckedThumbColor = Color(0xFF9B9B9B),
+                uncheckedBorderColor = Color(0xFF9B9B9B),
                 disabledCheckedThumbColor = Color(0xFF1A80E5),
                 disabledUncheckedThumbColor = Color(0xFF1A80E5)
             ))
@@ -248,20 +242,22 @@ private fun OnlineSwitch(doctorViewModel: DoctorViewModel, onCheckedChange: (Boo
 fun ShowWaitingPatientsCount(doctorViewModel: DoctorViewModel) {
     val patientsWaitingCount by doctorViewModel.patientsWaitingCount.collectAsState()
 
+    val context = LocalContext.current
+
     Box(modifier = Modifier
         .fillMaxWidth()
         .padding(horizontal = 15.dp)
     ) {
         Column(modifier = Modifier
             .clip(shape = ShapeDefaults.Medium)
-            .background(Color(0xFF66B0FA))
+            .background(Color(0xFFBAD4EE))
             .align(Alignment.CenterEnd)
             .height(50.dp)
             .width(100.dp)
             .fillMaxHeight(),
             verticalArrangement = Arrangement.Center
         ) {
-            Text(text = "N° Pacientes",
+            Text(text = "En espera",
                 modifier = Modifier.fillMaxWidth(), fontSize = 14.sp, textAlign = TextAlign.Center
             )
             Text(text = "$patientsWaitingCount",
@@ -270,6 +266,10 @@ fun ShowWaitingPatientsCount(doctorViewModel: DoctorViewModel) {
                     fontSize = 18.sp),
                 textAlign = TextAlign.Center
             )
+            Log.d(Constants.TAG, "${doctorViewModel.isDoctorOnline.value} - ${!doctorViewModel.doctorInConsultation.value} - $patientsWaitingCount")
+            if(doctorViewModel.isDoctorOnline.value && !doctorViewModel.doctorInConsultation.value && patientsWaitingCount == 0){
+                Toast.makeText(context, "No hay pacientes en espera", Toast.LENGTH_LONG).show()
+            }
         }
     }
 }

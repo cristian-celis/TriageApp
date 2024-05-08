@@ -1,12 +1,14 @@
 package com.example.triagecol.domain.usecases
 
 import android.util.Log
+import com.example.triagecol.data.remote.APIServiceDoctor
 import com.example.triagecol.data.remote.APIServicePatient
 import com.example.triagecol.domain.models.APIResult
 import com.example.triagecol.domain.models.dto.AddPatient
 import com.example.triagecol.domain.models.dto.AddSymptoms
 import com.example.triagecol.domain.models.ApiResponse
 import com.example.triagecol.domain.models.dto.PatientsDto
+import com.example.triagecol.utils.Constants
 import com.google.gson.Gson
 import retrofit2.HttpException
 import retrofit2.Retrofit
@@ -69,6 +71,19 @@ class PatientRepository @Inject constructor(
                 val gson = Gson()
                 val errorResponse = gson.fromJson(errorBody, ApiResponse::class.java)
                 APIResult.Error(Exception(errorResponse.message))
+            }
+        }catch (e: Exception){
+            APIResult.Error(e)
+        }
+    }
+
+    suspend fun getPatientsWaitingCount(): APIResult<Int>{
+        return try {
+            val call = retrofit.create(APIServiceDoctor::class.java).getPatientsWaitingCount()
+            if(call.isSuccessful){
+                APIResult.Success(call.body()!!)
+            }else{
+                APIResult.Error(Exception("Error Desconocido"))
             }
         }catch (e: Exception){
             APIResult.Error(e)

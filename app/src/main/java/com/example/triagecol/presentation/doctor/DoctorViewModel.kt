@@ -34,8 +34,8 @@ class DoctorViewModel @Inject constructor(
     )
     val patientData: StateFlow<PriorityPatientDto> = _patientData
 
-    private val _changingDoctorState = MutableStateFlow(false)
-    val changingDoctorState: StateFlow<Boolean> = _changingDoctorState
+    private val _updatingDoctorState = MutableStateFlow(false)
+    val updatingDoctorState: StateFlow<Boolean> = _updatingDoctorState
 
     private val _isFetchingPatients = MutableStateFlow(false)
     val isFetchingPatients: StateFlow<Boolean> = _isFetchingPatients
@@ -100,13 +100,13 @@ class DoctorViewModel @Inject constructor(
     }
 
     fun updateDoctorStatus(doctorOnline: Boolean) {
-        _changingDoctorState.value = true
+        _updatingDoctorState.value = true
 
         viewModelScope.launch {
             doctorRepository.updateDoctorStatus(
                 DoctorStatus(
                     _doctorData.value.id,
-                    getDoctorStatus()
+                    getDoctorStatus(state = doctorOnline)
                 )
             ).let {
                 when (it) {
@@ -131,7 +131,7 @@ class DoctorViewModel @Inject constructor(
                     }
                 }
             }
-            _changingDoctorState.value = false
+            _updatingDoctorState.value = false
         }
     }
 
@@ -157,7 +157,6 @@ class DoctorViewModel @Inject constructor(
                     }
                 }
             }
-            Log.d(Constants.TAG, "1.4")
             delay(120000L)
         }
     }
@@ -185,9 +184,7 @@ class DoctorViewModel @Inject constructor(
         )
     }
 
-    private fun getDoctorStatus(): String {
-        return if (_isDoctorOnline.value) "Conectado" else "Desconectado"
-    }
+    private fun getDoctorStatus(state: Boolean) = if (state) "Conectado" else "Desconectado"
 
     fun setDoctorData(userData: StaffMemberDto) {
         _doctorData.value = userData

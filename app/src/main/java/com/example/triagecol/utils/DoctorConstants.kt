@@ -14,7 +14,7 @@ object DoctorConstants {
 
     const val NO_SYMPTOMS_MESSAGE = "El paciente no registró sintomas."
 
-    const val NO_PATIENT_MESSAGE = "No hay pacientes en consulta."
+    const val NO_PATIENT_MESSAGE = "No hay pacientes en consulta"
 
     const val CONSULTATION_IN_PROGRESS_MESSAGE = "No puede cambiar de estado mientras está en consulta."
 }

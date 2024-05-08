@@ -17,7 +17,7 @@ interface APIServiceDoctor {
     @PATCH(EndPointConstants.UPDATE_DOCTOR_STATUS)
     suspend fun updateDoctorStatus(@Body doctorStatus: DoctorStatus): Response<ApiResponse>
 
-    @POST(EndPointConstants.ASSIGN_PATIENT)
+    @GET(EndPointConstants.ASSIGN_PATIENT)
     suspend fun assignPatient(): Response<PriorityPatientDto>
 
     @GET(EndPointConstants.GET_PATIENTS_WAITING_COUNT)
