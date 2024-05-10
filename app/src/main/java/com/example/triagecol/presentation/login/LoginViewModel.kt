@@ -22,11 +22,11 @@ class LoginViewModel @Inject constructor(
     private val loginRepository: LoginRepository
 ) : ViewModel() {
 
-    private val _user = MutableLiveData<String>()
-    val user: LiveData<String> = _user
+    private val _user = MutableStateFlow("")
+    val user: StateFlow<String> = _user
 
-    private val _password = MutableLiveData<String>()
-    val password: LiveData<String> = _password
+    private val _password = MutableStateFlow<String>("")
+    val password: StateFlow<String> = _password
 
     private val _loginEnable = MutableLiveData<Boolean>()
     val loginEnable: LiveData<Boolean> = _loginEnable
@@ -46,8 +46,11 @@ class LoginViewModel @Inject constructor(
     private val _authenticatingCredentials = MutableStateFlow(false)
     val authenticatingCredentials: StateFlow<Boolean> = _authenticatingCredentials
 
+    private val _showToastMessage = MutableStateFlow(false)
+    val showToastMessage: StateFlow<Boolean> = _showToastMessage
+
     fun onLoginChanged(user: String, password: String) {
-        _user.value = user
+        if(_user.value.length <= 10) _user.value = user
         _password.value = password
         _loginEnable.value = validCredentials(user, password)
     }
@@ -85,6 +88,7 @@ class LoginViewModel @Inject constructor(
                                 Constants.TIMEOUT -> Constants.TIMEOUT_ERROR
                                 else -> "${it.exception.message}"
                             }
+                        _showToastMessage.value = true
                         _isValidCredentials.value = false
                     }
                 }
@@ -96,6 +100,10 @@ class LoginViewModel @Inject constructor(
     fun setValidCredentials(isValidCredentials: Boolean) {
         _isValidCredentials.value = isValidCredentials
         _userLoggedIn.value = AppScreens.LoginScreen
+    }
+
+    fun setShowToastMessage(){
+        _showToastMessage.value = false
     }
 
     fun clearError() {

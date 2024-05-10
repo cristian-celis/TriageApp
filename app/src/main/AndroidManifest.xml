@@ -21,7 +21,8 @@
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.TraigeCol"
-            tools:ignore="LockedOrientationActivity">
+            tools:ignore="LockedOrientationActivity"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

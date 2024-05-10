@@ -69,20 +69,6 @@ fun UserDataCard(
                         .padding(5.dp)
                 )
             }
-            /*Box(
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .background(Color(0xFFD3E5F7)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painter = painterResource(id = iconUser),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(33.dp)
-                        .align(Alignment.Center)
-                )
-            }*/
             Column(
                 modifier = Modifier
                     .fillMaxWidth()

@@ -4,7 +4,7 @@ object SupervisorConstants {
 
     const val MAIN_SCREEN_TEXT = "Pantalla Principal"
     const val SUPERVISOR_TEXT = "Supervisor"
-    const val WAIT_LIST = "Lista de espera pacientes"
+    const val WAIT_LIST = "Lista de Espera"
 
     const val ADD_PATIENT = "Agregar Paciente"
 

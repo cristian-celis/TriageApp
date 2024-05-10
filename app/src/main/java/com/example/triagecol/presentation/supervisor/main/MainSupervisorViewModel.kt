@@ -1,6 +1,5 @@
 package com.example.triagecol.presentation.supervisor.main
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.triagecol.domain.models.APIResult
@@ -38,10 +37,9 @@ class MainSupervisorViewModel @Inject constructor(
     private val _fetchingData = MutableStateFlow(false)
     val fetchingData: StateFlow<Boolean> = _fetchingData
 
-    private val _listUpdated = MutableStateFlow(false)
-    val listUpdated: StateFlow<Boolean> = _listUpdated
+    private val _updatingPatientList = MutableStateFlow(false)
+    val updatingPatientList: StateFlow<Boolean> = _updatingPatientList
 
-    //389, 512
     fun updateUserData(userData: StaffMemberDto){
         _userData.value = userData
     }
@@ -58,13 +56,11 @@ class MainSupervisorViewModel @Inject constructor(
                     is APIResult.Success -> {
                         _patientList.value = it.data
                         _successCall.value = true
-                        _listUpdated.value = true
                         viewModelScope.launch {
                             getPatientsWaitingCount()
                         }
                     }
                     is APIResult.Error -> {
-                        _listUpdated.value = false
                         _successCall.value = false
                         _error.value =
                             when (it.exception.message) {
@@ -79,26 +75,23 @@ class MainSupervisorViewModel @Inject constructor(
         }
     }
     private suspend fun getPatientsWaitingCount(){
-        while(_listUpdated.value){
+        while(_updatingPatientList.value){
             viewModelScope.launch {
                 patientRepository.getPatientsWaitingCount().let {
                     when(it){
                         is APIResult.Success -> {
                             _successCall.value = true
-                            _listUpdated.value = _patientList.value.size == it.data
-                            Log.d(Constants.TAG, "MainSupervisorViewModel -> Lista Espera Actualizada: " +
-                                    "${_listUpdated.value} - Se tiene: ${_patientList.value.size} - Llega: ${it.data}")
+                            _updatingPatientList.value = _patientList.value.size == it.data
                             _error.value = ""
                         }
                         is APIResult.Error -> {
-                            _listUpdated.value = false
+                            _successCall.value = false
                             _error.value =
                                 when (it.exception.message) {
                                     null -> Constants.NULL_ERROR
                                     Constants.TIMEOUT -> Constants.TIMEOUT_ERROR
                                     else -> "${it.exception.message}"
                                 }
-                            _successCall.value = false
                         }
                     }
                 }
@@ -107,10 +100,19 @@ class MainSupervisorViewModel @Inject constructor(
         }
     }
 
+    fun startUpdatePatientList(){
+        _updatingPatientList.value = true
+        viewModelScope.launch {
+            getPatientsWaitingCount()
+        }
+    }
+
+    fun stopUpdatingPatientList(){
+        _updatingPatientList.value = false
+    }
 
     fun clearUserData(){
-        _listUpdated.value = false
-        _error.value = "Fuera de Linea."
+        _updatingPatientList.value = false
         _userData.value = StaffMemberDto(0,"","","","","","","Supervisor")
     }
 }

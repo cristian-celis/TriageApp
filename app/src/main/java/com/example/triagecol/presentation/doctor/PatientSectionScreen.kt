@@ -38,6 +38,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.toUpperCase
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.traigecol.R
@@ -54,8 +55,9 @@ fun PatientSectionScreen(doctorViewModel: DoctorViewModel, modifier: Modifier = 
     val patient = patientData.priorityPatient
     val symptoms = patientData.patientSymptoms
 
-    Box(modifier = modifier
-        .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
+    Box(
+        modifier = modifier
+            .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
         //.border(border = BorderStroke(1.dp, color = Color(0xFFCFCFCF)))
     ) {
         Column(
@@ -96,26 +98,7 @@ fun PatientSectionScreen(doctorViewModel: DoctorViewModel, modifier: Modifier = 
                         )
                     }
                 } else {
-                    Box(modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 5.dp)
-                    ) {
-                        Column(modifier = Modifier
-                            .clip(shape = ShapeDefaults.Small)
-                            .background(Color(0xFFECECEC))
-                            .align(Alignment.Center)
-                            .height(33.dp)
-                            .width(250.dp),
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Text(
-                                text = DoctorConstants.NO_PATIENT_MESSAGE,
-                                style = TextStyle(fontSize = 16.sp, color = Color(0xFF000000)),
-                                modifier = Modifier.fillMaxWidth(),
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    }
+                    RoundedBoxTextMessage(message = DoctorConstants.NO_PATIENT_MESSAGE, topPadding = 5.dp, bottomPadding = 5.dp)
                 }
             }
 
@@ -148,7 +131,7 @@ fun PatientSectionScreen(doctorViewModel: DoctorViewModel, modifier: Modifier = 
                     }
                 }
             } else {
-                Spacer(modifier = Modifier.height(30.dp))
+                RoundedBoxTextMessage(message = DoctorConstants.NO_PATIENT_MESSAGE, topPadding = 8.dp, bottomPadding = 14.dp)
             }
 
             HorizontalDivider(
@@ -170,41 +153,28 @@ fun PatientSectionScreen(doctorViewModel: DoctorViewModel, modifier: Modifier = 
                     .fillMaxWidth()
                     .padding(vertical = 12.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(0.33f)
-                        .height(95.dp)
-                ) {
-                    VitalSignsCards(
-                        iconResource = painterResource(id = R.drawable.temperature_icon),
-                        vitalSignName = SupervisorConstants.TEMPERATURE,
-                        vitalSignValue = patient.temperature
-                    )
-                }
+                VitalSignsCards(
+                    iconResource = painterResource(id = R.drawable.temperature_icon),
+                    vitalSignName = SupervisorConstants.TEMPERATURE,
+                    vitalSignValue = patient.temperature,
+                    modifier = Modifier.fillMaxWidth(0.33f)
+                )
                 Spacer(modifier = Modifier.width(9.dp))
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(0.5f)
-                        .height(95.dp)
-                ) {
-                    VitalSignsCards(
-                        iconResource = painterResource(id = R.drawable.blood_oxygen_icon),
-                        vitalSignName = SupervisorConstants.BLOOD_OXYGEN,
-                        vitalSignValue = patient.bloodOxygen
-                    )
-                }
+
+                VitalSignsCards(
+                    iconResource = painterResource(id = R.drawable.blood_oxygen_icon),
+                    vitalSignName = SupervisorConstants.BLOOD_OXYGEN,
+                    vitalSignValue = patient.bloodOxygen,
+                    modifier = Modifier.fillMaxWidth(0.5f)
+                )
                 Spacer(modifier = Modifier.width(9.dp))
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(1f)
-                        .height(95.dp)
-                ) {
-                    VitalSignsCards(
-                        iconResource = painterResource(id = R.drawable.heart_rate_icon),
-                        vitalSignName = SupervisorConstants.HEART_RATE,
-                        vitalSignValue = patient.heartRate
-                    )
-                }
+
+                VitalSignsCards(
+                    iconResource = painterResource(id = R.drawable.heart_rate_icon),
+                    vitalSignName = SupervisorConstants.HEART_RATE,
+                    vitalSignValue = patient.heartRate,
+                    modifier = Modifier.fillMaxWidth(1f)
+                )
             }
 
         }
@@ -217,53 +187,89 @@ fun SymptomsCard(symptomName: String) {
 }
 
 @Composable
-fun VitalSignsCards(iconResource: Painter, vitalSignName: String, vitalSignValue: String) {
-    Column(
-        modifier = Modifier
-            .border(
-                border = BorderStroke(width = 1.dp, color = Color(0xFFBEBEBE)),
-                shape = ShapeDefaults.Small
-            )
-            .fillMaxSize()
+private fun VitalSignsCards(
+    iconResource: Painter,
+    vitalSignName: String,
+    vitalSignValue: String,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .height(100.dp)
     ) {
-        Text(
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(35.dp),
-            text = vitalSignName,
-            style = TextStyle(color = Color.Gray, fontSize = 14.sp),
-            textAlign = TextAlign.Center
-        )
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+                .border(
+                    border = BorderStroke(width = 1.dp, color = Color(0xFFBEBEBE)),
+                    shape = ShapeDefaults.Small
+                )
+                .fillMaxSize()
         ) {
-            Box(
+            Text(
                 modifier = Modifier
-                    .fillMaxHeight()
-                    .padding(3.dp)
+                    .fillMaxWidth()
+                    .height(35.dp)
+                    .padding(3.dp),
+                text = vitalSignName,
+                style = TextStyle(color = Color.Gray, fontSize = 14.sp),
+                textAlign = TextAlign.Center
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    painter = iconResource,
-                    contentDescription = null,
+                Box(
                     modifier = Modifier
-                        .size(40.dp)
-                        .background(Color(0xFFEEEEEE), shape = ShapeDefaults.Medium)
-                        .align(Alignment.CenterStart)
+                        .fillMaxHeight()
+                        .padding(3.dp)
+                ) {
+                    Icon(
+                        painter = iconResource,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .align(Alignment.CenterStart)
+                    )
+                }
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = vitalSignValue,
+                    style = TextStyle(
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        textAlign = TextAlign.Center
+                    )
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun RoundedBoxTextMessage(message: String, topPadding: Dp, bottomPadding: Dp) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = topPadding, bottom = bottomPadding)
+    ) {
+        Column(
+            modifier = Modifier
+                .clip(shape = ShapeDefaults.Small)
+                .background(Color(0xFFECECEC))
+                .align(Alignment.Center)
+                .height(33.dp)
+                .width(250.dp),
+            verticalArrangement = Arrangement.Center
+        ) {
             Text(
+                text = message,
+                style = TextStyle(fontSize = 16.sp, color = Color(0xFF000000)),
                 modifier = Modifier.fillMaxWidth(),
-                text = vitalSignValue,
-                style = TextStyle(
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    textAlign = TextAlign.Center
-                )
+                textAlign = TextAlign.Center
             )
         }
     }

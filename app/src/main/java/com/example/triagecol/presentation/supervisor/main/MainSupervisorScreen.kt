@@ -1,6 +1,9 @@
 package com.example.triagecol.presentation.supervisor.main
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,29 +13,43 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.DefaultAlpha
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.traigecol.R
 import com.example.triagecol.domain.models.dto.PatientDto
 import com.example.triagecol.domain.models.dto.PatientDtoForList
 import com.example.triagecol.presentation.common.ConfirmScreenDialog
 import com.example.triagecol.presentation.common.RefreshButtonAnimation
 import com.example.triagecol.presentation.common.TopBarScreen
 import com.example.triagecol.presentation.navigation.AppScreens
+import com.example.triagecol.utils.Constants
 import com.example.triagecol.utils.SupervisorConstants
 import com.example.triagecol.utils.TextConstants
 
@@ -46,8 +63,11 @@ fun MainSupervisorScreen(
     val patientList by mainSupervisorViewModel.patientList.collectAsState()
     val successCall by mainSupervisorViewModel.successCall.collectAsState()
     val fetchingData by mainSupervisorViewModel.fetchingData.collectAsState()
-    val error by mainSupervisorViewModel.error.collectAsState()
-    val listUpdated by mainSupervisorViewModel.listUpdated.collectAsState()
+    val updatingPatientList by mainSupervisorViewModel.updatingPatientList.collectAsState()
+
+    LaunchedEffect(key1 = true){
+        mainSupervisorViewModel.startUpdatePatientList()
+    }
 
     if (showDialogForSignOff) {
         ConfirmScreenDialog(
@@ -62,7 +82,7 @@ fun MainSupervisorScreen(
         }
     }
 
-    if(!fetchingData && error.isEmpty() && !listUpdated){
+    if(!fetchingData && successCall && !updatingPatientList){
         mainSupervisorViewModel.getPatientList()
     }
 
@@ -78,7 +98,7 @@ fun MainSupervisorScreen(
                 .fillMaxHeight(0.085f)
                 .padding(bottom = 10.dp)
                 .background(Color.White),
-            titleText = SupervisorConstants.MAIN_SCREEN_TEXT,
+            titleText = SupervisorConstants.SUPERVISOR_TEXT,
             backColor = Color(0xA3FF4D4D),
             tintColor = Color.White
         ) {
@@ -92,16 +112,6 @@ fun MainSupervisorScreen(
                     .background(Color.White)
                     .padding(7.dp)
             ) {
-                Text(
-                    text = SupervisorConstants.SUPERVISOR_TEXT,
-                    style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.SemiBold),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp)
-                )
-                Spacer(modifier = Modifier.height(15.dp))
-
                 Text(
                     text = "Nombre: ${mainSupervisorViewModel.userData.value.name} ${mainSupervisorViewModel.userData.value.lastname}",
                     style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
@@ -120,28 +130,52 @@ fun MainSupervisorScreen(
 
                 Text(
                     text = SupervisorConstants.WAIT_LIST,
-                    style = TextStyle(fontSize = 18.sp),
-                    textAlign = TextAlign.Center,
+                    style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.SemiBold),
+                    textAlign = TextAlign.Start,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 9.dp, bottom = 16.dp)
+                        .padding(start = 10.dp, top = 13.dp, bottom = 18.dp)
                 )
 
-                if (successCall) {
-                    Row(modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 12.dp)) {
-                        Text(
-                            text = "Nombre Paciente",
-                            style = TextStyle(fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
-                        )
-                        Text(
-                            text = "Numero Documento",
-                            modifier = Modifier.fillMaxWidth(),
-                            textAlign = TextAlign.End,
-                            style = TextStyle(fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                Row (modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 10.dp, bottom = 14.dp),
+                    verticalAlignment = Alignment.CenterVertically){
+                    Box (modifier = Modifier
+                        .size(38.dp)
+                        .background(color = Color(0xA3E7E7E7), shape = ShapeDefaults.Medium)){
+                        Icon(painter = painterResource(id = R.drawable.people_icon),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(30.dp)
+                                .align(Alignment.Center)
                         )
                     }
+                    Text(text = "Total pacientes: ${patientList.size}", modifier = Modifier.padding(start = 10.dp))
+                }
+
+                HorizontalDivider(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = Color(0xFFDADADA),
+                    thickness = 1.dp
+                )
+
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 12.dp, start = 12.dp, end = 12.dp)) {
+                    Text(
+                        text = "Paciente",
+                        style = TextStyle(fontSize = 15.sp)
+                    )
+                    Text(
+                        text = "Identificacion",
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.End,
+                        style = TextStyle(fontSize = 15.sp)
+                    )
+                }
+
+                if (successCall) {
                     LazyColumn(
                         modifier = Modifier
                             .padding(7.dp)
@@ -151,22 +185,22 @@ fun MainSupervisorScreen(
                         items(count = patientList.size) {
                             val patient = patientList[it]
                             PatientItemCard(patient = patient)
-                            Spacer(modifier = Modifier.height(3.dp))
+                            Spacer(modifier = Modifier.height(5.dp))
                         }
                     }
                 } else {
-                    Box(
+                    Text(text = "Oprime aqui para cargar la lista de espera",
                         modifier = Modifier
                             .fillMaxWidth()
-                            .align(Alignment.CenterHorizontally)
-                            .padding(10.dp)
-                    ) {
+                            .padding(10.dp),
+                        textAlign = TextAlign.Center,
+                        style = TextStyle(fontSize = 15.sp))
+                    Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
                         RefreshButtonAnimation(isRefreshing = fetchingData, refreshIconSize = 45.dp) {
                             mainSupervisorViewModel.getPatientList()
                         }
                     }
                 }
-
             }
         }
 
@@ -177,6 +211,7 @@ fun MainSupervisorScreen(
                 .align(Alignment.BottomCenter)
                 .padding(10.dp),
                 navigationOnAddClick = {
+                    mainSupervisorViewModel.stopUpdatingPatientList()
                     navController.navigate(AppScreens.PatientScreen.route)
                 })
         }
@@ -214,10 +249,12 @@ fun PatientItemCard(patient: PatientDtoForList) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(color = Color(0xFFF3F1F1))
+            .background(color = Color(0xFFF3F1F1), shape = ShapeDefaults.Small)
             .padding(5.dp)
     ) {
-        Text(text = "${patient.name} ${patient.lastname}")
-        Text(text = patient.idNumber, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.End)
+        Text(text = "${patient.name} ${patient.lastname}", modifier = Modifier.padding(start = 3.dp))
+        Text(text = patient.idNumber, modifier = Modifier
+            .fillMaxWidth()
+            .padding(end = 3.dp), textAlign = TextAlign.End)
     }
 }
