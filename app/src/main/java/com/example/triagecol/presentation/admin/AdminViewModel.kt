@@ -1,5 +1,6 @@
 package com.example.triagecol.presentation.admin
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.triagecol.domain.usecases.StaffRepositoryImpl
@@ -20,6 +21,9 @@ class AdminViewModel @Inject constructor(
 
     private val _fetchingData = MutableStateFlow(true)
     val fetchingData: StateFlow<Boolean> = _fetchingData
+
+    private val _fetchingStaffCount = MutableStateFlow(true)
+    val fetchingStaffCount: StateFlow<Boolean> = _fetchingStaffCount
 
     private val _userList = MutableStateFlow<List<StaffMemberDto>>(StaffDto())
     val userList: StateFlow<List<StaffMemberDto>> = _userList
@@ -77,7 +81,6 @@ class AdminViewModel @Inject constructor(
                     is APIResult.Success -> {
                         _successCall.value = true
                     }
-
                     is APIResult.Error -> {
                         _successCall.value = false
                         _error.value =
@@ -90,6 +93,32 @@ class AdminViewModel @Inject constructor(
                 }
             }
             _fetchingData.value = false
+        }
+    }
+
+    fun getCountStaff(){
+        _fetchingStaffCount.value = true
+        viewModelScope.launch {
+            staffRepositoryImpl.getStaffCount().let {
+                when(it){
+                    is APIResult.Success -> {
+                        if(it.data != _userList.value.size){
+                            getUserList()
+                        }
+                        _successCall.value = true
+                    }
+                    is APIResult.Error -> {
+                        _successCall.value = false
+                        _error.value =
+                            when (it.exception.message) {
+                                null -> Constants.NULL_ERROR
+                                Constants.TIMEOUT -> Constants.TIMEOUT_ERROR
+                                else -> "${it.exception.message}"
+                            }
+                    }
+                }
+            }
+            _fetchingStaffCount.value = false
         }
     }
 

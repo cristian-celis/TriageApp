@@ -45,15 +45,9 @@ class DetailCardViewModel @Inject constructor(
     private val _addMode = MutableStateFlow(true)
     val addMode: StateFlow<Boolean> = _addMode
 
-    private val _detailMode = MutableStateFlow<DetailMode>(DetailMode.ENTERING)
-    val detailMode: StateFlow<DetailMode> = _detailMode
-
     private val _userData =
         MutableStateFlow(StaffMemberDto(0, "", "", "", "Medico", "", "", ""))
     val userData: StateFlow<StaffMemberDto> = _userData
-
-    private val _detailState = MutableStateFlow(DetailState.ENTERING)
-    val detailState: StateFlow<DetailState> = _detailState
 
     private val _isApiRequestPending = MutableStateFlow(false)
     val isApiRequestPending: StateFlow<Boolean> = _isApiRequestPending
@@ -87,8 +81,6 @@ class DetailCardViewModel @Inject constructor(
         _password.value = ""
         _role.value = userData.role
         _userData.value = userData
-
-        _detailMode.value = DetailMode.ENTERING
     }
 
     private fun validDataHasChanged(): Boolean {
@@ -123,7 +115,6 @@ class DetailCardViewModel @Inject constructor(
                 ).let {
                     when (it) {
                         is APIResult.Success -> {
-                            _detailState.value = DetailState.SAVED
                             _successCall.value = true
                         }
 
@@ -166,7 +157,6 @@ class DetailCardViewModel @Inject constructor(
                     when (it) {
                         is APIResult.Success -> {
                             _successCall.value = true
-                            _detailState.value = DetailState.SAVED
                         }
 
                         is APIResult.Error -> {
@@ -183,10 +173,6 @@ class DetailCardViewModel @Inject constructor(
                 _isApiRequestPending.value = false
             }
         }
-    }
-
-    fun setDetailState(detailState: DetailState) {
-        _detailState.value = detailState
     }
 
     fun deleteUser(idUser: String) {
@@ -229,10 +215,6 @@ class DetailCardViewModel @Inject constructor(
     fun setAddMode() {
         _addMode.value = true
         _editMode.value = false
-    }
-
-    fun setDetailMode(detailMode: DetailMode) {
-        _detailMode.value = detailMode
     }
 
     fun resetData() {

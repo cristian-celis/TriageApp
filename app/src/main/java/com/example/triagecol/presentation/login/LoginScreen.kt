@@ -108,7 +108,7 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel) {
             placeHolderText = TextConstants.USERNAME,
             value = user,
             isTextFieldEnable = false
-        ) { loginViewModel.onLoginChanged(it, password) }
+        ) { loginViewModel.onLoginChanged(if(it.length < 11) it else user, password) }
 
         Spacer(modifier = Modifier.size(8.dp))
 

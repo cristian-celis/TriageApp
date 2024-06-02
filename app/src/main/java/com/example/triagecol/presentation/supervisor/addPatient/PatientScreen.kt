@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -33,13 +32,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.triagecol.presentation.admin.details.DetailMode
-import com.example.triagecol.presentation.common.ConfirmScreenDialog
 import com.example.triagecol.presentation.common.TextFieldComponent
 import com.example.triagecol.presentation.common.TopBarScreen
 import com.example.triagecol.presentation.navigation.AppScreens
 import com.example.triagecol.utils.SupervisorConstants
-import com.example.triagecol.utils.TextConstants
 
 @Composable
 fun PatientScreen(
@@ -75,7 +71,6 @@ fun PatientScreen(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(top = 15.dp)
             .pointerInput(Unit) {
                 detectTapGestures(
                     onTap = { focusManager.clearFocus() }
@@ -85,7 +80,7 @@ fun PatientScreen(
         TopBarScreen(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.085f).padding(bottom = 10.dp)
+                .padding(bottom = 10.dp)
             , titleText = SupervisorConstants.PATIENT_TEXT,
             backColor = Color.White,
             tintColor = Color.Black
@@ -113,7 +108,7 @@ fun PatientScreen(
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(140.dp))
+        Spacer(modifier = Modifier.height(70.dp))
     }
 }
 
@@ -130,7 +125,8 @@ fun ContinueButton(patientViewModel: PatientViewModel) {
             patientViewModel.setIsDialogShown(true)
         },
         modifier = Modifier
-            .fillMaxWidth().padding(horizontal = 16.dp)
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
             .height(52.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color(0xFF1A80E5),
@@ -138,7 +134,8 @@ fun ContinueButton(patientViewModel: PatientViewModel) {
             contentColor = Color.White,
             disabledContentColor = Color.White
         ),
-        enabled = saveEnable, shape = MaterialTheme.shapes.medium
+        enabled = saveEnable && !isSavingData,
+        shape = MaterialTheme.shapes.medium
     ) {
         if (isSavingData) ProgressIndicator()
         else Text(
@@ -155,7 +152,7 @@ fun NameLabelTextField(nameLabel: String) {
         style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.W500),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 5.dp, top = 7.dp),
+            .padding(bottom = 3.dp, top = 5.dp),
         textAlign = TextAlign.Start
     )
 }
@@ -171,81 +168,63 @@ private fun ProgressIndicator() {
 
 @Composable
 fun BasicData(patientViewModel: PatientViewModel, modifier: Modifier = Modifier) {
-    val idNumber by patientViewModel.idNumber.collectAsState()
-    val name by patientViewModel.name.collectAsState()
-    val lastname by patientViewModel.lastname.collectAsState()
-    val age by patientViewModel.age.collectAsState()
+    val patient by patientViewModel.patient.collectAsState()
 
     Column (modifier = modifier.padding(start = 16.dp, end = 16.dp)){
         NameLabelTextField(SupervisorConstants.NAME)
         TextFieldComponent(
-            placeHolderText = SupervisorConstants.NAME, value = name, isTextFieldEnable = false,
+            placeHolderText = SupervisorConstants.NAME, value = patient.name, isTextFieldEnable = false,
             onTextFieldChanged = {
-                patientViewModel.updateUserData(
-                    idNumber, it, lastname, age
-                )
+                patientViewModel.updatePatientData(it, PatientData.NAME)
             })
         NameLabelTextField(SupervisorConstants.LAST_NAME)
         TextFieldComponent(
-            placeHolderText = SupervisorConstants.LAST_NAME,
-            value = lastname,
-            isTextFieldEnable = false,
+            placeHolderText = SupervisorConstants.LAST_NAME, value = patient.lastname, isTextFieldEnable = false,
             onTextFieldChanged = {
-                patientViewModel.updateUserData(
-                    idNumber, name, it, age
-                )
+                patientViewModel.updatePatientData(it, PatientData.LASTNAME)
             })
         NameLabelTextField(SupervisorConstants.ID_NUMBER)
         TextFieldComponent(
-            placeHolderText = SupervisorConstants.ID_NUMBER,
-            value = idNumber,
-            isTextFieldEnable = false,
+            placeHolderText = SupervisorConstants.ID_NUMBER, value = patient.idNumber, isTextFieldEnable = false,
             onTextFieldChanged = {
-                patientViewModel.updateUserData(
-                    it, name, lastname, age
-                )
+                patientViewModel.updatePatientData(it, PatientData.ID_NUMBER)
             })
         NameLabelTextField(SupervisorConstants.AGE)
         TextFieldComponent(
-            placeHolderText = SupervisorConstants.AGE,
-            value = age,
-            isTextFieldEnable = false,
+            placeHolderText = SupervisorConstants.AGE, value = patient.age, isTextFieldEnable = false,
             onTextFieldChanged = {
-                patientViewModel.updateUserData(idNumber, name, lastname, it)
+                patientViewModel.updatePatientData(it, PatientData.AGE)
             })
     }
 }
 
 @Composable
 fun VitalSigns(patientViewModel: PatientViewModel, modifier: Modifier = Modifier) {
-    val temperature by patientViewModel.temperature.collectAsState()
-    val heartRate by patientViewModel.heartRate.collectAsState()
-    val bloodOxygen by patientViewModel.bloodOxygen.collectAsState()
-
+    val patient by patientViewModel.patient.collectAsState()
     Column (modifier = modifier.padding(start = 16.dp, end = 16.dp)){
         NameLabelTextField(SupervisorConstants.TEMPERATURE)
         TextFieldComponent(
             placeHolderText = SupervisorConstants.TEMPERATURE,
-            value = temperature,
+            value = patient.temperature,
             isTextFieldEnable = false,
             onTextFieldChanged = {
-                patientViewModel.updateVitalSigns(it, heartRate, bloodOxygen)
+                patientViewModel.updatePatientData(it, PatientData.TEMPERATURE)
             })
         NameLabelTextField(SupervisorConstants.HEART_RATE)
         TextFieldComponent(
             placeHolderText = SupervisorConstants.HEART_RATE,
-            value = heartRate,
+            value = patient.heartRate,
             isTextFieldEnable = false,
             onTextFieldChanged = {
-                patientViewModel.updateVitalSigns(temperature, it, bloodOxygen)
+                patientViewModel.updatePatientData(it, PatientData.HEART_RATE)
             })
         NameLabelTextField(SupervisorConstants.BLOOD_OXYGEN)
         TextFieldComponent(
             placeHolderText = SupervisorConstants.BLOOD_OXYGEN,
-            value = bloodOxygen,
+            value = patient.bloodOxygen,
             isTextFieldEnable = false,
             onTextFieldChanged = {
-                patientViewModel.updateVitalSigns(temperature, heartRate, it)
+                patientViewModel.updatePatientData(it, PatientData.BLOOD_OXYGEN)
             })
     }
 }
@@ -257,24 +236,23 @@ fun SelectGender(
 ) {
     val options = listOf(
         SupervisorConstants.FEMALE_TEXT,
-        SupervisorConstants.MALE_TEXT,
-        SupervisorConstants.OTHER_TEXT
+        SupervisorConstants.MALE_TEXT
     )
-    val role: String by patientViewModel.gender.collectAsState()
+    val patient by patientViewModel.patient.collectAsState()
 
     Column (modifier = modifier.padding(start = 16.dp, end = 16.dp)){
-        NameLabelTextField(SupervisorConstants.GENDER)
+        NameLabelTextField(SupervisorConstants.SEX)
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 5.dp, bottom = 2.dp), horizontalArrangement = Arrangement.SpaceBetween
+                .padding(top = 3.dp, bottom = 2.dp), horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             options.forEach { option ->
                 Row {
                     RadioButton(
-                        selected = role == option,
-                        onClick = { patientViewModel.setGender(option) },
+                        selected = patient.sex == option,
+                        onClick = { patientViewModel.updatePatientData(option, PatientData.SEX) },
                         colors = RadioButtonDefaults.colors(
                             selectedColor = Color(0xFF1A80E5)
                         )

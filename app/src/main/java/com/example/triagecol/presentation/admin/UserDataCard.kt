@@ -1,6 +1,8 @@
 package com.example.triagecol.presentation.admin
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -45,16 +47,17 @@ fun UserDataCard(
 
     Box(
         modifier = Modifier
-            .height(80.dp)
+            .height(82.dp)
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(start = 7.dp, end = 7.dp, bottom = 6.dp)
             .clickable(
                 interactionSource = interactionSource,
                 indication = null,
                 onClick = { onClick(medicalStaff) },
             )
-            .clip(MaterialTheme.shapes.medium)
-            .background(Color.White)//.shadow(3.dp)
+            .border(border = BorderStroke(1.dp, color = Color(0xFFD8D8D8)), shape = MaterialTheme.shapes.small)
+            .clip(MaterialTheme.shapes.small)
+            .background(color = Color.White)
     ) {
         Row {
             Column (horizontalAlignment = Alignment.Start,
@@ -64,9 +67,9 @@ fun UserDataCard(
                     painter = painterResource(id = iconUser),
                     contentDescription = null,
                     modifier = Modifier
-                        .size(45.dp).clip(CircleShape)
+                        .size(50.dp).clip(MaterialTheme.shapes.medium)
                         .background(Color(0xFFF3F1F1))
-                        .padding(5.dp)
+                        .padding(2.dp)
                 )
             }
             Column(

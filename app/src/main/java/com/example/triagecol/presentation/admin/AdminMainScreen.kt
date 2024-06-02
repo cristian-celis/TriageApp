@@ -21,6 +21,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -44,8 +45,13 @@ fun AdminMainScreen(navController: NavController, adminViewModel: AdminViewModel
 
     val userList by adminViewModel.userList.collectAsState()
     val fetchingData by adminViewModel.fetchingData.collectAsState()
+    val fetchingStaffCount by adminViewModel.fetchingStaffCount.collectAsState()
     val successCall by adminViewModel.successCall.collectAsState()
     val showDialog by adminViewModel.showDialog.collectAsState()
+
+    LaunchedEffect(key1 = true){
+        adminViewModel.getCountStaff()
+    }
 
     if(showDialog){
         ConfirmScreenDialog(mainText = TextConstants.CONFIRM_SIGN_OFF,
@@ -57,7 +63,9 @@ fun AdminMainScreen(navController: NavController, adminViewModel: AdminViewModel
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize().background(Color(0xFFF3F1F1))) {
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .background(Color(0xFFF3F1F1))) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -67,18 +75,17 @@ fun AdminMainScreen(navController: NavController, adminViewModel: AdminViewModel
             TopBarScreen(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(0.085f)
                     .background(Color.White),
                 titleText = TextConstants.ADMIN_TITLE,
-                backColor = Color(0xA3FF4D4D),
+                backColor = Color(0xA34D74FF),
                 tintColor = Color.White
             ) {
                 adminViewModel.setDialog(true)
             }
 
-            if (fetchingData) {
-                ShimmerEffect()
+            if (fetchingData || fetchingStaffCount) {
                 adminViewModel.clearError()
+                ShimmerEffect()
             } else if (!successCall) {
                 ErrorMessage(adminViewModel.error.value) { adminViewModel.getUserList() }
             } else {
@@ -96,7 +103,9 @@ fun AdminMainScreen(navController: NavController, adminViewModel: AdminViewModel
                         )
                     }
                 } else {
-                    LazyColumn(modifier = Modifier.padding(7.dp).fillMaxHeight(0.9f)) {
+                    LazyColumn(modifier = Modifier
+                        .padding(vertical = 8.dp)
+                        .fillMaxHeight(0.9f)) {
                         items(count = userList.size) {
                             val user = userList[it]
                             UserDataCard(
@@ -112,45 +121,20 @@ fun AdminMainScreen(navController: NavController, adminViewModel: AdminViewModel
 
                 Box(
                     modifier = Modifier
-                        .fillMaxSize().
-                        padding(start = 13.dp, end = 13.dp, bottom = 16.dp).
-                        background(Color.Transparent)
+                        .fillMaxSize()
+                        .padding(start = 13.dp, end = 13.dp, bottom = 16.dp)
+                        .background(Color.Transparent)
                 ) {
                     AddStaff(
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
-                            .fillMaxWidth().fillMaxHeight(),
+                            .fillMaxWidth()
+                            .height(70.dp),
                         { navController.navigate(AppScreens.DetailCard.route) }
                     ) { adminViewModel.setClickOnAddButton(true) }
                 }
-                DeleteAllPatientsButton {
-                    adminViewModel.deleteAllPatients()
-                }
-                Spacer(modifier = Modifier.height(50.dp))
             }
         }
-    }
-}
-
-@Composable
-fun DeleteAllPatientsButton(onClick: () -> Unit) {
-    Button(
-        onClick = { onClick() },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(10.dp),
-        colors = ButtonColors(
-            containerColor = Color(0xFFAF1717),
-            contentColor = Color.White,
-            disabledContainerColor = Color(0xFFCF7979),
-            disabledContentColor = Color.White
-        )
-    ) {
-        Text(
-            text = "Vaciar Pacientes.", style = TextStyle(
-                fontWeight = FontWeight.SemiBold, fontSize = 14.sp
-            ), textAlign = TextAlign.Center
-        )
     }
 }
 
@@ -177,7 +161,7 @@ fun ErrorMessage(error: String, onRefresh: () -> Unit) {
             }
         ) {
             Icon(
-                painterResource(id = R.drawable.ic_refresh), // Usa el ícono de recarga
+                painterResource(id = R.drawable.ic_refresh),
                 contentDescription = "Refresh",
                 modifier = Modifier.size(50.dp),
                 tint = Color.LightGray
@@ -198,7 +182,6 @@ fun AddStaff(
             navigationOnAddClick()
         },
         modifier = modifier,
-            //.height(48.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color(0xFF1A80E5),
             contentColor = Color.White,
@@ -208,7 +191,7 @@ fun AddStaff(
     ) {
         Text(
             text = TextConstants.ADD_TEXT,
-            style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)
         )
     }
 }

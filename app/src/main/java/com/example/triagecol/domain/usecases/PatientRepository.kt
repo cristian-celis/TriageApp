@@ -20,43 +20,44 @@ class PatientRepository @Inject constructor(
 
     suspend fun savePatientData(patientData: AddPatient): APIResult<ApiResponse> {
         return try {
-            Log.d("prueba", "Guardando Informacion Basica del Paciente: $patientData")
             val call = retrofit.create(APIServicePatient::class.java).addPatient(patientData)
-
             if (call.isSuccessful)
                 APIResult.Success(call.body()!!)
             else {
                 val errorBody = call.errorBody()?.string()
                 val gson = Gson()
                 val errorResponse = gson.fromJson(errorBody, ApiResponse::class.java)
-                APIResult.Error(Exception(errorResponse.message))
+                //APIResult.Error(Exception(errorResponse.message))
+                APIResult.Error(Exception("Error Desconocido"))
             }
-
         } catch (e: HttpException) {
             APIResult.Error(java.lang.Exception("Revisa tu conexion a internet."))
-        }catch (e: Throwable){
-            APIResult.Error(java.lang.Exception("idk men, otro tipo de error"))
+        }catch (e: Exception){
+            APIResult.Error(java.lang.Exception("Error de Conexion."))
         }
     }
 
     suspend fun saveSymptomsPat(
         idNumberPat: String,
-        symptomsList: ArrayList<Int>
+        symptomsList: ArrayList<Int>,
+        pregnancy: Boolean,
+        observations: String
     ): APIResult<ApiResponse> {
         return try {
-            val patient = AddSymptoms(idNumberPat.toInt(), symptomsList)
+            val patient = AddSymptoms(idNumberPat.toInt(), symptomsList, pregnancy, observations)
             val call = retrofit.create(APIServicePatient::class.java).addPatientSymptoms(patient)
-            Log.d("prueba", "Que paso?: ${call.body()}")
             if (call.isSuccessful) {
                 APIResult.Success(call.body()!!)
             } else {
                 val errorBody = call.errorBody()?.string()
                 val gson = Gson()
                 val errorResponse = gson.fromJson(errorBody, ApiResponse::class.java)
-                APIResult.Error(Exception(errorResponse.message))
+                //APIResult.Error(Exception(errorResponse.message))
+                APIResult.Error(Exception("Error Desconocido"))
             }
         } catch (e: Exception) {
-            APIResult.Error(e)
+            Log.d(Constants.TAG, "Error, excepcion: ${e.message}")
+            APIResult.Error(Exception("Error de Conexion"))
         }
     }
 
@@ -70,10 +71,11 @@ class PatientRepository @Inject constructor(
                 val errorBody = call.errorBody()?.string()
                 val gson = Gson()
                 val errorResponse = gson.fromJson(errorBody, ApiResponse::class.java)
-                APIResult.Error(Exception(errorResponse.message))
+                //APIResult.Error(Exception(errorResponse.message))
+                APIResult.Error(Exception("Error Desconocido"))
             }
         }catch (e: Exception){
-            APIResult.Error(e)
+            APIResult.Error(Exception("Error de conexion"))
         }
     }
 
@@ -86,7 +88,26 @@ class PatientRepository @Inject constructor(
                 APIResult.Error(Exception("Error Desconocido"))
             }
         }catch (e: Exception){
-            APIResult.Error(e)
+            APIResult.Error(Exception("Error de conexion"))
+        }
+    }
+
+    suspend fun deletePatient(id: String): APIResult<ApiResponse>{
+        return try{
+            val call = retrofit.create(APIServicePatient::class.java).deletePatient(id.toInt())
+            if(call.isSuccessful){
+                APIResult.Success(call.body()!!)
+            }else{
+                val errorBody = call.errorBody()?.string()
+                val gson = Gson()
+                val errorResponse = gson.fromJson(errorBody, ApiResponse::class.java)
+                //APIResult.Error(Exception(errorResponse.message))
+                APIResult.Error(Exception("Error Desconocido"))
+            }
+        }catch (e: HttpException){
+            APIResult.Error(java.lang.Exception("Revisa tu conexion a internet."))
+        }catch (e: Throwable){
+            APIResult.Error(java.lang.Exception("Error de conexion."))
         }
     }
 }

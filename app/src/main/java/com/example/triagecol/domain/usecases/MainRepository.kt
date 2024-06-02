@@ -16,7 +16,7 @@ class MainRepository @Inject constructor(
             Log.d(Constants.TAG, "Iniciando Back")
             retrofit.create(APIServiceMain::class.java).initBack()
         } catch (e: Exception) {
-            APIResult.Error(e)
+            APIResult.Error(Exception("Error de Conexion"))
         }
     }
 }

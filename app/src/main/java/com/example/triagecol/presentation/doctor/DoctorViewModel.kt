@@ -8,6 +8,7 @@ import com.example.triagecol.domain.models.dto.DoctorStatus
 import com.example.triagecol.domain.models.dto.PatientDto
 import com.example.triagecol.domain.models.dto.PriorityPatientDto
 import com.example.triagecol.domain.models.dto.StaffMemberDto
+import com.example.triagecol.domain.models.dto.toPatient
 import com.example.triagecol.domain.usecases.DoctorRepository
 import com.example.triagecol.utils.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,7 +29,7 @@ class DoctorViewModel @Inject constructor(
 
     private val _patientData = MutableStateFlow(
         PriorityPatientDto(
-            PatientDto(0, "", "", "", "", "", "", "", ""),
+            PatientDto(0, "", "", "", "", "", "", "", "", 0, ""),
             emptyList()
         )
     )
@@ -157,7 +158,7 @@ class DoctorViewModel @Inject constructor(
         setShowDialog(false)
         _doctorInConsultation.value = false
         _patientData.value = PriorityPatientDto(
-            PatientDto(0, "", "", "", "", "", "", "", ""),
+            PatientDto(0, "", "", "", "", "", "", "", "", 0, ""),
             emptyList()
         )
         if (_isDoctorOnline.value) updateDoctorStatus(false)
@@ -174,7 +175,7 @@ class DoctorViewModel @Inject constructor(
         }
         _doctorInConsultation.value = false
         _patientData.value = PriorityPatientDto(
-            PatientDto(0, "", "", "", "", "", "", "", ""),
+            PatientDto(0, "", "", "", "", "", "", "", "", 0, ""),
             emptyList()
         )
     }

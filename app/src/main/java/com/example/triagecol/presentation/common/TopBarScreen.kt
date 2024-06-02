@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -37,8 +38,8 @@ fun TopBarScreen(
     onClick: () -> Unit
 ) {
     Row(
-        modifier = modifier.padding(start = 10.dp),
-        verticalAlignment = Alignment . CenterVertically
+        modifier = modifier.padding(start = 10.dp).height(70.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             painter = painterResource(id = R.drawable.ic_go_back),

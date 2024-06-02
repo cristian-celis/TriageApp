@@ -2,6 +2,15 @@ package com.example.triagecol.presentation.doctor
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -15,26 +24,35 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.toUpperCase
@@ -58,7 +76,6 @@ fun PatientSectionScreen(doctorViewModel: DoctorViewModel, modifier: Modifier = 
     Box(
         modifier = modifier
             .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
-        //.border(border = BorderStroke(1.dp, color = Color(0xFFCFCFCF)))
     ) {
         Column(
             modifier = Modifier
@@ -96,6 +113,13 @@ fun PatientSectionScreen(doctorViewModel: DoctorViewModel, modifier: Modifier = 
                             text = "Edad: ${patient.age} Años",
                             style = TextStyle(fontSize = 14.sp)
                         )
+                        Text(
+                            text = "Estado de embarazo: ${if(patient.pregnancy == 1) "Si" else "No"}",
+                            style = TextStyle(fontSize = 14.sp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(5.dp)
+                        )
                     }
                 } else {
                     RoundedBoxTextMessage(message = DoctorConstants.NO_PATIENT_MESSAGE, topPadding = 5.dp, bottomPadding = 5.dp)
@@ -114,15 +138,16 @@ fun PatientSectionScreen(doctorViewModel: DoctorViewModel, modifier: Modifier = 
                 textAlign = TextAlign.Start,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 17.dp, top = 5.dp)
+                    .padding(bottom = 10.dp, top = 8.dp)
             )
+
             if (symptoms.isNotEmpty()) {
                 LazyColumn(
                     modifier = Modifier
                         .height(150.dp)
                         .fillMaxWidth(),
                     verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.Start
                 ) {
                     items(count = symptoms.size) {
                         val symptom = symptoms[it]
@@ -131,14 +156,21 @@ fun PatientSectionScreen(doctorViewModel: DoctorViewModel, modifier: Modifier = 
                     }
                 }
             } else {
-                RoundedBoxTextMessage(message = DoctorConstants.NO_PATIENT_MESSAGE, topPadding = 8.dp, bottomPadding = 14.dp)
-            }
+                Column (modifier = Modifier
+                    .height(150.dp)
+                    .fillMaxWidth(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ){
+                    RoundedBoxTextMessage(message = "No hay sintomas registrados.", topPadding = 8.dp, bottomPadding = 14.dp)
+                }
 
-            HorizontalDivider(
-                modifier = Modifier.fillMaxWidth(),
-                color = Color(0xFFDADADA),
-                thickness = 1.dp
-            )
+                HorizontalDivider(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = Color(0xFFDADADA),
+                    thickness = 1.dp
+                )
+            }
 
             Text(
                 text = DoctorConstants.VITAL_SIGNS,
@@ -146,7 +178,7 @@ fun PatientSectionScreen(doctorViewModel: DoctorViewModel, modifier: Modifier = 
                 textAlign = TextAlign.Start,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 5.dp, top = 5.dp)
+                    .padding(bottom = 5.dp, top = 8.dp)
             )
             Row(
                 modifier = Modifier
@@ -156,7 +188,7 @@ fun PatientSectionScreen(doctorViewModel: DoctorViewModel, modifier: Modifier = 
                 VitalSignsCards(
                     iconResource = painterResource(id = R.drawable.temperature_icon),
                     vitalSignName = SupervisorConstants.TEMPERATURE,
-                    vitalSignValue = patient.temperature,
+                    vitalSignValue = "${patient.temperature} °C",
                     modifier = Modifier.fillMaxWidth(0.33f)
                 )
                 Spacer(modifier = Modifier.width(9.dp))
@@ -164,7 +196,7 @@ fun PatientSectionScreen(doctorViewModel: DoctorViewModel, modifier: Modifier = 
                 VitalSignsCards(
                     iconResource = painterResource(id = R.drawable.blood_oxygen_icon),
                     vitalSignName = SupervisorConstants.BLOOD_OXYGEN,
-                    vitalSignValue = patient.bloodOxygen,
+                    vitalSignValue = "${patient.bloodOxygen}%",
                     modifier = Modifier.fillMaxWidth(0.5f)
                 )
                 Spacer(modifier = Modifier.width(9.dp))
@@ -172,12 +204,35 @@ fun PatientSectionScreen(doctorViewModel: DoctorViewModel, modifier: Modifier = 
                 VitalSignsCards(
                     iconResource = painterResource(id = R.drawable.heart_rate_icon),
                     vitalSignName = SupervisorConstants.HEART_RATE,
-                    vitalSignValue = patient.heartRate,
+                    vitalSignValue = "${patient.heartRate} bpm",
                     modifier = Modifier.fillMaxWidth(1f)
                 )
             }
-
+            HorizontalDivider(
+                modifier = Modifier.fillMaxWidth(),
+                color = Color(0xFFDADADA),
+                thickness = 1.dp
+            )
+            Observations(doctorViewModel = doctorViewModel)
         }
+    }
+}
+
+@Composable
+fun Observations(doctorViewModel: DoctorViewModel) {
+    val observations by doctorViewModel.patientData.collectAsState()
+    Text(
+        text = "Observaciones",
+        style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.SemiBold),
+        textAlign = TextAlign.Start,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 5.dp, top = 8.dp)
+    )
+    if(observations.priorityPatient.observations.isNotEmpty()){
+        Text(text = observations.priorityPatient.observations)
+    }else{
+        RoundedBoxTextMessage(message = "No tiene observaciones", topPadding = 5.dp, bottomPadding = 5.dp)
     }
 }
 
@@ -209,7 +264,7 @@ private fun VitalSignsCards(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(35.dp)
-                    .padding(3.dp),
+                    .padding(top = 3.dp),
                 text = vitalSignName,
                 style = TextStyle(color = Color.Gray, fontSize = 14.sp),
                 textAlign = TextAlign.Center
@@ -225,7 +280,6 @@ private fun VitalSignsCards(
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .padding(3.dp)
                 ) {
                     Icon(
                         painter = iconResource,

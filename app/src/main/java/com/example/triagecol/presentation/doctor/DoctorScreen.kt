@@ -13,13 +13,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ShapeDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -78,7 +81,6 @@ fun DoctorScreen(navController: NavController, doctorViewModel: DoctorViewModel)
         TopBarScreen(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.09f)
                 .padding(bottom = 10.dp)
                 .background(Color.White),
             titleText = DoctorConstants.DOCTOR_SCREE,
@@ -96,23 +98,21 @@ fun DoctorScreen(navController: NavController, doctorViewModel: DoctorViewModel)
             doctorViewModel = doctorViewModel,
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.8f)
+                .fillMaxHeight(0.85f)
         )
-
-        ShowWaitingPatientsCount(doctorViewModel)
 
         Box(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(10.dp)
+                .fillMaxSize().height(70.dp)
                 .background(Color.Transparent)
         ) {
             GetAndEndPatientConsultBtt(
-                doctorViewModel = doctorViewModel,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(75.dp)
                     .align(Alignment.BottomCenter)
+                    .padding(10.dp)
+                    .fillMaxWidth()
+                    .height(60.dp),
+                doctorViewModel = doctorViewModel
             )
         }
     }
@@ -121,6 +121,8 @@ fun DoctorScreen(navController: NavController, doctorViewModel: DoctorViewModel)
 @Composable
 fun DoctorData(doctorViewModel: DoctorViewModel, modifier: Modifier = Modifier) {
     val doctorData by doctorViewModel.doctorData.collectAsState()
+    val patientsWaitingCount by doctorViewModel.patientsWaitingCount.collectAsState()
+    val isDoctorOnline by doctorViewModel.isDoctorOnline.collectAsState()
 
     Box(
         modifier = modifier
@@ -146,8 +148,15 @@ fun DoctorData(doctorViewModel: DoctorViewModel, modifier: Modifier = Modifier) 
                     text = "Identificacion: ${doctorData.idNumber}",
                     style = TextStyle(fontSize = 14.sp)
                 )
+                Surface(tonalElevation = 5.dp,
+                    shape = RoundedCornerShape(5.dp),
+                    color = if(isDoctorOnline) Color(0xFF1A80E5) else Color(0xFFB8CBFA),
+                    contentColor = Color.White,
+                    modifier = Modifier.padding(top = 3.dp)
+                ) {
+                    Text(text = "En espera: $patientsWaitingCount", modifier = Modifier.padding(horizontal = 5.dp))
+                }
             }
-
 
             OnlineSwitch(doctorViewModel = doctorViewModel) {
                 doctorViewModel.updateDoctorStatus(it)
@@ -166,12 +175,15 @@ fun GetAndEndPatientConsultBtt(doctorViewModel: DoctorViewModel, modifier: Modif
         onClick = {
             if (doctorInConsultation) doctorViewModel.endConsultation()
             else doctorViewModel.assignPatient()
-        }, modifier = modifier.padding(5.dp), colors = ButtonDefaults.buttonColors(
+        },
+        modifier = modifier,
+        colors = ButtonDefaults.buttonColors(
             containerColor = if (doctorInConsultation) Color(0xFFFF3030) else Color(0xFF1A80E5),
             disabledContainerColor = Color(0xFFB8CBFA),
             contentColor = Color.White,
-            disabledContentColor = Color.White
-        ), enabled = isDoctorOnline, shape = ShapeDefaults.Medium
+            disabledContentColor = Color.White),
+        enabled = isDoctorOnline,
+        shape = ShapeDefaults.Medium
     ) {
         if (isFetchingPatients) {
             ProgressIndicator(
@@ -181,7 +193,7 @@ fun GetAndEndPatientConsultBtt(doctorViewModel: DoctorViewModel, modifier: Modif
             Text(
                 text = if (doctorInConsultation) DoctorConstants.END_CONSULTATION else DoctorConstants.GET_PATIENT,
                 textAlign = TextAlign.Center,
-                style = TextStyle(fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                style = TextStyle(fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
             )
         }
     }
@@ -260,7 +272,7 @@ fun ShowWaitingPatientsCount(doctorViewModel: DoctorViewModel) {
         Column(
             modifier = Modifier
                 .clip(shape = ShapeDefaults.Medium)
-                .background(Color(0xFFBAD4EE))
+                .background(Color(0xFF1A80E5))
                 .align(Alignment.CenterEnd)
                 .height(50.dp)
                 .width(100.dp)
@@ -269,14 +281,15 @@ fun ShowWaitingPatientsCount(doctorViewModel: DoctorViewModel) {
         ) {
             Text(
                 text = "En espera",
-                modifier = Modifier.fillMaxWidth(), fontSize = 14.sp, textAlign = TextAlign.Center
+                modifier = Modifier.fillMaxWidth(), fontSize = 14.sp, textAlign = TextAlign.Center, color = Color.White
             )
             Text(
                 text = "$patientsWaitingCount",
                 modifier = Modifier.fillMaxWidth(),
                 style = TextStyle(
                     fontWeight = FontWeight.SemiBold,
-                    fontSize = 18.sp
+                    fontSize = 18.sp,
+                    color = Color.White
                 ),
                 textAlign = TextAlign.Center
             )

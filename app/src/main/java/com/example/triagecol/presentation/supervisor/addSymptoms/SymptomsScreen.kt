@@ -1,9 +1,9 @@
 package com.example.triagecol.presentation.supervisor.addSymptoms
 
+import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,33 +13,38 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.traigecol.R
+import com.example.triagecol.presentation.common.TopBarScreen
 import com.example.triagecol.presentation.navigation.AppScreens
+import com.example.triagecol.utils.Constants
 import com.example.triagecol.utils.SupervisorConstants
 
 @Composable
@@ -50,14 +55,10 @@ fun SymptomsScreen(
 
     val isSavingData by symptomsViewModel.isSavingSymptoms.collectAsState()
     val successCall by symptomsViewModel.successCall.collectAsState()
+    val error by symptomsViewModel.error.collectAsState()
+    val successDeleting by symptomsViewModel.successDeletion.collectAsState()
 
     val focusManager = LocalFocusManager.current
-
-    /*
-    * CUANDO SE INICIA EL SYMPTOM SCREEN SE SETEA EL NUMERO DE DOCUMENTO DEL PACIENTE AGREGADO.
-    * DESPUES DE AGREGAR UN PACIENTE Y SETEAR LOS SINTOMAS, AL AGREGAR OTRO PACIENTE EL
-    * NUMERO DE DOCUMENTO SE SETEA MAL!!!
-    * */
 
     if (successCall) {
         navController.navigate(AppScreens.SupervisorScreen.route) {
@@ -66,7 +67,17 @@ fun SymptomsScreen(
         symptomsViewModel.resetData()
         Toast.makeText(
             LocalContext.current,
-            "Paciente registrado en lista de espera.",
+            "Paciente registrado en lista de espera",
+            Toast.LENGTH_LONG
+        ).show()
+    }
+
+    if (successDeleting) {
+        navController.popBackStack()
+        symptomsViewModel.resetData()
+        Toast.makeText(
+            LocalContext.current,
+            "Proceso cancelado",
             Toast.LENGTH_LONG
         ).show()
     }
@@ -75,7 +86,6 @@ fun SymptomsScreen(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(start = 16.dp, end = 16.dp)
             .pointerInput(Unit) {
                 detectTapGestures(
                     onTap = { focusManager.clearFocus() }
@@ -83,53 +93,46 @@ fun SymptomsScreen(
             },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(
+
+        TopBarScreen(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(80.dp)
-                .padding(top = 10.dp, bottom = 10.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(bottom = 10.dp), titleText = SupervisorConstants.SYMPTOMS_TEXT,
+            backColor = Color.White,
+            tintColor = Color.Black
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_go_back),
-                contentDescription = null,
-                modifier = Modifier
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = {
-                            navController.navigate(route = AppScreens.SupervisorScreen.route)
-                        }
-                    )
-                    .size(25.dp))
-
-            Text(
-                text = SupervisorConstants.SYMPTOMS_TEXT,
-                style = TextStyle(fontSize = 25.sp, fontWeight = FontWeight.Bold),
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
+            navController.navigate(route = AppScreens.SupervisorScreen.route)
         }
 
         CreateCheckBoxes(symptomsViewModel = symptomsViewModel)
 
         if (isSavingData) {
-            ProgressIndicator()
+            ProgressIndicator(75.dp, 10.dp, Color.Black, 3.dp)
         } else {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(10.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                GoBackButton(symptomsViewModel = symptomsViewModel, navController = navController)
-                SendDataButton(symptomsViewModel = symptomsViewModel)
+                CancelButton(
+                    modifier = Modifier
+                        .fillMaxWidth(0.5f)
+                        .padding(end = 5.dp),
+                    symptomsViewModel = symptomsViewModel
+                )
+                SendDataButton(
+                    modifier = Modifier
+                        .fillMaxWidth(1f)
+                        .padding(start = 5.dp),
+                    symptomsViewModel = symptomsViewModel
+                )
             }
         }
 
-        if (!successCall) {
+        if (!successCall || !successDeleting) {
             Text(
-                text = symptomsViewModel.error.value,
+                text = error,
                 style = TextStyle(
                     fontSize = 18.sp,
                     color = Color(0xFFFF0000)
@@ -138,89 +141,28 @@ fun SymptomsScreen(
                     .padding(20.dp)
             )
         }
-
     }
 }
 
 @Composable
-private fun ProgressIndicator() {
+private fun ProgressIndicator(size: Dp, padding: Dp, color: Color, stroke: Dp) {
     CircularProgressIndicator(
         modifier = Modifier
-            .size(75.dp)
-            .padding(10.dp),
-        color = Color.Black,
-        strokeWidth = 3.dp
+            .size(size)
+            .padding(padding),
+        color = color,
+        strokeWidth = stroke
     )
 }
 
 @Composable
-fun CreateCheckBoxes(symptomsViewModel: SymptomsViewModel) {
-
-    val chestPain by symptomsViewModel.chestPain.collectAsState()
-    val breathDiff by symptomsViewModel.breathingDiff.collectAsState()
-    val conscAlt by symptomsViewModel.consciousnessAlt.collectAsState()
-    val suddenWeakness by symptomsViewModel.suddenWeakness.collectAsState()
-    val sevAbdPain by symptomsViewModel.sevAbdPain.collectAsState()
-    val sevTrauma by symptomsViewModel.sevTrauma.collectAsState()
-
-    CheckBoxes(
-        checked = chestPain,
-        onCheckedChange = {
-            symptomsViewModel.updateSymptoms(
-                it, breathDiff, conscAlt, suddenWeakness, sevAbdPain, sevTrauma
-            )
-        }, text = SupervisorConstants.CHEST_PAIN
-    )
-    CheckBoxes(
-        checked = breathDiff,
-        onCheckedChange = {
-            symptomsViewModel.updateSymptoms(
-                chestPain, it, conscAlt, suddenWeakness, sevAbdPain, sevTrauma
-            )
-        }, text = SupervisorConstants.BREATH_DIFF
-    )
-    CheckBoxes(
-        checked = conscAlt,
-        onCheckedChange = {
-            symptomsViewModel.updateSymptoms(
-                chestPain, breathDiff, it, suddenWeakness, sevAbdPain, sevTrauma
-            )
-        }, text = SupervisorConstants.CONSC_ALT
-    )
-    CheckBoxes(
-        checked = suddenWeakness,
-        onCheckedChange = {
-            symptomsViewModel.updateSymptoms(
-                chestPain, breathDiff, conscAlt, it, sevAbdPain, sevTrauma
-            )
-        }, text = SupervisorConstants.SUDDEN_WEAKNESS
-    )
-    CheckBoxes(
-        checked = sevAbdPain,
-        onCheckedChange = {
-            symptomsViewModel.updateSymptoms(
-                chestPain, breathDiff, conscAlt, suddenWeakness, it, sevTrauma
-            )
-        }, text = SupervisorConstants.SEV_ABD_PAIN
-    )
-    CheckBoxes(
-        checked = sevTrauma,
-        onCheckedChange = {
-            symptomsViewModel.updateSymptoms(
-                chestPain, breathDiff, conscAlt, suddenWeakness, sevAbdPain, it
-            )
-        }, text = SupervisorConstants.SEV_TRAUMA
-    )
-}
-
-@Composable
-fun GoBackButton(symptomsViewModel: SymptomsViewModel, navController: NavController) {
+fun CancelButton(modifier: Modifier = Modifier, symptomsViewModel: SymptomsViewModel) {
+    val deletingPatient by symptomsViewModel.deleting.collectAsState()
     Button(
         onClick = {
-            symptomsViewModel.resetData()
-            navController.popBackStack()
+            symptomsViewModel.deletePatient()
         },
-        modifier = Modifier,
+        modifier = modifier.height(45.dp),
         shape = ShapeDefaults.Small,
         colors = ButtonColors(
             containerColor = Color(0xFFFF3232),
@@ -228,20 +170,28 @@ fun GoBackButton(symptomsViewModel: SymptomsViewModel, navController: NavControl
             contentColor = Color.White,
             disabledContentColor = Color.White
         ),
-        enabled = !symptomsViewModel.isSavingSymptoms.value
+        enabled = !symptomsViewModel.isSavingSymptoms.value && !deletingPatient
     ) {
-        Text(
-            text = SupervisorConstants.CANCEL_TEXT,
-            style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.W500)
-        )
+        if (!deletingPatient) {
+            Text(
+                text = SupervisorConstants.CANCEL_TEXT,
+                style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.W500)
+            )
+        } else {
+            ProgressIndicator(size = 20.dp, padding = 3.dp, color = Color.White, stroke = 5.dp)
+        }
     }
 }
 
 @Composable
-fun SendDataButton(symptomsViewModel: SymptomsViewModel) {
+fun SendDataButton(modifier: Modifier = Modifier, symptomsViewModel: SymptomsViewModel) {
+    val savingSymptoms by symptomsViewModel.isSavingSymptoms.collectAsState()
     Button(
-        onClick = { symptomsViewModel.sendSymptomsData() },
-        modifier = Modifier,
+        onClick = {
+            Log.d(Constants.TAG, "Boton oprimido")
+            symptomsViewModel.sendSymptomsData()
+        },
+        modifier = modifier.height(45.dp),
         shape = ShapeDefaults.Small,
         colors = ButtonColors(
             containerColor = Color(0xFF1A80E5),
@@ -251,30 +201,40 @@ fun SendDataButton(symptomsViewModel: SymptomsViewModel) {
         ),
         enabled = !symptomsViewModel.isSavingSymptoms.value
     ) {
-        Text(
-            text = SupervisorConstants.SEND_TEXT,
-            style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.W500)
-        )
+        if (!savingSymptoms) {
+            Text(
+                text = SupervisorConstants.SEND_TEXT,
+                style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.W500)
+            )
+        } else {
+            ProgressIndicator(size = 20.dp, padding = 3.dp, color = Color.White, stroke = 5.dp)
+        }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CheckBoxes(
-    text: String,
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
-) {
-    Row(
+fun Textarea(symptomsViewModel: SymptomsViewModel) {
+    val observations by symptomsViewModel.observations.collectAsState()
+    TextField(
+        value = observations,
+        onValueChange = { symptomsViewModel.updateObservation(it) },
+        placeholder = {
+            Text(
+                text = "Ingrese las observaciones medicas del paciente (No es obligatorio).",
+                style = MaterialTheme.typography.bodyLarge,
+                color = colorResource(id = R.color.placeholder)
+            )
+        },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(5.dp)
-    ) {
-        Checkbox(
-            checked = checked,
-            onCheckedChange = {
-                onCheckedChange(it)
-            }
+            .height(100.dp)
+            .padding(10.dp)
+            .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(8.dp)),
+        colors = TextFieldDefaults.textFieldColors(
+            containerColor = Color(0xFFE8EDF2),
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent
         )
-        Text(text = text, modifier = Modifier.padding(start = 10.dp, top = 11.dp))
-    }
+    )
 }

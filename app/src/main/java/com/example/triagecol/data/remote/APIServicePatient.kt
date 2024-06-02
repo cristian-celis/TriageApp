@@ -7,8 +7,10 @@ import com.example.triagecol.domain.models.dto.PatientsDto
 import com.example.triagecol.utils.EndPointConstants
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 interface APIServicePatient {
 
@@ -23,4 +25,7 @@ interface APIServicePatient {
 
     @GET(EndPointConstants.GET_PATIENT_LIST)
     suspend fun getPatientList(): Response<PatientsDto>
+
+    @DELETE(EndPointConstants.DELETE_PATIENT)
+    suspend fun deletePatient(@Path("id") id: Int): Response<ApiResponse>
 }

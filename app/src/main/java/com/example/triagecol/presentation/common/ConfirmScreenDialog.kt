@@ -4,9 +4,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import com.example.triagecol.presentation.admin.details.DetailMode
 import com.example.triagecol.utils.TextConstants
 
 @Composable

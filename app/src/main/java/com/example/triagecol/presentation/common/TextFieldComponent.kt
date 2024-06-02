@@ -52,6 +52,8 @@ fun TextFieldComponent(
     onTextFieldChanged: (String) -> Unit
 ) {
 
+    val regex = "^[a-zA-Z0-9]*$".toRegex()
+
     Box(
         modifier = Modifier
             .padding(bottom = 14.dp)
@@ -61,7 +63,7 @@ fun TextFieldComponent(
             modifier = Modifier
                 .fillMaxWidth(),
             value = value,
-            onValueChange = { onTextFieldChanged(it) },
+            onValueChange = { if(regex.matches(it)) onTextFieldChanged(it) },
             textStyle = TextStyle(color = Color.Black, fontSize = 18.sp),
             //label = { Text("Label") },
             placeholder = {

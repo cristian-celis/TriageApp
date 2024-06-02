@@ -25,6 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.traigecol.R
+import com.example.triagecol.presentation.common.NameLabelTextField
 import com.example.triagecol.presentation.common.PasswordTextField
 import com.example.triagecol.presentation.common.TextFieldComponent
 import com.example.triagecol.utils.Constants
@@ -108,18 +109,6 @@ fun TextBoxesForData(modifier: Modifier = Modifier, detailCardViewModel: DetailC
             .fillMaxWidth()
             .padding(top = 10.dp, bottom = 4.dp))
     }
-}
-
-@Composable
-fun NameLabelTextField(modifier: Modifier = Modifier, nameLabel: String) {
-    Text(
-        text = nameLabel,
-        style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.W500),
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(bottom = 5.dp, top = 10.dp),
-        textAlign = TextAlign.Start
-    )
 }
 
 @Composable

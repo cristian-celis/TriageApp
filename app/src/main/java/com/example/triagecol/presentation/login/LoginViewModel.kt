@@ -22,6 +22,8 @@ class LoginViewModel @Inject constructor(
     private val loginRepository: LoginRepository
 ) : ViewModel() {
 
+    private val regex = "^[a-zA-Z0-9]*$".toRegex()
+
     private val _user = MutableStateFlow("")
     val user: StateFlow<String> = _user
 
@@ -50,7 +52,7 @@ class LoginViewModel @Inject constructor(
     val showToastMessage: StateFlow<Boolean> = _showToastMessage
 
     fun onLoginChanged(user: String, password: String) {
-        if(_user.value.length <= 10) _user.value = user
+        _user.value = user
         _password.value = password
         _loginEnable.value = validCredentials(user, password)
     }
@@ -61,7 +63,7 @@ class LoginViewModel @Inject constructor(
     fun login() {
         _authenticatingCredentials.value = true
         viewModelScope.launch {
-            loginRepository.login(LoginModel(_user.value!!, _password.value!!)).let {
+            loginRepository.login(LoginModel(_user.value, _password.value)).let {
                 when (it) {
                     is APIResult.Success -> {
                         _userLoggedIn.value =

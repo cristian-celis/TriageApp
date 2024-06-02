@@ -25,10 +25,11 @@ class DoctorRepository @Inject constructor(
                 val errorBody = call.errorBody()?.string()
                 val gson = Gson()
                 val errorResponse = gson.fromJson(errorBody, ApiResponse::class.java)
-                APIResult.Error(Exception(errorResponse.message))
+                //APIResult.Error(Exception(errorResponse.message))
+                APIResult.Error(Exception("Error Desconocido"))
             }
         } catch (e: Exception) {
-            APIResult.Error(e)
+            APIResult.Error(Exception("Error de Conexion"))
         }
     }
 
@@ -43,10 +44,11 @@ class DoctorRepository @Inject constructor(
                 val errorBody = call.errorBody()?.string()
                 val gson = Gson()
                 val errorResponse = gson.fromJson(errorBody, ApiResponse::class.java)
-                APIResult.Error(Exception(errorResponse.message))
+                //APIResult.Error(Exception(errorResponse.message))
+                APIResult.Error(Exception("Error Desconocido"))
             }
         } catch (e: Exception) {
-            APIResult.Error(e)
+            APIResult.Error(Exception("Error de Conexion"))
         }
     }
 
@@ -60,7 +62,7 @@ class DoctorRepository @Inject constructor(
                 APIResult.Error(Exception("Error Desconocido"))
             }
         }catch (e: Exception){
-            APIResult.Error(e)
+            APIResult.Error(Exception("Error de Conexion"))
         }
     }
 }

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,6 +24,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,7 +44,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.traigecol.R
+import com.example.triagecol.presentation.common.TopBarScreen
 import com.example.triagecol.presentation.navigation.AppScreens
+import com.example.triagecol.utils.SupervisorConstants
 import com.example.triagecol.utils.TextConstants
 
 @Composable
@@ -59,7 +63,7 @@ fun DetailCard(
 
     var screenTitle by rememberSaveable { mutableStateOf(TextConstants.ADD_STAFF_TITLE) }
 
-    if (detailCardViewModel.detailMode.value == DetailMode.ENTERING) {
+    LaunchedEffect(key1 = true){
         screenTitle = if (detailCardViewModel.userData.value.id != 0) {
             detailCardViewModel.setEditMode()
             TextConstants.EDIT_STAFF_TITLE
@@ -67,12 +71,9 @@ fun DetailCard(
             detailCardViewModel.setAddMode()
             TextConstants.ADD_STAFF_TITLE
         }
-        detailCardViewModel.setDetailMode(DetailMode.ENTERED)
     }
 
     if (successCall) {
-        detailCardViewModel.setDetailState(DetailState.ENTERING)
-        detailCardViewModel.setDetailMode(DetailMode.ENTERING)
         detailCardViewModel.resetData()
         navController.popBackStack()
     }
@@ -87,34 +88,14 @@ fun DetailCard(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
 
-        Row(
+        TopBarScreen(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(80.dp)
-                .padding(10.dp), verticalAlignment = Alignment.CenterVertically
+                .fillMaxWidth(),
+            titleText = screenTitle,
+            backColor = Color.White,
+            tintColor = Color.Black
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_go_back),
-                contentDescription = null,
-                modifier = Modifier
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = {
-                            detailCardViewModel.setDetailMode(DetailMode.ENTERING)
-                            navController.popBackStack()
-                        })
-                    .size(25.dp)
-            )
-
-            Box {
-                Text(
-                    text = screenTitle,
-                    style = TextStyle(fontSize = 25.sp, fontWeight = FontWeight.Bold),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
+            navController.popBackStack()
         }
 
         TextBoxesForData(modifier = Modifier.fillMaxWidth(), detailCardViewModel)
@@ -173,7 +154,6 @@ fun DeleteUserButton(
             confirmButton = {
                 Button(onClick = {
                     detailCardViewModel.deleteUser(idUser.toString())
-                    detailCardViewModel.setDetailMode(DetailMode.ENTERING)
                 }) {
                     Text(
                         text = TextConstants.YES_TEXT

@@ -6,6 +6,7 @@ import com.example.triagecol.domain.models.APIResult
 import com.example.triagecol.domain.models.dto.StaffMember
 import com.example.triagecol.domain.models.ApiResponse
 import com.example.triagecol.domain.models.dto.StaffDto
+import com.example.triagecol.utils.Constants
 import com.google.gson.Gson
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -43,10 +44,11 @@ class StaffRepositoryImpl @Inject constructor(
                 val errorBody = response.errorBody()?.string()
                 val gson = Gson()
                 val errorResponse = gson.fromJson(errorBody, ApiResponse::class.java)
-                APIResult.Error(Exception(errorResponse.message))
+                //APIResult.Error(Exception(errorResponse.message))
+                APIResult.Error(Exception("Error Desconocido"))
             }
         } catch (e: Exception) {
-            APIResult.Error(java.lang.Exception("Revisa tu conexion a internet."))
+            APIResult.Error(Exception("Error de conexion"))
         }
     }
 
@@ -62,10 +64,11 @@ class StaffRepositoryImpl @Inject constructor(
                 val errorBody = response.errorBody()?.string()
                 val gson = Gson()
                 val errorResponse = gson.fromJson(errorBody, ApiResponse::class.java)
-                APIResult.Error(Exception(errorResponse.message))
+                //APIResult.Error(Exception(errorResponse.message))
+                APIResult.Error(Exception("Error Desconocido"))
             }
         } catch (e: Exception) {
-            APIResult.Error(e)
+            APIResult.Error(Exception("Error de conexion"))
         }
     }
 
@@ -79,11 +82,12 @@ class StaffRepositoryImpl @Inject constructor(
                 val errorBody = response.errorBody()?.string()
                 val gson = Gson()
                 val errorResponse = gson.fromJson(errorBody, ApiResponse::class.java)
-                APIResult.Error(Exception(errorResponse.message))
+                //APIResult.Error(Exception(errorResponse.message))
+                APIResult.Error(Exception("Error Desconocido"))
             }
         } catch (e: Exception) {
             Log.d("prueba", e.message!!)
-            APIResult.Error(e)
+            APIResult.Error(Exception("Error de conexion"))
         }
     }
 
@@ -96,10 +100,26 @@ class StaffRepositoryImpl @Inject constructor(
                 val errorBody = response.errorBody()?.string()
                 val gson = Gson()
                 val errorResponse = gson.fromJson(errorBody, ApiResponse::class.java)
-                APIResult.Error(Exception(errorResponse.message))
+                //APIResult.Error(Exception(errorResponse.message))
+                APIResult.Error(Exception("Error Desconocido"))
             }
         } catch (e: Exception) {
-            APIResult.Error(e)
+            APIResult.Error(Exception("Error de conexion"))
+        }
+    }
+
+    suspend fun getStaffCount(): APIResult<Int>{
+        return try {
+            Log.d(Constants.TAG, "Response iniciando...")
+            val response = retrofit.create(APIServiceStaff::class.java).getStaffCount()
+            Log.d(Constants.TAG, "Response: ${response.body()}")
+            if(response.isSuccessful){
+                APIResult.Success(response.body()!!)
+            }else{
+                APIResult.Error(Exception("Error desconocido"))
+            }
+        }catch (e: Exception){
+            APIResult.Error(Exception("Error de conexion"))
         }
     }
 }

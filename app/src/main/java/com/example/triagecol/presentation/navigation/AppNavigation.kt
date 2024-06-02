@@ -11,7 +11,6 @@ import com.example.triagecol.presentation.admin.AdminViewModel
 import com.example.triagecol.domain.UserPage
 import com.example.triagecol.presentation.SplashScreen
 import com.example.triagecol.presentation.admin.AdminMainScreen
-import com.example.triagecol.presentation.admin.details.DetailState
 import com.example.triagecol.presentation.admin.details.DetailCard
 import com.example.triagecol.presentation.admin.details.DetailCardViewModel
 import com.example.triagecol.presentation.doctor.DoctorScreen
@@ -72,11 +71,6 @@ fun AppNavigation(mainViewModel: MainViewModel) {
             Log.d(Constants.TAG, "Admin screen")
             if (mainViewModel.currentScreen.value.route != AppScreens.AdminScreen.route) {
                 mainViewModel.writeSaveLogin(UserPage.ADMIN, AppScreens.AdminScreen)
-            }
-            if (detailCardViewModel.detailState.value == DetailState.ENTERING) {
-                Log.d(Constants.TAG, "Actualizando datos.")
-                adminViewModel.getUserList()
-                detailCardViewModel.setDetailState(DetailState.DONE)
             }
             AdminMainScreen(navController, adminViewModel)
         }

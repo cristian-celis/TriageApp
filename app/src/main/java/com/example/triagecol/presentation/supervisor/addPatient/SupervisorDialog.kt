@@ -35,6 +35,8 @@ fun SupervisorDialog(
     onConfirm: () -> Unit,
     patientViewModel: PatientViewModel
 ) {
+    val patient = patientViewModel.patient.value
+
     Dialog(
         onDismissRequest = {
             onDismiss()
@@ -66,7 +68,7 @@ fun SupervisorDialog(
                 verticalArrangement = Arrangement.spacedBy(25.dp)
             ) {
                 Text(
-                    text = "Resumen datos ingresados.",
+                    text = "Resumen datos ingresados",
                     modifier = Modifier.fillMaxWidth(),
                     style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 20.sp),
                     textAlign = TextAlign.Center
@@ -77,42 +79,42 @@ fun SupervisorDialog(
                 ) {
                     PatientSummary(
                         label = SupervisorConstants.NAME,
-                        value = patientViewModel.name.value,
+                        value = patient.name,
                         modifier = Modifier.fillMaxWidth()
                     )
                     PatientSummary(
                         label = SupervisorConstants.LAST_NAME,
-                        value = patientViewModel.lastname.value,
+                        value = patient.lastname,
                         modifier = Modifier.fillMaxWidth()
                     )
                     PatientSummary(
                         label = SupervisorConstants.ID_NUMBER,
-                        value = patientViewModel.idNumber.value,
+                        value = patient.idNumber,
                         modifier = Modifier.fillMaxWidth()
                     )
                     PatientSummary(
-                        label = SupervisorConstants.GENDER,
-                        value = patientViewModel.gender.value,
+                        label = SupervisorConstants.SEX,
+                        value = patient.sex,
                         modifier = Modifier.fillMaxWidth()
                     )
                     PatientSummary(
                         label = SupervisorConstants.AGE,
-                        value = patientViewModel.age.value,
+                        value = patient.age,
                         modifier = Modifier.fillMaxWidth()
                     )
                     PatientSummary(
                         label = SupervisorConstants.TEMPERATURE,
-                        value = patientViewModel.temperature.value,
+                        value = patient.temperature,
                         modifier = Modifier.fillMaxWidth()
                     )
                     PatientSummary(
                         label = SupervisorConstants.HEART_RATE,
-                        value = patientViewModel.heartRate.value,
+                        value = patient.heartRate,
                         modifier = Modifier.fillMaxWidth()
                     )
                     PatientSummary(
                         label = SupervisorConstants.BLOOD_OXYGEN,
-                        value = patientViewModel.bloodOxygen.value,
+                        value = patient.bloodOxygen,
                         modifier = Modifier.fillMaxWidth()
                     )
                     HorizontalDivider()
@@ -153,7 +155,7 @@ fun SupervisorDialog(
                         shape = CircleShape
                     ) {
                         Text(
-                            text = "Enviar",
+                            text = "Aceptar",
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.Center

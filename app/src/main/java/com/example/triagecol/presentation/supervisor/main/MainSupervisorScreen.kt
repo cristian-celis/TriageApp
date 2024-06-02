@@ -95,7 +95,6 @@ fun MainSupervisorScreen(
         TopBarScreen(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.085f)
                 .padding(bottom = 10.dp)
                 .background(Color.White),
             titleText = SupervisorConstants.SUPERVISOR_TEXT,
@@ -160,22 +159,9 @@ fun MainSupervisorScreen(
                     thickness = 1.dp
                 )
 
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 12.dp, start = 12.dp, end = 12.dp)) {
-                    Text(
-                        text = "Paciente",
-                        style = TextStyle(fontSize = 15.sp)
-                    )
-                    Text(
-                        text = "Identificacion",
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.End,
-                        style = TextStyle(fontSize = 15.sp)
-                    )
-                }
+                AccordionScreen(modifier = Modifier, mainSupervisorViewModel = mainSupervisorViewModel)
 
-                if (successCall) {
+                /*if (successCall) {
                     LazyColumn(
                         modifier = Modifier
                             .padding(7.dp)
@@ -200,7 +186,7 @@ fun MainSupervisorScreen(
                             mainSupervisorViewModel.getPatientList()
                         }
                     }
-                }
+                }*/
             }
         }
 

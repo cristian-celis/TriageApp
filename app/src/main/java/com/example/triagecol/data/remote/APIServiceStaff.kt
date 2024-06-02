@@ -30,6 +30,9 @@ interface APIServiceStaff {
     @DELETE(EndPointConstants.DELETE_ALL_PATIENTS)
     suspend fun deleteAllPatients(): Response<ApiResponse>
 
+    @GET(EndPointConstants.REGISTERED_STAFF)
+    suspend fun getStaffCount(): Response<Int>
+
     /*
     https://triage-api.onrender.com/
      */
