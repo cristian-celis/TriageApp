@@ -2,6 +2,7 @@ package com.example.triagecol.presentation.supervisor.main
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,11 +12,14 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.ArrowDropDown
+import androidx.compose.material.icons.outlined.Maximize
 import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -34,11 +38,13 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.traigecol.R
 import com.example.triagecol.domain.models.dto.PatientDtoForList
 
 @Composable
@@ -63,7 +69,7 @@ fun AccordionScreen(
             ) {
                 LazyColumn {
                     items(patientList.size) { row ->
-                        AccordionRow(patientList[row], row)
+                        AccordionRow(patientList[row], row + 1)
                         HorizontalDivider(color = Color.LightGray, thickness = 1.dp)
                     }
                 }
@@ -93,12 +99,12 @@ private fun AccordionHeader(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text("Pacientes", Modifier.weight(1f), color = Gray)
-            Surface(shape = CircleShape) {
+            Surface(shape = CircleShape, color = Color.White) {
                 Icon(
-                    Icons.Outlined.ArrowDropDown,
-                    contentDescription = "arrow-down",
-                    modifier = Modifier.rotate(degrees),
-                    tint = White
+                    painter = painterResource(id = if(isExpanded) R.drawable.minus_icon else R.drawable.add),
+                    contentDescription = null,
+                    modifier = if(isExpanded) Modifier.size(15.dp) else Modifier.size(22.dp),
+                    tint = Color.Black
                 )
             }
         }
@@ -109,21 +115,22 @@ private fun AccordionHeader(
 private fun AccordionRow(patient: PatientDtoForList, level: Int) {
     Row(
         modifier = Modifier
-            .fillMaxWidth().fillMaxHeight()
+            .fillMaxWidth()
+            .fillMaxHeight()
             .height(40.dp)
             .background(color = Color(0xFFF3F1F1), shape = ShapeDefaults.Small),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(text = "$level",
-            modifier = Modifier.padding(start = 3.dp)
+            modifier = Modifier.padding(start = 10.dp)
         )
         Text(
             text = "${patient.name} ${patient.lastname}"
         )
         Text(
             text = patient.idNumber,
-            modifier = Modifier.padding(end = 3.dp)
+            modifier = Modifier.padding(end = 10.dp)
         )
     }
 }

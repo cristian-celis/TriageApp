@@ -25,6 +25,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -63,15 +64,11 @@ fun TextFieldComponent(
             modifier = Modifier
                 .fillMaxWidth(),
             value = value,
-            onValueChange = { if(regex.matches(it)) onTextFieldChanged(it) },
+            onValueChange = { if(regex.matches(it) && it.length < 40) onTextFieldChanged(it) },
             textStyle = TextStyle(color = Color.Black, fontSize = 18.sp),
-            //label = { Text("Label") },
-            placeholder = {
-                Text(
-                    text = placeHolderText, style = MaterialTheme.typography.bodyLarge,
-                    color = colorResource(id = R.color.placeholder)
-                )
-            },
+            label = { Text(
+                text = placeHolderText, color = colorResource(id = R.color.body)
+            ) },
             shape = MaterialTheme.shapes.extraSmall,
             colors = TextFieldDefaults.textFieldColors(
                 containerColor = Color(0xFFE8EDF2),
@@ -111,8 +108,8 @@ fun PasswordTextField(
             value = value,
             onValueChange = { onTextFieldChanged(it) },
             modifier = Modifier.fillMaxWidth(),
+            //isError = true,
             singleLine = true,
-            //Color(0xFF383838)
             textStyle = TextStyle(color = Color.Black, fontSize = 18.sp),
             visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -129,12 +126,9 @@ fun PasswordTextField(
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent
             ),
-            placeholder = {
-                Text(
-                    text = placeHolderText, style = MaterialTheme.typography.bodyLarge,
-                    color = colorResource(id = R.color.placeholder)
-                )
-            },
+            label = { Text(
+                text = placeHolderText, color = colorResource(id = R.color.body)
+            ) },
             enabled = isEnable
         )
     }

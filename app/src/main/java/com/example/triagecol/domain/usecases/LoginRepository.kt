@@ -28,14 +28,12 @@ class LoginRepository @Inject constructor(
                 val errorBody = call.errorBody()?.string()
                 val gson = Gson()
                 val errorResponse = gson.fromJson(errorBody, ApiResponse::class.java)
-                //APIResult.Error(Exception(errorResponse.message))
-                APIResult.Error(Exception("Error Desconocido"))
+                APIResult.Error(Exception(errorResponse.message))
             }
         }catch (e:UnknownHostException){
             APIResult.Error(Exception("Error de conexión: Asegurate de tener acceso a internet"))
-        }
-        catch (e:Exception){
-            APIResult.Error(Exception("Error de Conexion"))
+        }catch (e:Exception){
+            APIResult.Error(e)
         }
     }
 }

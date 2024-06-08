@@ -26,14 +26,12 @@ fun SplashScreen(navController: NavController) {
     val mainViewModel: MainViewModel = hiltViewModel()
 
     LaunchedEffect(key1 = true) {
-        delay(1000)
+        delay(700)
         navController.popBackStack()
 
         val nextScreen = when (mainViewModel.savedLogin.value) {
             "ADMIN" ->  AppScreens.AdminScreen
             "LOGIN" ->  AppScreens.LoginScreen
-            //"SUPERVISOR" ->  AppScreens.SupervisorScreen
-            //"DOCTOR" ->  AppScreens.DoctorScreen
             else -> {AppScreens.LoginScreen}
         }
 

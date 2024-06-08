@@ -9,6 +9,8 @@ import com.example.triagecol.domain.models.dto.PriorityPatientDto
 import com.example.triagecol.utils.Constants
 import com.google.gson.Gson
 import retrofit2.Retrofit
+import java.net.UnknownHostException
+import java.util.concurrent.TimeoutException
 import javax.inject.Inject
 
 class DoctorRepository @Inject constructor(
@@ -25,17 +27,17 @@ class DoctorRepository @Inject constructor(
                 val errorBody = call.errorBody()?.string()
                 val gson = Gson()
                 val errorResponse = gson.fromJson(errorBody, ApiResponse::class.java)
-                //APIResult.Error(Exception(errorResponse.message))
-                APIResult.Error(Exception("Error Desconocido"))
+                APIResult.Error(Exception(errorResponse.message))
             }
-        } catch (e: Exception) {
-            APIResult.Error(Exception("Error de Conexion"))
+        }catch (e:UnknownHostException){
+            APIResult.Error(Exception("Error de conexión: Asegurate de tener acceso a internet"))
+        }catch (e:Exception){
+            APIResult.Error(e)
         }
     }
 
     suspend fun updateDoctorStatus(doctorStatus: DoctorStatus): APIResult<ApiResponse> {
         return try {
-            Log.d(Constants.TAG, "Cambiando estado del doctor a: $doctorStatus")
             val call = retrofit.create(APIServiceDoctor::class.java).updateDoctorStatus(doctorStatus)
 
             if (call.isSuccessful) {
@@ -44,25 +46,30 @@ class DoctorRepository @Inject constructor(
                 val errorBody = call.errorBody()?.string()
                 val gson = Gson()
                 val errorResponse = gson.fromJson(errorBody, ApiResponse::class.java)
-                //APIResult.Error(Exception(errorResponse.message))
-                APIResult.Error(Exception("Error Desconocido"))
+                APIResult.Error(Exception(errorResponse.message))
             }
-        } catch (e: Exception) {
-            APIResult.Error(Exception("Error de Conexion"))
+        }catch (e:UnknownHostException){
+            APIResult.Error(Exception("Error de conexión: Asegurate de tener acceso a internet"))
+        }catch (e:Exception){
+            APIResult.Error(e)
         }
     }
 
     suspend fun getPatientsWaitingCount(): APIResult<Int>{
         return try {
-            Log.d(Constants.TAG, "Obteniendo el numero de pacientes en espera.")
             val call = retrofit.create(APIServiceDoctor::class.java).getPatientsWaitingCount()
             if(call.isSuccessful){
                 APIResult.Success(call.body()!!)
             }else{
-                APIResult.Error(Exception("Error Desconocido"))
+                val errorBody = call.errorBody()?.string()
+                val gson = Gson()
+                val errorResponse = gson.fromJson(errorBody, ApiResponse::class.java)
+                APIResult.Error(Exception(errorResponse.message))
             }
-        }catch (e: Exception){
-            APIResult.Error(Exception("Error de Conexion"))
+        }catch (e: UnknownHostException){
+            APIResult.Error(Exception("Error de conexión: Asegurate de tener acceso a internet"))
+        }catch (e:Exception){
+            APIResult.Error(e)
         }
     }
 }

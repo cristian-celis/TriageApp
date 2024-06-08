@@ -22,8 +22,6 @@ class LoginViewModel @Inject constructor(
     private val loginRepository: LoginRepository
 ) : ViewModel() {
 
-    private val regex = "^[a-zA-Z0-9]*$".toRegex()
-
     private val _user = MutableStateFlow("")
     val user: StateFlow<String> = _user
 
@@ -36,8 +34,7 @@ class LoginViewModel @Inject constructor(
     private val _isValidCredentials = MutableStateFlow(false)
     val isValidCredentials: StateFlow<Boolean> = _isValidCredentials
 
-    private val _userData = MutableStateFlow(StaffMemberDto(0, "", "", "", "", "", "", ""))
-    val userData: StateFlow<StaffMemberDto> = _userData
+    var userData = StaffMemberDto(0, "", "", "", "", "", "", "")
 
     private val _userLoggedIn = MutableStateFlow<AppScreens>(AppScreens.LoginScreen)
     val userLoggedIn: StateFlow<AppScreens> = _userLoggedIn
@@ -69,9 +66,9 @@ class LoginViewModel @Inject constructor(
                         _userLoggedIn.value =
                             when (it.data.accountType) {
                                 1 -> {
-                                    _userData.value = it.data.user.toStaffMemberDto()
+                                    userData = it.data.user.toStaffMemberDto()
                                     when (it.data.user.role) {
-                                        Constants.SUPERVISOR -> AppScreens.SupervisorScreen
+                                        Constants.SUPERVISOR -> AppScreens.MainSupervisorScreen
                                         Constants.DOCTOR -> AppScreens.DoctorScreen
                                         else -> AppScreens.LoginScreen
                                     }

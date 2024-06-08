@@ -1,5 +1,6 @@
 package com.example.triagecol.presentation.supervisor.main
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.triagecol.domain.models.APIResult
@@ -11,16 +12,23 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MainSupervisorViewModel @Inject constructor(
     private val patientRepository: PatientRepository
-): ViewModel() {
+) : ViewModel() {
 
-    private val _userData = MutableStateFlow(StaffMemberDto(0,"","","","","","","Supervisor"))
-    val userData: StateFlow<StaffMemberDto> = _userData
+    private val _idNumber = MutableStateFlow("")
+    val idNumber: StateFlow<String> = _idNumber
+
+    private val _name = MutableStateFlow("")
+    val name: StateFlow<String> = _name
+
+    private val _fetchingStaffMember = MutableStateFlow(false)
+    val fetchingStaffMember: StateFlow<Boolean> = _fetchingStaffMember
 
     private val _patientList = MutableStateFlow<PatientsDto>(PatientsDto())
     val patientList: StateFlow<PatientsDto> = _patientList
@@ -34,25 +42,21 @@ class MainSupervisorViewModel @Inject constructor(
     private val _error = MutableStateFlow("")
     val error: StateFlow<String> = _error
 
-    private val _fetchingData = MutableStateFlow(false)
-    val fetchingData: StateFlow<Boolean> = _fetchingData
+    private val _fetchingPatients = MutableStateFlow(false)
+    val fetchingPatients: StateFlow<Boolean> = _fetchingPatients
 
     private val _updatingPatientList = MutableStateFlow(false)
     val updatingPatientList: StateFlow<Boolean> = _updatingPatientList
 
-    fun updateUserData(userData: StaffMemberDto){
-        _userData.value = userData
-    }
-
-    fun setDialogForSignOff(showDialog: Boolean){
+    fun setDialogForSignOff(showDialog: Boolean) {
         _showDialogForSignOff.value = showDialog
     }
 
-    fun getPatientList(){
-        _fetchingData.value = true
+    fun getPatientList() {
+        _fetchingPatients.value = true
         viewModelScope.launch {
             patientRepository.getPatientList().let {
-                when (it){
+                when (it) {
                     is APIResult.Success -> {
                         _patientList.value = it.data
                         _successCall.value = true
@@ -60,6 +64,7 @@ class MainSupervisorViewModel @Inject constructor(
                             getPatientsWaitingCount()
                         }
                     }
+
                     is APIResult.Error -> {
                         _successCall.value = false
                         _error.value =
@@ -71,19 +76,21 @@ class MainSupervisorViewModel @Inject constructor(
                     }
                 }
             }
-            _fetchingData.value = false
+            _fetchingPatients.value = false
         }
     }
-    private suspend fun getPatientsWaitingCount(){
-        while(_updatingPatientList.value){
+
+    private suspend fun getPatientsWaitingCount() {
+        while (_updatingPatientList.value) {
             viewModelScope.launch {
                 patientRepository.getPatientsWaitingCount().let {
-                    when(it){
+                    when (it) {
                         is APIResult.Success -> {
                             _successCall.value = true
                             _updatingPatientList.value = _patientList.value.size == it.data
                             _error.value = ""
                         }
+
                         is APIResult.Error -> {
                             _successCall.value = false
                             _error.value =
@@ -100,19 +107,48 @@ class MainSupervisorViewModel @Inject constructor(
         }
     }
 
-    fun startUpdatePatientList(){
+    fun getSupervisorData(idSupervisor: String) {
+        _fetchingStaffMember.value = true
+        viewModelScope.launch {
+            Log.d(Constants.TAG, "IdSupervisor: $idSupervisor")
+            patientRepository.getSupervisorData(idSupervisor).let { data ->
+                when (data) {
+                    is APIResult.Success -> {
+                        _successCall.value = true
+                        _idNumber.value = data.data.idNumber
+                        _name.value = "${data.data.name} ${data.data.lastname}"
+                        _error.value = ""
+                    }
+
+                    is APIResult.Error -> {
+                        _successCall.value = false
+                        _error.value =
+                            when (data.exception.message) {
+                                null -> Constants.NULL_ERROR
+                                Constants.TIMEOUT -> Constants.TIMEOUT_ERROR
+                                else -> "${data.exception.message}"
+                            }
+                    }
+                }
+            }
+            _fetchingStaffMember.value = false
+        }
+    }
+
+    fun startUpdatePatientList() {
         _updatingPatientList.value = true
         viewModelScope.launch {
             getPatientsWaitingCount()
         }
     }
 
-    fun stopUpdatingPatientList(){
+    fun stopUpdatingPatientList() {
         _updatingPatientList.value = false
     }
 
-    fun clearUserData(){
+    fun clearUserData() {
         _updatingPatientList.value = false
-        _userData.value = StaffMemberDto(0,"","","","","","","Supervisor")
+        _idNumber.value = ""
+        _name.value = ""
     }
 }

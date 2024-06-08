@@ -20,8 +20,7 @@ class PatientViewModel @Inject constructor(
     private val patientRepository: PatientRepository
 ): ViewModel() {
 
-    private val _id = MutableStateFlow("")
-    val id: StateFlow<String> = _id
+    var idPatient: String = ""
 
     private val _patient = MutableStateFlow<AddPatient>(
         AddPatient("", "","","","Femenino","","","")
@@ -81,7 +80,7 @@ class PatientViewModel @Inject constructor(
                 patientRepository.savePatientData(_patient.value).let {
                     when(it){
                         is APIResult.Success -> {
-                            _id.value = it.data.message
+                            idPatient = it.data.message
                             _isValidData.value = true
                             _error.value = ""
                         }
@@ -92,7 +91,6 @@ class PatientViewModel @Inject constructor(
                                     Constants.TIMEOUT -> Constants.TIMEOUT_ERROR
                                     else -> "${it.exception.message}"
                                 }
-                            Log.d(Constants.TAG, _error.value)
                             _isValidData.value = false
                         }
                     }

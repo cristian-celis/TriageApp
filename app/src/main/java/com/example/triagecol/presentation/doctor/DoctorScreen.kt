@@ -1,6 +1,8 @@
 package com.example.triagecol.presentation.doctor
 
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -44,20 +46,26 @@ import androidx.navigation.NavController
 import com.example.triagecol.presentation.common.ConfirmScreenDialog
 import com.example.triagecol.presentation.common.TopBarScreen
 import com.example.triagecol.presentation.navigation.AppScreens
+import com.example.triagecol.utils.Constants
 import com.example.triagecol.utils.DoctorConstants
 import com.example.triagecol.utils.TextConstants
 
 @Composable
 fun DoctorScreen(navController: NavController, doctorViewModel: DoctorViewModel) {
 
-    val showDialog by doctorViewModel.showDialog.collectAsState()
+    val showDialogForSignOff by doctorViewModel.showDialogForSignOff.collectAsState()
     val showToastMessage by doctorViewModel.showToastMessage.collectAsState()
+    val error by doctorViewModel.error.collectAsState()
 
     val context = LocalContext.current
 
-    if (showDialog) {
+    BackHandler(true) {
+        doctorViewModel.setDialogForSignOff(true)
+    }
+
+    if (showDialogForSignOff) {
         ConfirmScreenDialog(mainText = TextConstants.CONFIRM_SIGN_OFF,
-            onDismiss = { doctorViewModel.setShowDialog(false) }) {
+            onDismiss = { doctorViewModel.setDialogForSignOff(false) }) {
             doctorViewModel.clearAll()
             navController.navigate(AppScreens.LoginScreen.route) {
                 popUpTo(AppScreens.DoctorScreen.route) { inclusive = true }
@@ -67,7 +75,7 @@ fun DoctorScreen(navController: NavController, doctorViewModel: DoctorViewModel)
 
     if (showToastMessage) {
         Toast.makeText(context,
-            doctorViewModel.error.value.ifEmpty { "No hay pacientes en espera" }, Toast.LENGTH_SHORT
+            error.ifEmpty { "No hay pacientes en espera" }, Toast.LENGTH_SHORT
         ).show()
         doctorViewModel.setShowToastMessage()
     }
@@ -87,7 +95,7 @@ fun DoctorScreen(navController: NavController, doctorViewModel: DoctorViewModel)
             backColor = Color(0xA3FF4D4D),
             tintColor = Color.White
         ) {
-            doctorViewModel.setShowDialog(true)
+            doctorViewModel.setDialogForSignOff(true)
         }
 
         DoctorData(
@@ -103,7 +111,8 @@ fun DoctorScreen(navController: NavController, doctorViewModel: DoctorViewModel)
 
         Box(
             modifier = Modifier
-                .fillMaxSize().height(70.dp)
+                .fillMaxSize()
+                .height(70.dp)
                 .background(Color.Transparent)
         ) {
             GetAndEndPatientConsultBtt(

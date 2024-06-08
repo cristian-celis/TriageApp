@@ -1,5 +1,6 @@
 package com.example.triagecol.presentation.supervisor.addPatient
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -49,10 +50,12 @@ fun PatientScreen(
 
     val focusManager = LocalFocusManager.current
 
+    BackHandler(true) {
+        navController.popBackStack()
+    }
+
     if (isValidData) {
-        navController.navigate(AppScreens.SymptomsScreen.route) {
-            popUpTo(AppScreens.PatientScreen.route) { inclusive = true }
-        }
+        navController.navigate(AppScreens.AddSymptomsScreen.setInitialValues(patientViewModel.idPatient, patientViewModel.patient.value.sex))
         patientViewModel.resetData()
     }
 
@@ -171,25 +174,29 @@ fun BasicData(patientViewModel: PatientViewModel, modifier: Modifier = Modifier)
     val patient by patientViewModel.patient.collectAsState()
 
     Column (modifier = modifier.padding(start = 16.dp, end = 16.dp)){
-        NameLabelTextField(SupervisorConstants.NAME)
+
+        Text(text = "Ingrese los datos básicos del paciente",
+            modifier = Modifier.fillMaxWidth()
+                .padding(bottom = 15.dp),
+            textAlign = TextAlign.Center,
+            style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+        )
+
         TextFieldComponent(
             placeHolderText = SupervisorConstants.NAME, value = patient.name, isTextFieldEnable = false,
             onTextFieldChanged = {
                 patientViewModel.updatePatientData(it, PatientData.NAME)
             })
-        NameLabelTextField(SupervisorConstants.LAST_NAME)
         TextFieldComponent(
             placeHolderText = SupervisorConstants.LAST_NAME, value = patient.lastname, isTextFieldEnable = false,
             onTextFieldChanged = {
                 patientViewModel.updatePatientData(it, PatientData.LASTNAME)
             })
-        NameLabelTextField(SupervisorConstants.ID_NUMBER)
         TextFieldComponent(
             placeHolderText = SupervisorConstants.ID_NUMBER, value = patient.idNumber, isTextFieldEnable = false,
             onTextFieldChanged = {
                 patientViewModel.updatePatientData(it, PatientData.ID_NUMBER)
             })
-        NameLabelTextField(SupervisorConstants.AGE)
         TextFieldComponent(
             placeHolderText = SupervisorConstants.AGE, value = patient.age, isTextFieldEnable = false,
             onTextFieldChanged = {
@@ -202,7 +209,6 @@ fun BasicData(patientViewModel: PatientViewModel, modifier: Modifier = Modifier)
 fun VitalSigns(patientViewModel: PatientViewModel, modifier: Modifier = Modifier) {
     val patient by patientViewModel.patient.collectAsState()
     Column (modifier = modifier.padding(start = 16.dp, end = 16.dp)){
-        NameLabelTextField(SupervisorConstants.TEMPERATURE)
         TextFieldComponent(
             placeHolderText = SupervisorConstants.TEMPERATURE,
             value = patient.temperature,
@@ -210,7 +216,6 @@ fun VitalSigns(patientViewModel: PatientViewModel, modifier: Modifier = Modifier
             onTextFieldChanged = {
                 patientViewModel.updatePatientData(it, PatientData.TEMPERATURE)
             })
-        NameLabelTextField(SupervisorConstants.HEART_RATE)
         TextFieldComponent(
             placeHolderText = SupervisorConstants.HEART_RATE,
             value = patient.heartRate,
@@ -218,7 +223,6 @@ fun VitalSigns(patientViewModel: PatientViewModel, modifier: Modifier = Modifier
             onTextFieldChanged = {
                 patientViewModel.updatePatientData(it, PatientData.HEART_RATE)
             })
-        NameLabelTextField(SupervisorConstants.BLOOD_OXYGEN)
         TextFieldComponent(
             placeHolderText = SupervisorConstants.BLOOD_OXYGEN,
             value = patient.bloodOxygen,

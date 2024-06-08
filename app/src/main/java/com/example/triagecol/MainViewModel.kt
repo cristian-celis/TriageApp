@@ -1,13 +1,11 @@
 package com.example.triagecol
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.triagecol.domain.UserPage
 import com.example.triagecol.domain.datastore.DataStoreImpl
 import com.example.triagecol.domain.usecases.MainRepository
 import com.example.triagecol.presentation.navigation.AppScreens
-import com.example.triagecol.utils.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,8 +22,7 @@ class MainViewModel @Inject constructor(
     private val _savedLogin = MutableStateFlow<String?>(null)
     val savedLogin: StateFlow<String?> = _savedLogin
 
-    private val _currentScreen = MutableStateFlow<AppScreens>(AppScreens.LoginScreen)
-    val currentScreen: StateFlow<AppScreens> = _currentScreen
+    private var currentScreen: AppScreens = AppScreens.LoginScreen
 
     init {
         viewModelScope.launch {
@@ -35,14 +32,16 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun writeSaveLogin(userPage: UserPage, newCurrentPage: AppScreens) {
-        viewModelScope.launch {
-            _currentScreen.value = newCurrentPage
-            dataStoreImpl.writeSaveLogin(userPage)
+    fun writeSaveLogin(userPage: UserPage, newCurrentScreen: AppScreens) {
+        if(currentScreen != newCurrentScreen){
+            currentScreen = newCurrentScreen
+            viewModelScope.launch {
+                dataStoreImpl.writeSaveLogin(userPage)
+            }
         }
     }
 
-    fun initBack(){
+    fun initAPI(){
         viewModelScope.launch {
             mainRepository.initApi()
         }

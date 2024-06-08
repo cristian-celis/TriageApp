@@ -24,7 +24,9 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            isDebuggable = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -64,6 +66,7 @@ dependencies {
     implementation("androidx.compose.material3:material3-android:1.3.0-alpha03")
     implementation("androidx.datastore:datastore-core:1.0.0")
     implementation("androidx.compose.animation:animation-core-android:1.6.4")
+    implementation("androidx.compose.material3:material3")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -78,7 +81,7 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
 
     //state flow
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.3")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
     //Dagger Hilt
     implementation("com.google.dagger:hilt-android:2.45")
@@ -92,9 +95,9 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
 
     // Navigation compose
-    val nav_version = "2.5.3"
+    val nav_version = "2.7.7"
     implementation("androidx.navigation:navigation-compose:$nav_version")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.1")
 
     //Data Store
     implementation ("androidx.datastore:datastore-preferences:1.0.0")

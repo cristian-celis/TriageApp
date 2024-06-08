@@ -27,7 +27,6 @@ fun User.toStaffMemberDto(): StaffMemberDto = StaffMemberDto(
     name = this.name!!,
     lastname = this.lastname!!,
     username = this.username!!,
-    password = "",
     phoneNumber = this.phoneNumber!!,
     role = this.role!!,
     doctorStatus = this.doctorStatus

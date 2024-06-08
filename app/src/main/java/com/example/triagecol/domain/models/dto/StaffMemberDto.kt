@@ -10,7 +10,6 @@ data class StaffMemberDto(
     @SerializedName("nombre") val name: String,
     @SerializedName("apellido") val lastname: String,
     @SerializedName("usuario") val username: String,
-    @SerializedName("clave") val password: String,
     @SerializedName("telefono") val phoneNumber: String,
     @SerializedName("rol") val role: String,
     @SerializedName("estado") val doctorStatus: String? = null
@@ -25,7 +24,6 @@ data class StaffMember(
     @SerializedName("rol") val role: String,
     @SerializedName("estado") val doctorStatus: String? = null
 )
-
 data class DoctorStatus(
     @SerializedName("id") val id: Int,
     @SerializedName("estado") val doctorStatus: String

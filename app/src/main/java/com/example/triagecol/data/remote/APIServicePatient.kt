@@ -4,6 +4,7 @@ import com.example.triagecol.domain.models.dto.AddPatient
 import com.example.triagecol.domain.models.dto.AddSymptoms
 import com.example.triagecol.domain.models.ApiResponse
 import com.example.triagecol.domain.models.dto.PatientsDto
+import com.example.triagecol.domain.models.dto.StaffMemberDto
 import com.example.triagecol.utils.EndPointConstants
 import retrofit2.Response
 import retrofit2.http.Body
@@ -28,4 +29,7 @@ interface APIServicePatient {
 
     @DELETE(EndPointConstants.DELETE_PATIENT)
     suspend fun deletePatient(@Path("id") id: Int): Response<ApiResponse>
+
+    @GET(EndPointConstants.GET_STAFF_MEMBER)
+    suspend fun getStaffMember(@Path("id") id: Int): Response<StaffMemberDto>
 }

@@ -1,5 +1,6 @@
 package com.example.triagecol.presentation.supervisor.addSymptoms
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.triagecol.presentation.common.NameLabelTextField
+import com.example.triagecol.utils.Constants
 import com.example.triagecol.utils.SupervisorConstants
 
 @Composable
@@ -66,16 +68,19 @@ fun CreateCheckBoxes(symptomsViewModel: SymptomsViewModel) {
                 )
             }, text = SupervisorConstants.SEV_TRAUMA
         )
-        NameLabelTextField(nameLabel = "¿Se encuentra en embarazo?")
-        CheckBoxes(
-            checked = symptoms.pregnancy,
-            onCheckedChange = {
-                symptomsViewModel.updateSymptoms(
-                    it, SymptomsTitle.PREGNANCY
-                )
-            }, text = if(symptoms.pregnancy) "Sí" else "No"
-        )
-        NameLabelTextField(nameLabel = "Observaciones")
+        Log.d(Constants.TAG, "Sex: ${symptomsViewModel.sexPatient}")
+        if(symptomsViewModel.sexPatient == "Femenino"){
+            NameLabelTextField(nameLabel = "¿Se encuentra en embarazo?")
+            CheckBoxes(
+                checked = symptoms.pregnancy,
+                onCheckedChange = {
+                    symptomsViewModel.updateSymptoms(
+                        it, SymptomsTitle.PREGNANCY
+                    )
+                }, text = if(symptoms.pregnancy) "Sí" else "No"
+            )
+        }
+        NameLabelTextField(nameLabel = "Observaciones medicas")
         Textarea(symptomsViewModel = symptomsViewModel)
     }
 }

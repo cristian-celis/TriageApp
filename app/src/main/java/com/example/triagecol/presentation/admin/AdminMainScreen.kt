@@ -1,11 +1,9 @@
 package com.example.triagecol.presentation.admin
 
-import ArticleCardShimmerEffect
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -48,6 +45,7 @@ fun AdminMainScreen(navController: NavController, adminViewModel: AdminViewModel
     val fetchingStaffCount by adminViewModel.fetchingStaffCount.collectAsState()
     val successCall by adminViewModel.successCall.collectAsState()
     val showDialog by adminViewModel.showDialog.collectAsState()
+    val error by adminViewModel.error.collectAsState()
 
     LaunchedEffect(key1 = true){
         adminViewModel.getCountStaff()
@@ -87,7 +85,7 @@ fun AdminMainScreen(navController: NavController, adminViewModel: AdminViewModel
                 adminViewModel.clearError()
                 ShimmerEffect()
             } else if (!successCall) {
-                ErrorMessage(adminViewModel.error.value) { adminViewModel.getUserList() }
+                ErrorMessage(error) { adminViewModel.getUserList() }
             } else {
                 if (userList.isEmpty()) {
                     Box(
@@ -111,9 +109,8 @@ fun AdminMainScreen(navController: NavController, adminViewModel: AdminViewModel
                             UserDataCard(
                                 medicalStaff = user,
                                 onClick = {
-                                    adminViewModel.setUserDataDetails(user)
-                                    adminViewModel.setClickOnAddButton(false)
-                                    navController.navigate(AppScreens.DetailCard.route)
+                                    adminViewModel.setUserDetails(user)
+                                    navController.navigate(AppScreens.DetailCard.setEditTitle(true))
                                 })
                         }
                     }
@@ -130,8 +127,7 @@ fun AdminMainScreen(navController: NavController, adminViewModel: AdminViewModel
                             .align(Alignment.BottomCenter)
                             .fillMaxWidth()
                             .height(70.dp),
-                        { navController.navigate(AppScreens.DetailCard.route) }
-                    ) { adminViewModel.setClickOnAddButton(true) }
+                    ){ navController.navigate(AppScreens.DetailCard.setEditTitle(false)) }
                 }
             }
         }
@@ -174,11 +170,9 @@ fun ErrorMessage(error: String, onRefresh: () -> Unit) {
 fun AddStaff(
     modifier: Modifier = Modifier,
     navigationOnAddClick: () -> Unit,
-    onAddClick: (Boolean) -> Unit
 ) {
     Button(
         onClick = {
-            onAddClick(true)
             navigationOnAddClick()
         },
         modifier = modifier,

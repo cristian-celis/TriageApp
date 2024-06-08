@@ -39,11 +39,7 @@ class DetailCardViewModel @Inject constructor(
     private val _saveEnable = MutableStateFlow<Boolean>(false)
     val saveEnable: StateFlow<Boolean> = _saveEnable
 
-    private val _editMode = MutableStateFlow(false)
-    val editMode: StateFlow<Boolean> = _editMode
-
-    private val _addMode = MutableStateFlow(true)
-    val addMode: StateFlow<Boolean> = _addMode
+    var editMode: Boolean = false
 
     private val _userData =
         MutableStateFlow(StaffMemberDto(0, "", "", "", "Medico", "", "", ""))
@@ -87,14 +83,13 @@ class DetailCardViewModel @Inject constructor(
         return (_idNumber.value != _userData.value.idNumber ||
                 _name.value != _userData.value.name ||
                 _lastname.value != _userData.value.lastname ||
-                _password.value != _userData.value.password ||
                 _phoneNumber.value != _userData.value.phoneNumber ||
                 _role.value != _userData.value.role
                 )
     }
 
     private fun validCredentials(): Boolean {
-        return if (_editMode.value) validDataHasChanged()
+        return if (editMode) validDataHasChanged()
         else {
             _idNumber.value.isNotBlank()
                     && _name.value.isNotBlank()
@@ -205,16 +200,6 @@ class DetailCardViewModel @Inject constructor(
     fun setRole(role: String) {
         _role.value = role
         _saveEnable.value = validCredentials()
-    }
-
-    fun setEditMode() {
-        _editMode.value = true
-        _addMode.value = false
-    }
-
-    fun setAddMode() {
-        _addMode.value = true
-        _editMode.value = false
     }
 
     fun resetData() {

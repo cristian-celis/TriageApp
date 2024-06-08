@@ -20,5 +20,7 @@ object EndPointConstants {
     const val UPDATE_DOCTOR_STATUS = "personal/actualizarEstadoMedico"
     const val REGISTERED_STAFF = "/personal/cantidadPersonal"
 
+    const val GET_STAFF_MEMBER = "personal/obtenerMiembro/{id}"
+
     const val GET_PATIENTS_WAITING_COUNT = "paciente/cantidadPacientes"
 }

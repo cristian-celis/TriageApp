@@ -2,6 +2,7 @@ package com.example.triagecol.presentation.supervisor.addSymptoms
 
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -17,7 +18,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -26,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -57,13 +58,31 @@ fun SymptomsScreen(
     val successCall by symptomsViewModel.successCall.collectAsState()
     val error by symptomsViewModel.error.collectAsState()
     val successDeleting by symptomsViewModel.successDeletion.collectAsState()
+    val showDialog by symptomsViewModel.showDialog.collectAsState()
 
     val focusManager = LocalFocusManager.current
+    val context = LocalContext.current
+
+    BackHandler(true) {
+        symptomsViewModel.setShowDialog(true)
+    }
+
+    LaunchedEffect(key1 = true) {
+        if(symptomsViewModel.idPatient.isEmpty()){
+            Toast.makeText(context, "No es posible asignar sintomas. Vuelvalo a intentar.", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    if(showDialog){
+        AlertDialog(onCancel = {symptomsViewModel.setShowDialog(false)},
+            onAccept = {
+                symptomsViewModel.setShowDialog(false)
+                symptomsViewModel.deletePatient()
+            })
+    }
 
     if (successCall) {
-        navController.navigate(AppScreens.SupervisorScreen.route) {
-            popUpTo(AppScreens.SymptomsScreen.route) { inclusive = true }
-        }
+        navController.popBackStack(AppScreens.MainSupervisorScreen.route, false)
         symptomsViewModel.resetData()
         Toast.makeText(
             LocalContext.current,
@@ -73,7 +92,7 @@ fun SymptomsScreen(
     }
 
     if (successDeleting) {
-        navController.popBackStack()
+        navController.popBackStack(AppScreens.MainSupervisorScreen.route, false)
         symptomsViewModel.resetData()
         Toast.makeText(
             LocalContext.current,
@@ -101,7 +120,7 @@ fun SymptomsScreen(
             backColor = Color.White,
             tintColor = Color.Black
         ) {
-            navController.navigate(route = AppScreens.SupervisorScreen.route)
+            navController.popBackStack(AppScreens.MainSupervisorScreen.route, false)
         }
 
         CreateCheckBoxes(symptomsViewModel = symptomsViewModel)
@@ -158,6 +177,7 @@ private fun ProgressIndicator(size: Dp, padding: Dp, color: Color, stroke: Dp) {
 @Composable
 fun CancelButton(modifier: Modifier = Modifier, symptomsViewModel: SymptomsViewModel) {
     val deletingPatient by symptomsViewModel.deleting.collectAsState()
+    val savingSymptoms by symptomsViewModel.isSavingSymptoms.collectAsState()
     Button(
         onClick = {
             symptomsViewModel.deletePatient()
@@ -170,7 +190,7 @@ fun CancelButton(modifier: Modifier = Modifier, symptomsViewModel: SymptomsViewM
             contentColor = Color.White,
             disabledContentColor = Color.White
         ),
-        enabled = !symptomsViewModel.isSavingSymptoms.value && !deletingPatient
+        enabled = !savingSymptoms && !deletingPatient
     ) {
         if (!deletingPatient) {
             Text(
@@ -178,7 +198,7 @@ fun CancelButton(modifier: Modifier = Modifier, symptomsViewModel: SymptomsViewM
                 style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.W500)
             )
         } else {
-            ProgressIndicator(size = 20.dp, padding = 3.dp, color = Color.White, stroke = 5.dp)
+            ProgressIndicator(size = 20.dp, padding = 3.dp, color = Color.White, stroke = 3.dp)
         }
     }
 }
@@ -188,7 +208,6 @@ fun SendDataButton(modifier: Modifier = Modifier, symptomsViewModel: SymptomsVie
     val savingSymptoms by symptomsViewModel.isSavingSymptoms.collectAsState()
     Button(
         onClick = {
-            Log.d(Constants.TAG, "Boton oprimido")
             symptomsViewModel.sendSymptomsData()
         },
         modifier = modifier.height(45.dp),
@@ -199,7 +218,7 @@ fun SendDataButton(modifier: Modifier = Modifier, symptomsViewModel: SymptomsVie
             contentColor = Color.White,
             disabledContentColor = Color.White
         ),
-        enabled = !symptomsViewModel.isSavingSymptoms.value
+        enabled = !savingSymptoms
     ) {
         if (!savingSymptoms) {
             Text(
@@ -221,11 +240,13 @@ fun Textarea(symptomsViewModel: SymptomsViewModel) {
         onValueChange = { symptomsViewModel.updateObservation(it) },
         placeholder = {
             Text(
-                text = "Ingrese las observaciones medicas del paciente (No es obligatorio).",
+                text = "Ingrese las observaciones medicas (No es obligatorio).",
                 style = MaterialTheme.typography.bodyLarge,
                 color = colorResource(id = R.color.placeholder)
             )
         },
+        maxLines = 3,
+        textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
         modifier = Modifier
             .fillMaxWidth()
             .height(100.dp)

@@ -53,8 +53,8 @@ class DoctorViewModel @Inject constructor(
     private val _patientsWaitingCount = MutableStateFlow<Int>(0)
     val patientsWaitingCount: StateFlow<Int> = _patientsWaitingCount
 
-    private val _showDialog = MutableStateFlow(false)
-    val showDialog: StateFlow<Boolean> = _showDialog
+    private val _showDialogForSignOff = MutableStateFlow(false)
+    val showDialogForSignOff: StateFlow<Boolean> = _showDialogForSignOff
 
     private val _updatingPatientList = MutableStateFlow(false)
     val updatingPatientList: StateFlow<Boolean> = _updatingPatientList
@@ -62,8 +62,8 @@ class DoctorViewModel @Inject constructor(
     private val _showToastMessage = MutableStateFlow(false)
     val showToastMessage: StateFlow<Boolean> = _showToastMessage
 
-    fun setShowDialog(showDialog: Boolean) {
-        _showDialog.value = showDialog
+    fun setDialogForSignOff(showDialog: Boolean){
+        _showDialogForSignOff.value = showDialog
     }
 
     fun assignPatient() {
@@ -155,7 +155,7 @@ class DoctorViewModel @Inject constructor(
     }
 
     fun clearAll() {
-        setShowDialog(false)
+        setDialogForSignOff(false)
         _doctorInConsultation.value = false
         _patientData.value = PriorityPatientDto(
             PatientDto(0, "", "", "", "", "", "", "", "", 0, ""),

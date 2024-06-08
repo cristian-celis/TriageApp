@@ -19,8 +19,8 @@ class SymptomsViewModel @Inject constructor(
     private val patientRepository: PatientRepository
 ): ViewModel() {
 
-    private val _id = MutableStateFlow("")
-    val id: StateFlow<String> = _id
+    var idPatient = ""
+    var sexPatient = "Masculino"
 
     private val _symptoms = MutableStateFlow<SymptomsAdd>(
         InitSymptoms.symptoms
@@ -44,6 +44,9 @@ class SymptomsViewModel @Inject constructor(
 
     private val _deleting = MutableStateFlow(false)
     val deleting: StateFlow<Boolean> = _deleting
+
+    private val _showDialog = MutableStateFlow(false)
+    val showDialog: StateFlow<Boolean> = _showDialog
 
     fun updateSymptoms(
         value: Boolean,
@@ -85,7 +88,7 @@ class SymptomsViewModel @Inject constructor(
             _isSavingSymptoms.value = true
             viewModelScope.launch {
                 patientRepository.saveSymptomsPat(
-                    _id.value,
+                    idPatient,
                     symptomsList,
                     _symptoms.value.pregnancy,
                     _observations.value
@@ -113,7 +116,7 @@ class SymptomsViewModel @Inject constructor(
     fun deletePatient(){
         _deleting.value = true
         viewModelScope.launch {
-            patientRepository.deletePatient(_id.value).let {
+            patientRepository.deletePatient(idPatient).let {
                 when(it){
                     is APIResult.Success -> {
                         _successDeletion.value = true
@@ -133,6 +136,10 @@ class SymptomsViewModel @Inject constructor(
         }
     }
 
+    fun setShowDialog(showDialog: Boolean){
+        _showDialog.value = showDialog
+    }
+
     fun resetData(){
         _successCall.value = false
         _successDeletion.value = false
@@ -140,8 +147,9 @@ class SymptomsViewModel @Inject constructor(
         _symptoms.value = InitSymptoms.symptoms
     }
 
-    fun setIdPatient(idPatient: String){
-        _id.value = idPatient
+    fun setInitialValues(idPatient: String, sex: String){
+        this.idPatient = idPatient
+        this.sexPatient = sex
     }
 }
 

@@ -19,21 +19,16 @@ class AdminViewModel @Inject constructor(
     private val staffRepositoryImpl: StaffRepositoryImpl
 ) : ViewModel() {
 
-    private val _fetchingData = MutableStateFlow(true)
+    private val _fetchingData = MutableStateFlow(false)
     val fetchingData: StateFlow<Boolean> = _fetchingData
 
-    private val _fetchingStaffCount = MutableStateFlow(true)
+    private val _fetchingStaffCount = MutableStateFlow(false)
     val fetchingStaffCount: StateFlow<Boolean> = _fetchingStaffCount
 
     private val _userList = MutableStateFlow<List<StaffMemberDto>>(StaffDto())
     val userList: StateFlow<List<StaffMemberDto>> = _userList
 
-    private val _userData =
-        MutableStateFlow(StaffMemberDto(0, "", "", "", "", "", "", ""))
-    val userData: StateFlow<StaffMemberDto> = _userData
-
-    private val _clickOnAddButton = MutableStateFlow(false)
-    val clickOnAddButton: StateFlow<Boolean> = _clickOnAddButton
+    var userData = StaffMemberDto(0, "", "", "", "", "", "", "")
 
     private val _error = MutableStateFlow("")
     val error: StateFlow<String> = _error
@@ -58,29 +53,6 @@ class AdminViewModel @Inject constructor(
                         _userList.value = it.data
                     }
 
-                    is APIResult.Error -> {
-                        _successCall.value = false
-                        _error.value =
-                            when (it.exception.message) {
-                                null -> Constants.NULL_ERROR
-                                Constants.TIMEOUT -> Constants.TIMEOUT_ERROR
-                                else -> "${it.exception.message}"
-                            }
-                    }
-                }
-            }
-            _fetchingData.value = false
-        }
-    }
-
-    fun deleteAllPatients() {
-        _fetchingData.value = true
-        viewModelScope.launch {
-            staffRepositoryImpl.deleteAllPatients().let {
-                when (it) {
-                    is APIResult.Success -> {
-                        _successCall.value = true
-                    }
                     is APIResult.Error -> {
                         _successCall.value = false
                         _error.value =
@@ -126,11 +98,7 @@ class AdminViewModel @Inject constructor(
         _error.value = ""
     }
 
-    fun setClickOnAddButton(isClicked: Boolean) {
-        _clickOnAddButton.value = isClicked
-    }
-
-    fun setUserDataDetails(userData: StaffMemberDto) {
-        _userData.value = userData
+    fun setUserDetails(userData: StaffMemberDto) {
+        this.userData = userData
     }
 }

@@ -28,4 +28,6 @@ object TextConstants {
     const val CONFIRM_CHANGE_DOCTOR_STATUS = "¿Está seguro que desea cambiar de estado?"
     const val CONFIRM_DELETE_ALL_PATIENTS = "¿Está seguro que desea eliminar a TODOS los pacientes registrados?"
     const val SAVE_TEXT = "Guardar"
+
+    const val UNKNOWN_ERROR = "Error Desconocido"
 }

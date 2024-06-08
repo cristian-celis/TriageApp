@@ -1,24 +1,21 @@
 package com.example.triagecol.presentation.supervisor.main
 
+import android.content.Intent
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -30,10 +27,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.DefaultAlpha
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -43,10 +37,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.traigecol.R
-import com.example.triagecol.domain.models.dto.PatientDto
+import com.example.triagecol.MainActivity
 import com.example.triagecol.domain.models.dto.PatientDtoForList
 import com.example.triagecol.presentation.common.ConfirmScreenDialog
-import com.example.triagecol.presentation.common.RefreshButtonAnimation
 import com.example.triagecol.presentation.common.TopBarScreen
 import com.example.triagecol.presentation.navigation.AppScreens
 import com.example.triagecol.utils.Constants
@@ -56,17 +49,24 @@ import com.example.triagecol.utils.TextConstants
 @Composable
 fun MainSupervisorScreen(
     navController: NavController,
-    mainSupervisorViewModel: MainSupervisorViewModel
+    mainSupervisorViewModel: MainSupervisorViewModel,
+    idSupervisor: String
 ) {
 
     val showDialogForSignOff by mainSupervisorViewModel.showDialogForSignOff.collectAsState()
-    val patientList by mainSupervisorViewModel.patientList.collectAsState()
     val successCall by mainSupervisorViewModel.successCall.collectAsState()
-    val fetchingData by mainSupervisorViewModel.fetchingData.collectAsState()
+    val fetchingData by mainSupervisorViewModel.fetchingPatients.collectAsState()
     val updatingPatientList by mainSupervisorViewModel.updatingPatientList.collectAsState()
+    val error by mainSupervisorViewModel.error.collectAsState()
 
-    LaunchedEffect(key1 = true){
+    LaunchedEffect(key1 = true) {
+        if(mainSupervisorViewModel.idNumber.value.isNotBlank())
+            mainSupervisorViewModel.getSupervisorData(idSupervisor)
         mainSupervisorViewModel.startUpdatePatientList()
+    }
+
+    BackHandler(true) {
+        mainSupervisorViewModel.setDialogForSignOff(true)
     }
 
     if (showDialogForSignOff) {
@@ -77,12 +77,17 @@ fun MainSupervisorScreen(
             mainSupervisorViewModel.setDialogForSignOff(false)
             mainSupervisorViewModel.clearUserData()
             navController.navigate(AppScreens.LoginScreen.route) {
-                popUpTo(AppScreens.SupervisorScreen.route) { inclusive = true }
+                popUpTo(AppScreens.MainSupervisorScreen.route) { inclusive = true }
             }
         }
     }
 
-    if(!fetchingData && successCall && !updatingPatientList){
+    val context = LocalContext.current
+    if(error.isNotBlank() && !successCall){
+        Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+    }
+
+    if (!fetchingData && successCall && !updatingPatientList) {
         mainSupervisorViewModel.getPatientList()
     }
 
@@ -104,91 +109,9 @@ fun MainSupervisorScreen(
             mainSupervisorViewModel.setDialogForSignOff(true)
         }
 
-        Box (modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp)){
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.White)
-                    .padding(7.dp)
-            ) {
-                Text(
-                    text = "Nombre: ${mainSupervisorViewModel.userData.value.name} ${mainSupervisorViewModel.userData.value.lastname}",
-                    style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
-                )
-                Text(text = "Numero Documento: ${mainSupervisorViewModel.userData.value.idNumber}")
-            }
-        }
+        HeaderScreen(mainSupervisorViewModel = mainSupervisorViewModel)
 
-        Box (modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp)){
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.White)
-                    .padding(7.dp)
-            ) {
-
-                Text(
-                    text = SupervisorConstants.WAIT_LIST,
-                    style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.SemiBold),
-                    textAlign = TextAlign.Start,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 10.dp, top = 13.dp, bottom = 18.dp)
-                )
-
-                Row (modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 10.dp, bottom = 14.dp),
-                    verticalAlignment = Alignment.CenterVertically){
-                    Box (modifier = Modifier
-                        .size(38.dp)
-                        .background(color = Color(0xA3E7E7E7), shape = ShapeDefaults.Medium)){
-                        Icon(painter = painterResource(id = R.drawable.people_icon),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(30.dp)
-                                .align(Alignment.Center)
-                        )
-                    }
-                    Text(text = "Total pacientes: ${patientList.size}", modifier = Modifier.padding(start = 10.dp))
-                }
-
-                HorizontalDivider(
-                    modifier = Modifier.fillMaxWidth(),
-                    color = Color(0xFFDADADA),
-                    thickness = 1.dp
-                )
-
-                AccordionScreen(modifier = Modifier, mainSupervisorViewModel = mainSupervisorViewModel)
-
-                /*if (successCall) {
-                    LazyColumn(
-                        modifier = Modifier
-                            .padding(7.dp)
-                            .fillMaxHeight(0.8f)
-                            .background(Color.White)
-                    ) {
-                        items(count = patientList.size) {
-                            val patient = patientList[it]
-                            PatientItemCard(patient = patient)
-                            Spacer(modifier = Modifier.height(5.dp))
-                        }
-                    }
-                } else {
-                    Text(text = "Oprime aqui para cargar la lista de espera",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(10.dp),
-                        textAlign = TextAlign.Center,
-                        style = TextStyle(fontSize = 15.sp))
-                    Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
-                        RefreshButtonAnimation(isRefreshing = fetchingData, refreshIconSize = 45.dp) {
-                            mainSupervisorViewModel.getPatientList()
-                        }
-                    }
-                }*/
-            }
-        }
+        BodyScreen(mainSupervisorViewModel = mainSupervisorViewModel)
 
         Box(modifier = Modifier.fillMaxSize()) {
             AddPatient(modifier = Modifier
@@ -198,7 +121,7 @@ fun MainSupervisorScreen(
                 .padding(10.dp),
                 navigationOnAddClick = {
                     mainSupervisorViewModel.stopUpdatingPatientList()
-                    navController.navigate(AppScreens.PatientScreen.route)
+                    navController.navigate(AppScreens.AddPatientScreen.route)
                 })
         }
     }
@@ -214,7 +137,6 @@ fun AddPatient(
             navigationOnAddClick()
         },
         modifier = modifier,
-        //.height(48.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color(0xFF1A80E5),
             contentColor = Color.White,
@@ -231,16 +153,94 @@ fun AddPatient(
 }
 
 @Composable
-fun PatientItemCard(patient: PatientDtoForList) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(color = Color(0xFFF3F1F1), shape = ShapeDefaults.Small)
-            .padding(5.dp)
-    ) {
-        Text(text = "${patient.name} ${patient.lastname}", modifier = Modifier.padding(start = 3.dp))
-        Text(text = patient.idNumber, modifier = Modifier
-            .fillMaxWidth()
-            .padding(end = 3.dp), textAlign = TextAlign.End)
+fun HeaderScreen(modifier: Modifier = Modifier, mainSupervisorViewModel: MainSupervisorViewModel) {
+    val idNumber by mainSupervisorViewModel.idNumber.collectAsState()
+    val name by mainSupervisorViewModel.name.collectAsState()
+    val fetchingStaffMember by mainSupervisorViewModel.fetchingStaffMember.collectAsState()
+
+    Box(modifier = modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp)) {
+        Column(
+            modifier = Modifier
+                .background(Color.White)
+                .fillMaxWidth()
+                .padding(7.dp)
+        ) {
+            Text(
+                text = "Nombre: $name",
+                style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+            )
+            Text(text = "Numero Documento: $idNumber")
+            if(fetchingStaffMember)
+                ProgressIndicator()
+        }
     }
+}
+
+@Composable
+fun BodyScreen(modifier: Modifier = Modifier, mainSupervisorViewModel: MainSupervisorViewModel) {
+    val patientList by mainSupervisorViewModel.patientList.collectAsState()
+
+    Box(modifier = modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp)) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White)
+                .padding(7.dp)
+        ) {
+
+            Text(
+                text = SupervisorConstants.WAIT_LIST,
+                style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.SemiBold),
+                textAlign = TextAlign.Start,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 10.dp, top = 15.dp, bottom = 25.dp)
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 10.dp, bottom = 14.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(38.dp)
+                        .background(color = Color(0xA3E7E7E7), shape = ShapeDefaults.Medium)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.people_icon),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(30.dp)
+                            .align(Alignment.Center)
+                    )
+                }
+                Text(
+                    text = "Total pacientes: ${patientList.size}",
+                    modifier = Modifier.padding(start = 10.dp)
+                )
+            }
+
+            HorizontalDivider(
+                modifier = Modifier.fillMaxWidth(),
+                color = Color(0xFFDADADA),
+                thickness = 1.dp
+            )
+
+            AccordionScreen(
+                modifier = Modifier,
+                mainSupervisorViewModel = mainSupervisorViewModel
+            )
+        }
+    }
+}
+
+@Composable
+private fun ProgressIndicator() {
+    CircularProgressIndicator(
+        modifier = Modifier.size(25.dp),
+        color = Color.LightGray,
+        strokeWidth = 3.dp
+    )
 }
