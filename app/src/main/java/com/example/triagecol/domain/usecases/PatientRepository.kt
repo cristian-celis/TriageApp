@@ -4,7 +4,7 @@ import android.util.Log
 import com.example.triagecol.data.remote.APIServiceDoctor
 import com.example.triagecol.data.remote.APIServicePatient
 import com.example.triagecol.domain.models.APIResult
-import com.example.triagecol.domain.models.dto.AddPatient
+import com.example.triagecol.domain.models.dto.AddPatientRequest
 import com.example.triagecol.domain.models.dto.AddSymptoms
 import com.example.triagecol.domain.models.ApiResponse
 import com.example.triagecol.domain.models.dto.PatientsDto
@@ -22,7 +22,7 @@ class PatientRepository @Inject constructor(
     private val retrofit: Retrofit
 ) {
 
-    suspend fun savePatientData(patientData: AddPatient): APIResult<ApiResponse> {
+    suspend fun savePatientData(patientData: AddPatientRequest): APIResult<ApiResponse> {
         return try {
             val call = retrofit.create(APIServicePatient::class.java).addPatient(patientData)
             if (call.isSuccessful)
@@ -49,10 +49,6 @@ class PatientRepository @Inject constructor(
         observations: String
     ): APIResult<ApiResponse> {
         return try {
-            Log.d(Constants.TAG, "Informacion -> \n idNumber: $idNumberPat" +
-                    "\n symptomsList: $symptomsList" +
-                    "\n pregnancy: $pregnancy" +
-                    "\n observations: $observations")
             val patient = AddSymptoms(idNumberPat.toInt(), symptomsList, pregnancy, observations)
             val call = retrofit.create(APIServicePatient::class.java).addPatientSymptoms(patient)
             if (call.isSuccessful) {
@@ -64,10 +60,8 @@ class PatientRepository @Inject constructor(
                 Log.d(Constants.TAG, "ERROR: ${errorResponse.message}")
                 APIResult.Error(Exception(errorResponse.message))
             }
-        }catch (e: TimeoutException){
-            APIResult.Error(Exception(Constants.TIMEOUT_ERROR))
-        } catch (e: Exception) {
-            APIResult.Error(Exception("Error de conexion: ${e.message}"))
+        }catch (e: Exception) {
+            APIResult.Error(e)
         }
     }
 
@@ -83,12 +77,8 @@ class PatientRepository @Inject constructor(
                 val errorResponse = gson.fromJson(errorBody, ApiResponse::class.java)
                 APIResult.Error(Exception(errorResponse.message))
             }
-        }catch (e: TimeoutException){
-            APIResult.Error(Exception(Constants.TIMEOUT_ERROR))
-        } catch (e: IOException) {
-            APIResult.Error(Exception(Constants.IO_EXCEPTION))
-        } catch (e: Exception){
-            APIResult.Error(Exception("Error de conexion: ${e.message}"))
+        }catch (e: Exception){
+            APIResult.Error(e)
         }
     }
 
@@ -103,10 +93,8 @@ class PatientRepository @Inject constructor(
                 val errorResponse = gson.fromJson(errorBody, ApiResponse::class.java)
                 APIResult.Error(Exception(errorResponse.message))
             }
-        }catch (e: TimeoutException){
-            APIResult.Error(Exception(Constants.TIMEOUT_ERROR))
         }catch (e: Exception){
-            APIResult.Error(Exception("Error de conexion: ${e.message}"))
+            APIResult.Error(e)
         }
     }
 

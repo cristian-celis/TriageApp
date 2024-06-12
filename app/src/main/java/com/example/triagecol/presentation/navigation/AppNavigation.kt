@@ -57,13 +57,11 @@ fun AppNavigation(mainViewModel: MainViewModel) {
     {
         composable(route = AppScreens.LoginScreen.route) {
             Log.d(Constants.TAG, "Login screen")
+            SetPortraitOrientationOnly()
             mainViewModel.writeSaveLogin(UserPage.LOGIN, AppScreens.LoginScreen)
             LoginScreen(navController, loginViewModel)
         }
         composable(route = AppScreens.DoctorScreen.route) {
-            LaunchedEffect(key1 = true) {
-                ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR
-            }
             Log.d(Constants.TAG, "Doctor screen")
             doctorViewModel.setDoctorData(loginViewModel.userData)
             DoctorScreen(navController, doctorViewModel)
@@ -74,6 +72,7 @@ fun AppNavigation(mainViewModel: MainViewModel) {
                 type = NavType.StringType
             })
         ) {
+            EnableScreenOrientation()
             val id = it.arguments?.getString("id") ?: ""
             MainSupervisorScreen(
                 navController = navController,
@@ -98,9 +97,7 @@ fun AppNavigation(mainViewModel: MainViewModel) {
             Log.d(Constants.TAG, "Vital Signs Screen")
             val idPatient = it.arguments?.getString("id") ?: ""
             val sexPatient = it.arguments?.getString("sex") ?: "Masculino"
-            if (symptomsViewModel.idPatient.isBlank() && idPatient.isNotBlank()) {
-                symptomsViewModel.setInitialValues(idPatient, sexPatient)
-            }
+            symptomsViewModel.setInitialValues(idPatient, sexPatient)
             SymptomsScreen(navController = navController, symptomsViewModel = symptomsViewModel)
         }
 
@@ -124,7 +121,6 @@ fun AppNavigation(mainViewModel: MainViewModel) {
             DetailCard(navController, detailCardViewModel, editTitle)
         }
         composable(route = AppScreens.SplashScreen.route) {
-            Log.d(Constants.TAG, "probando")
             Log.d(Constants.TAG, "SplashScreen")
             SplashScreen(navController)
         }

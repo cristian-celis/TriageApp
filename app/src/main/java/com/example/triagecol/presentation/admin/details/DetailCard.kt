@@ -78,8 +78,7 @@ fun DetailCard(
             modifier = Modifier
                 .fillMaxWidth(),
             titleText = screenTitle,
-            backColor = Color.White,
-            tintColor = Color.Black
+            signOut = false
         ) {
             navController.popBackStack()
         }

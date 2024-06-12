@@ -27,7 +27,7 @@ fun AlertDialog(onCancel: () -> Unit, onAccept: () -> Unit) {
         },
         title = {
             Text(
-                text = TextConstants.DELETE_TEXT
+                text = "Volver Al Menu Principal"
             )
         },
         text = { Text(text = "¿Seguro que desea salir sin guardar al paciente?") })

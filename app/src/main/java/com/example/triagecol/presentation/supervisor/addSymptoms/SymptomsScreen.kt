@@ -59,6 +59,7 @@ fun SymptomsScreen(
     val error by symptomsViewModel.error.collectAsState()
     val successDeleting by symptomsViewModel.successDeletion.collectAsState()
     val showDialog by symptomsViewModel.showDialog.collectAsState()
+    val idPatient by symptomsViewModel.idPatient.collectAsState()
 
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
@@ -68,7 +69,7 @@ fun SymptomsScreen(
     }
 
     LaunchedEffect(key1 = true) {
-        if(symptomsViewModel.idPatient.isEmpty()){
+        if(idPatient.isEmpty()){
             Toast.makeText(context, "No es posible asignar sintomas. Vuelvalo a intentar.", Toast.LENGTH_LONG).show()
         }
     }
@@ -81,22 +82,12 @@ fun SymptomsScreen(
             })
     }
 
-    if (successCall) {
+    if (successCall || successDeleting) {
         navController.popBackStack(AppScreens.MainSupervisorScreen.route, false)
         symptomsViewModel.resetData()
         Toast.makeText(
             LocalContext.current,
-            "Paciente registrado en lista de espera",
-            Toast.LENGTH_LONG
-        ).show()
-    }
-
-    if (successDeleting) {
-        navController.popBackStack(AppScreens.MainSupervisorScreen.route, false)
-        symptomsViewModel.resetData()
-        Toast.makeText(
-            LocalContext.current,
-            "Proceso cancelado",
+            if(successCall) "Paciente registrado en lista de espera" else "Proceso cancelado",
             Toast.LENGTH_LONG
         ).show()
     }
@@ -117,8 +108,7 @@ fun SymptomsScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 10.dp), titleText = SupervisorConstants.SYMPTOMS_TEXT,
-            backColor = Color.White,
-            tintColor = Color.Black
+            signOut = false
         ) {
             navController.popBackStack(AppScreens.MainSupervisorScreen.route, false)
         }

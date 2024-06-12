@@ -75,8 +75,7 @@ fun AdminMainScreen(navController: NavController, adminViewModel: AdminViewModel
                     .fillMaxWidth()
                     .background(Color.White),
                 titleText = TextConstants.ADMIN_TITLE,
-                backColor = Color(0xA34D74FF),
-                tintColor = Color.White
+                signOut = true
             ) {
                 adminViewModel.setDialog(true)
             }

@@ -33,8 +33,7 @@ import com.example.triagecol.utils.SupervisorConstants
 fun TopBarScreen(
     modifier: Modifier = Modifier,
     titleText: String,
-    backColor: Color,
-    tintColor: Color,
+    signOut: Boolean,
     onClick: () -> Unit
 ) {
     Row(
@@ -42,7 +41,7 @@ fun TopBarScreen(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
-            painter = painterResource(id = R.drawable.ic_go_back),
+            painter = painterResource(id = if(signOut) R.drawable.ic_go_back else R.drawable.close_icon),
             contentDescription = null,
             modifier = Modifier
                 .clickable(
@@ -52,9 +51,8 @@ fun TopBarScreen(
                         onClick()
                     }
                 )
-                .size(34.dp)
-                .background(color = backColor, shape = CircleShape),
-            tint = tintColor
+                .size(34.dp),
+            tint = Color.Black
         )
 
         Box {

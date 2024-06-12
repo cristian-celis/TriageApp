@@ -1,6 +1,6 @@
 package com.example.triagecol.data.remote
 
-import com.example.triagecol.domain.models.dto.AddPatient
+import com.example.triagecol.domain.models.dto.AddPatientRequest
 import com.example.triagecol.domain.models.dto.AddSymptoms
 import com.example.triagecol.domain.models.ApiResponse
 import com.example.triagecol.domain.models.dto.PatientsDto
@@ -22,7 +22,7 @@ interface APIServicePatient {
     suspend fun addPatientSymptoms(@Body symptomsList: AddSymptoms): Response<ApiResponse>
 
     @POST(EndPointConstants.ADD_PATIENT)
-    suspend fun addPatient(@Body patient: AddPatient): Response<ApiResponse>
+    suspend fun addPatient(@Body patient: AddPatientRequest): Response<ApiResponse>
 
     @GET(EndPointConstants.GET_PATIENT_LIST)
     suspend fun getPatientList(): Response<PatientsDto>

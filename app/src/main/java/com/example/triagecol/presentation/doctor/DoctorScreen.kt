@@ -92,8 +92,7 @@ fun DoctorScreen(navController: NavController, doctorViewModel: DoctorViewModel)
                 .padding(bottom = 10.dp)
                 .background(Color.White),
             titleText = DoctorConstants.DOCTOR_SCREE,
-            backColor = Color(0xA3FF4D4D),
-            tintColor = Color.White
+            signOut = true
         ) {
             doctorViewModel.setDialogForSignOff(true)
         }

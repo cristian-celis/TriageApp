@@ -1,14 +1,10 @@
 package com.example.triagecol.presentation.login
 
-import android.app.Activity
-import android.util.Log
+import android.content.pm.ActivityInfo
 import android.widget.Toast
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,14 +14,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -36,7 +30,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -70,9 +63,9 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel) {
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
 
-    /*BackHandler(true) {
-        (context as? Activity)?.finish()
-    }*/
+    LaunchedEffect(key1 = true) {
+        ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+    }
 
     if (isValidCredentials) {
         loginViewModel.clearError()
@@ -130,7 +123,7 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Iniciar Sesión",
+                    text = "Inicio de Sesión",
                     style = TextStyle(
                         fontWeight = FontWeight.Bold,
                         fontSize = 28.sp,
@@ -140,9 +133,11 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel) {
                 )
 
                 TextFieldComponent(
-                    placeHolderText = TextConstants.USERNAME,
+                    modifier = Modifier.padding(bottom = 14.dp),
+                    labelTitle = TextConstants.USERNAME,
+                    helpText = "Usuario",
                     value = user,
-                    isTextFieldEnable = false
+                    showLabel = true
                 ) { loginViewModel.onLoginChanged(if (it.length < 11) it else user, password) }
 
                 Spacer(modifier = Modifier.size(8.dp))
@@ -150,7 +145,6 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel) {
                 PasswordTextField(
                     placeHolderText = TextConstants.PASSWORD,
                     value = password,
-                    isEnable = true,
                     onTextFieldChanged = { loginViewModel.onLoginChanged(user, it) })
 
                 LoginButton(

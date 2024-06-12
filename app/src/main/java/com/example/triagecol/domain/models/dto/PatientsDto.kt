@@ -70,7 +70,7 @@ data class PriorityPatientDto(
     @SerializedName("sintomasPaciente") val patientSymptoms: List<SymptomDto> = emptyList()
 )
 
-data class AddPatient(
+data class AddPatientRequest(
     @SerializedName("numero_id") var idNumber: String,
     @SerializedName("nombre") var name: String,
     @SerializedName("apellido") var lastname: String,

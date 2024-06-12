@@ -19,8 +19,11 @@ class SymptomsViewModel @Inject constructor(
     private val patientRepository: PatientRepository
 ): ViewModel() {
 
-    var idPatient = ""
-    var sexPatient = "Masculino"
+    private val _idPatient = MutableStateFlow("")
+    val idPatient: StateFlow<String> = _idPatient
+
+    private val _sexPatient = MutableStateFlow("Masculino")
+    val sexPatient: StateFlow<String> = _sexPatient
 
     private val _symptoms = MutableStateFlow<SymptomsAdd>(
         InitSymptoms.symptoms
@@ -88,7 +91,7 @@ class SymptomsViewModel @Inject constructor(
             _isSavingSymptoms.value = true
             viewModelScope.launch {
                 patientRepository.saveSymptomsPat(
-                    idPatient,
+                    _idPatient.value,
                     symptomsList,
                     _symptoms.value.pregnancy,
                     _observations.value
@@ -116,7 +119,7 @@ class SymptomsViewModel @Inject constructor(
     fun deletePatient(){
         _deleting.value = true
         viewModelScope.launch {
-            patientRepository.deletePatient(idPatient).let {
+            patientRepository.deletePatient(_idPatient.value).let {
                 when(it){
                     is APIResult.Success -> {
                         _successDeletion.value = true
@@ -141,6 +144,7 @@ class SymptomsViewModel @Inject constructor(
     }
 
     fun resetData(){
+        _idPatient.value= ""
         _successCall.value = false
         _successDeletion.value = false
         _error.value = ""
@@ -148,8 +152,8 @@ class SymptomsViewModel @Inject constructor(
     }
 
     fun setInitialValues(idPatient: String, sex: String){
-        this.idPatient = idPatient
-        this.sexPatient = sex
+        _idPatient.value = idPatient
+        _sexPatient.value = sex
     }
 }
 

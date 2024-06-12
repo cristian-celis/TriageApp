@@ -4,15 +4,22 @@ import android.content.Intent
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -20,7 +27,9 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ShapeDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -60,7 +69,7 @@ fun MainSupervisorScreen(
     val error by mainSupervisorViewModel.error.collectAsState()
 
     LaunchedEffect(key1 = true) {
-        if(mainSupervisorViewModel.idNumber.value.isNotBlank())
+        if (mainSupervisorViewModel.idNumber.value.isBlank())
             mainSupervisorViewModel.getSupervisorData(idSupervisor)
         mainSupervisorViewModel.startUpdatePatientList()
     }
@@ -83,7 +92,7 @@ fun MainSupervisorScreen(
     }
 
     val context = LocalContext.current
-    if(error.isNotBlank() && !successCall){
+    if (error.isNotBlank() && !successCall) {
         Toast.makeText(context, error, Toast.LENGTH_LONG).show()
     }
 
@@ -94,6 +103,7 @@ fun MainSupervisorScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .background(color = Color(0xFFF3F1F1))
     ) {
 
@@ -103,8 +113,7 @@ fun MainSupervisorScreen(
                 .padding(bottom = 10.dp)
                 .background(Color.White),
             titleText = SupervisorConstants.SUPERVISOR_TEXT,
-            backColor = Color(0xA3FF4D4D),
-            tintColor = Color.White
+            signOut = true
         ) {
             mainSupervisorViewModel.setDialogForSignOff(true)
         }
@@ -165,13 +174,17 @@ fun HeaderScreen(modifier: Modifier = Modifier, mainSupervisorViewModel: MainSup
                 .fillMaxWidth()
                 .padding(7.dp)
         ) {
-            Text(
-                text = "Nombre: $name",
-                style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
-            )
-            Text(text = "Numero Documento: $idNumber")
-            if(fetchingStaffMember)
-                ProgressIndicator()
+            Row {
+                Text(
+                    text = "Nombre: $name",
+                    style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                )
+                if (fetchingStaffMember) ProgressIndicator()
+            }
+            Row {
+                Text(text = "Numero Documento: $idNumber")
+                if (fetchingStaffMember) ProgressIndicator()
+            }
         }
     }
 }
@@ -180,27 +193,30 @@ fun HeaderScreen(modifier: Modifier = Modifier, mainSupervisorViewModel: MainSup
 fun BodyScreen(modifier: Modifier = Modifier, mainSupervisorViewModel: MainSupervisorViewModel) {
     val patientList by mainSupervisorViewModel.patientList.collectAsState()
 
-    Box(modifier = modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp)) {
+    Surface(modifier = modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
+        shape = RoundedCornerShape(4.dp),
+        shadowElevation = 4.dp,
+        color = Color.White
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.White)
-                .padding(7.dp)
         ) {
 
             Text(
                 text = SupervisorConstants.WAIT_LIST,
-                style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.SemiBold),
+                style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.SemiBold),
                 textAlign = TextAlign.Start,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 10.dp, top = 15.dp, bottom = 25.dp)
+                    .padding(start = 15.dp, top = 20.dp, bottom = 17.dp)
             )
 
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 10.dp, bottom = 14.dp),
+                    .padding(start = 15.dp, bottom = 20.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(
@@ -221,13 +237,6 @@ fun BodyScreen(modifier: Modifier = Modifier, mainSupervisorViewModel: MainSuper
                     modifier = Modifier.padding(start = 10.dp)
                 )
             }
-
-            HorizontalDivider(
-                modifier = Modifier.fillMaxWidth(),
-                color = Color(0xFFDADADA),
-                thickness = 1.dp
-            )
-
             AccordionScreen(
                 modifier = Modifier,
                 mainSupervisorViewModel = mainSupervisorViewModel
@@ -240,7 +249,7 @@ fun BodyScreen(modifier: Modifier = Modifier, mainSupervisorViewModel: MainSuper
 private fun ProgressIndicator() {
     CircularProgressIndicator(
         modifier = Modifier.size(25.dp),
-        color = Color.LightGray,
+        color = Color.Black,
         strokeWidth = 3.dp
     )
 }
