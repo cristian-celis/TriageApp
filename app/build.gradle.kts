@@ -34,6 +34,7 @@ android {
         }
     }
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
@@ -79,6 +80,8 @@ dependencies {
     // life data
     implementation("androidx.compose.runtime:runtime-livedata:1.6.0")
     implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
+
+    coreLibraryDesugaring ("com.android.tools:desugar_jdk_libs:2.0.4")
 
     //state flow
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")

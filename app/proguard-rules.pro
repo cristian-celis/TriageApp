@@ -20,4 +20,4 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--keep class com.example.triagecol.domain.models.dto.*
+-keep class com.example.triage.domain.models.dto.*
