@@ -112,7 +112,9 @@ fun ReportDialog(modifier: Modifier = Modifier, adminViewModel: AdminViewModel) 
                     color = Color.Red)
 
                 Column(
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 20.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 20.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     Row {
@@ -120,8 +122,16 @@ fun ReportDialog(modifier: Modifier = Modifier, adminViewModel: AdminViewModel) 
                      CardItem(modifier = Modifier.fillMaxWidth(1f), label = "Pacientes atendidos", data = "${reportResult.patientsAttended}", fetchingReport)
                     }
                     Row {
-                        CardItem(modifier = Modifier.fillMaxWidth(0.5f), label = "Tiempo promedio de espera", data = reportResult.averageTime, fetchingReport)
-                        CardItem(modifier = Modifier.fillMaxWidth(1f), label = "Pacientes urgentes", data = "${reportResult.urgentPatient}", fetchingReport)
+                        CardItem(modifier = Modifier.fillMaxWidth(0.5f), label = "Promedio de espera (minutos)", data = reportResult.averageTime, fetchingReport)
+                        CardItem(modifier = Modifier.fillMaxWidth(1f), label = "Pacientes Triage I", data = "${reportResult.triageI}", fetchingReport)
+                    }
+                    Row {
+                        CardItem(modifier = Modifier.fillMaxWidth(0.5f), label = "Pacientes Triage II", data = "${reportResult.triageII}", fetchingReport)
+                        CardItem(modifier = Modifier.fillMaxWidth(1f), label = "Pacientes Triage III", data = "${reportResult.triageIII}", fetchingReport)
+                    }
+                    Row {
+                        CardItem(modifier = Modifier.fillMaxWidth(0.5f), label = "Pacientes Triage IV", data = "${reportResult.triageIV}", fetchingReport)
+                        CardItem(modifier = Modifier.fillMaxWidth(1f), label = "Pacientes Triage V", data = "${reportResult.triageV}", fetchingReport)
                     }
                 }
                 Row(
@@ -161,12 +171,12 @@ private fun CardItem(modifier: Modifier = Modifier, label: String, data: String,
         shape = RoundedCornerShape(12.dp),
         modifier = modifier
             .padding(5.dp)
-            .height(164.dp)
+            .height(145.dp)
     ) {
         Column(modifier = Modifier.padding(24.dp)) {
             Text(text = label, style = TextStyle(fontSize = 16.sp))
             if(!loading){
-                Text(text = data, style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.SemiBold))
+                Text(text = data, style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.SemiBold))
             }else{
                 ProgressIndicator()
             }

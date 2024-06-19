@@ -8,7 +8,7 @@ import com.example.triage.domain.models.dto.StaffMemberDto
 object GlobalObjects {
     val StaffMemberInit = StaffMemberDto(0, "", "", "", "", "", "", "Desconectado")
 
-    val PatientInit = PatientDto(0, "", "","", "", "", "", "", "", "", 0, "")
+    val PatientInit = PatientDto(0, "", "","", "", "", "", "", "", "", 0, "",0)
 
     val PatientRequestInit = AddPatientRequest("CC", "","", "", "", "Femenino", "", "", "")
 

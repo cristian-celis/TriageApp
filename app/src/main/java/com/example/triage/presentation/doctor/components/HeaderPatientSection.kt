@@ -46,6 +46,7 @@ fun HeaderPatientSection(modifier: Modifier = Modifier, doctorViewModel: DoctorV
                 DataLabels(label = StringResources.ID_NUMBER, data = patient.idNumber)
                 DataLabels(label = StringResources.AGE, data = patient.age)
                 DataLabels(label = StringResources.PREGNANCY, data = if(patient.pregnancy == 1) StringResources.YES_TEXT else StringResources.NOT_TEXT)
+                DataLabels(label = "Triage", data = patient.triage.toString())
             }
         } else {
             RoundedBoxTextMessage(message = StringResources.NO_PATIENT_MESSAGE, topPadding = 5.dp, bottomPadding = 5.dp)

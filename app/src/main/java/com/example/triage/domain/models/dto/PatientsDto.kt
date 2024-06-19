@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 class PatientsDto : ArrayList<PatientDtoForList>()
 
 data class PatientDtoForList(
-    @SerializedName("prioridad") val priorityPatient: Int,
+    @SerializedName("triage") val triage: Int,
     @SerializedName("nombre") val name: String,
     @SerializedName("apellido") val lastname: String,
     @SerializedName("tipo_documento") val idType: String,
@@ -24,7 +24,8 @@ data class PatientDto(
     @SerializedName("frecuencia_cardiaca") val heartRate: String,
     @SerializedName("oxigenacion_sangre") val bloodOxygen: String,
     @SerializedName("embarazo") val pregnancy: Int,
-    @SerializedName("observaciones") val observations: String
+    @SerializedName("observaciones") val observations: String,
+    @SerializedName("triage") val triage: Int
 )
 
 data class AddSymptoms(

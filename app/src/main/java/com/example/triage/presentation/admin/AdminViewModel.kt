@@ -33,7 +33,7 @@ class AdminViewModel @Inject constructor(
     private val _showReportDialog = MutableStateFlow(false)
     val showReportDialog: StateFlow<Boolean> = _showReportDialog
 
-    private val _reportResult = MutableStateFlow<ReportsDto>(ReportsDto(0,"0",0))
+    private val _reportResult = MutableStateFlow<ReportsDto>(ReportsDto(0,"0",0,0,0,0,0))
     val reportResult: StateFlow<ReportsDto> = _reportResult
 
     private val _successReportCall = MutableStateFlow(false)
@@ -147,7 +147,7 @@ class AdminViewModel @Inject constructor(
 
     fun setReportDate(year: Int, month: Int, day: Int){
         _reportDate.value = ReportsRequest(year, month, day)
-        _reportResult.value = ReportsDto(0,"0",0)
+        _reportResult.value = ReportsDto(0,"0",0,0,0,0,0)
         getReport()
     }
 

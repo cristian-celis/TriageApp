@@ -197,7 +197,6 @@ fun BodyScreen(modifier: Modifier = Modifier, mainSupervisorViewModel: MainSuper
                 .fillMaxWidth()
                 .background(Color.White)
         ) {
-
             Text(
                 text = StringResources.WAIT_LIST,
                 style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.SemiBold),
