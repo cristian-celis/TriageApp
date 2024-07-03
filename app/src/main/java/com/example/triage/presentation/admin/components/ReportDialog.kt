@@ -5,6 +5,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,6 +22,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -31,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -38,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.example.traigecol.R
 import com.example.triage.presentation.admin.AdminViewModel
 import com.example.triage.presentation.common.DateOfBirthInput
 import com.example.triage.presentation.common.LabelTextField
@@ -54,11 +59,15 @@ fun ReportDialog(modifier: Modifier = Modifier, adminViewModel: AdminViewModel) 
     val error by adminViewModel.error.collectAsState()
     val showCalendar by adminViewModel.showCalendar.collectAsState()
 
-    if(showCalendar){
+    if (showCalendar) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            DateOfBirthInput(title = "Seleccione la fecha del reporte",onConfirm = {
+            DateOfBirthInput(title = "Seleccione la fecha del reporte", onConfirm = {
                 val localDate = Instant.ofEpochMilli(it).atZone(ZoneId.of("UTC")).toLocalDate()
-                adminViewModel.setReportDate(localDate.year, localDate.monthValue, localDate.dayOfMonth)
+                adminViewModel.setReportDate(
+                    localDate.year,
+                    localDate.monthValue,
+                    localDate.dayOfMonth
+                )
                 adminViewModel.setShowCalendar(false)
             }) {
                 adminViewModel.setShowCalendar(false)
@@ -95,21 +104,43 @@ fun ReportDialog(modifier: Modifier = Modifier, adminViewModel: AdminViewModel) 
                     .verticalScroll(rememberScrollState())
                     .padding(16.dp)
             ) {
-                Text(
-                    text = "Reporte medico",
-                    modifier = Modifier.fillMaxWidth(),
-                    style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 26.sp),
-                    textAlign = TextAlign.Center
+                Row (modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
+                ){
+                    Box{}
+                    Text(
+                        text = "Reporte medico",
+                        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 26.sp)
+                    )
+                    IconButton(onClick = { adminViewModel.setReportDialog(false) }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.close_icon),
+                            contentDescription = null,
+                            modifier = Modifier.size(30.dp),
+                            tint = Color.Gray
+                        )
+                    }
+                }
+                LabelTextField(
+                    modifier = Modifier.padding(start = 5.dp, top = 20.dp),
+                    nameLabel = "Selecciona la fecha del informe"
                 )
-                LabelTextField(modifier = Modifier.padding(start = 5.dp, top = 20.dp), nameLabel = "Selecciona la fecha del informe")
-                AgeComponent(modifier = Modifier
-                    .fillMaxWidth(), value = reportDate.toString(), helpText = "Seleccione la fecha") {
+                AgeComponent(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    value = reportDate.toString(),
+                    helpText = "Seleccione la fecha"
+                ) {
                     adminViewModel.setShowCalendar(true)
                 }
-                Text(text = error, style = MaterialTheme.typography.labelMedium, modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 5.dp, bottom = 20.dp),
-                    color = Color.Red)
+                Text(
+                    text = error,
+                    style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.W400),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 15.dp),
+                    color = Color.Red
+                )
 
                 Column(
                     modifier = Modifier
@@ -118,20 +149,60 @@ fun ReportDialog(modifier: Modifier = Modifier, adminViewModel: AdminViewModel) 
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     Row {
-                     CardItem(modifier = Modifier.fillMaxWidth(0.5f), label = "Fecha informe", data = reportDate.toString(), false)
-                     CardItem(modifier = Modifier.fillMaxWidth(1f), label = "Pacientes atendidos", data = "${reportResult.patientsAttended}", fetchingReport)
+                        CardItem(
+                            modifier = Modifier.fillMaxWidth(0.5f),
+                            label = "Fecha informe",
+                            data = reportDate.toString(),
+                            false
+                        )
+                        CardItem(
+                            modifier = Modifier.fillMaxWidth(1f),
+                            label = "Pacientes atendidos",
+                            data = "${reportResult.patientsAttended}",
+                            fetchingReport
+                        )
                     }
                     Row {
-                        CardItem(modifier = Modifier.fillMaxWidth(0.5f), label = "Promedio de espera (minutos)", data = reportResult.averageTime, fetchingReport)
-                        CardItem(modifier = Modifier.fillMaxWidth(1f), label = "Pacientes Triage I", data = "${reportResult.triageI}", fetchingReport)
+                        CardItem(
+                            modifier = Modifier.fillMaxWidth(0.5f),
+                            label = "Promedio de espera (minutos)",
+                            data = String.format("%.2f", reportResult.averageTime.toFloat()),
+                            fetchingReport
+                        )
+                        CardItem(
+                            modifier = Modifier.fillMaxWidth(1f),
+                            label = "Pacientes Triage I",
+                            data = "${reportResult.triageI}",
+                            fetchingReport
+                        )
                     }
                     Row {
-                        CardItem(modifier = Modifier.fillMaxWidth(0.5f), label = "Pacientes Triage II", data = "${reportResult.triageII}", fetchingReport)
-                        CardItem(modifier = Modifier.fillMaxWidth(1f), label = "Pacientes Triage III", data = "${reportResult.triageIII}", fetchingReport)
+                        CardItem(
+                            modifier = Modifier.fillMaxWidth(0.5f),
+                            label = "Pacientes Triage II",
+                            data = "${reportResult.triageII}",
+                            fetchingReport
+                        )
+                        CardItem(
+                            modifier = Modifier.fillMaxWidth(1f),
+                            label = "Pacientes Triage III",
+                            data = "${reportResult.triageIII}",
+                            fetchingReport
+                        )
                     }
                     Row {
-                        CardItem(modifier = Modifier.fillMaxWidth(0.5f), label = "Pacientes Triage IV", data = "${reportResult.triageIV}", fetchingReport)
-                        CardItem(modifier = Modifier.fillMaxWidth(1f), label = "Pacientes Triage V", data = "${reportResult.triageV}", fetchingReport)
+                        CardItem(
+                            modifier = Modifier.fillMaxWidth(0.5f),
+                            label = "Pacientes Triage IV",
+                            data = "${reportResult.triageIV}",
+                            fetchingReport
+                        )
+                        CardItem(
+                            modifier = Modifier.fillMaxWidth(1f),
+                            label = "Pacientes Triage V",
+                            data = "${reportResult.triageV}",
+                            fetchingReport
+                        )
                     }
                 }
                 Row(
@@ -147,6 +218,7 @@ fun ReportDialog(modifier: Modifier = Modifier, adminViewModel: AdminViewModel) 
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
+                            .height(50.dp)
                             .weight(1f),
                         shape = RoundedCornerShape(12.dp)
                     ) {
@@ -167,17 +239,21 @@ fun ReportDialog(modifier: Modifier = Modifier, adminViewModel: AdminViewModel) 
 
 @Composable
 private fun CardItem(modifier: Modifier = Modifier, label: String, data: String, loading: Boolean) {
-    Surface(color = Color(0xFFF0F2F5),
+    Surface(
+        color = Color(0xFFF0F2F5),
         shape = RoundedCornerShape(12.dp),
         modifier = modifier
-            .padding(5.dp)
-            .height(145.dp)
+            .padding(bottom = 5.dp, start = 5.dp, end = 5.dp)
+            .height(125.dp)
     ) {
-        Column(modifier = Modifier.padding(24.dp)) {
+        Column(modifier = Modifier.padding(20.dp)) {
             Text(text = label, style = TextStyle(fontSize = 16.sp))
-            if(!loading){
-                Text(text = data, style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.SemiBold))
-            }else{
+            if (!loading) {
+                Text(
+                    text = data,
+                    style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.SemiBold)
+                )
+            } else {
                 ProgressIndicator()
             }
         }

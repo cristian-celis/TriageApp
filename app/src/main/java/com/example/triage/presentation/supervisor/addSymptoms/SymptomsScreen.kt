@@ -188,8 +188,10 @@ fun CancelButton(modifier: Modifier = Modifier, symptomsViewModel: SymptomsViewM
 @Composable
 fun SendDataButton(modifier: Modifier = Modifier, symptomsViewModel: SymptomsViewModel) {
     val savingSymptoms by symptomsViewModel.isSavingSymptoms.collectAsState()
+    val focusManager = LocalFocusManager.current
     Button(
         onClick = {
+            focusManager.clearFocus()
             symptomsViewModel.sendSymptomsData()
         },
         modifier = modifier.height(45.dp),

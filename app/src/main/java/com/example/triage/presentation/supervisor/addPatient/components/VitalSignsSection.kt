@@ -83,7 +83,7 @@ fun VitalSigns(patientViewModel: PatientViewModel, modifier: Modifier = Modifier
             keypad = true,
             onTextFieldChanged = {
                 if (it.length <= 3) {
-                    bloodOxygenError = if(it.length > 1) it.toInt() !in 80..200 else false
+                    bloodOxygenError = if(it.length > 1) it.toInt() !in 80..100 else false
                     patientViewModel.updatePatientData(it, PatientData.BLOOD_OXYGEN)
                 }
             })

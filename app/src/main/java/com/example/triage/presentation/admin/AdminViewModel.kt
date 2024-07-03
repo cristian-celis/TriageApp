@@ -14,6 +14,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -42,7 +43,7 @@ class AdminViewModel @Inject constructor(
     private val _fetchingReport = MutableStateFlow(false)
     val fetchingReport: StateFlow<Boolean> = _fetchingReport
 
-    private val _reportDate = MutableStateFlow(ReportsRequest(2024,6,16))
+    private val _reportDate = MutableStateFlow(ReportsRequest(LocalDate.now().year,LocalDate.now().monthValue,LocalDate.now().dayOfMonth))
     val reportDate: StateFlow<ReportsRequest> = _reportDate
 
     private val _showCalendar = MutableStateFlow(false)
@@ -64,6 +65,10 @@ class AdminViewModel @Inject constructor(
     }
 
     fun setReportDialog(showDialog: Boolean){
+        if(!showDialog){
+            _reportDate.value = ReportsRequest(LocalDate.now().year,LocalDate.now().monthValue,LocalDate.now().dayOfMonth)
+            _reportResult.value = ReportsDto(0,"0",0,0,0,0,0)
+        }
         _showReportDialog.value = showDialog
     }
 

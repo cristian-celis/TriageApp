@@ -18,7 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.traigecol.R
@@ -30,7 +32,7 @@ fun Textarea(symptomsViewModel: SymptomsViewModel) {
     val observations by symptomsViewModel.observations.collectAsState()
     TextField(
         value = observations,
-        onValueChange = { symptomsViewModel.updateObservation(it) },
+        onValueChange = { if(it.length < 151) symptomsViewModel.updateObservation(it) },
         placeholder = {
             Text(
                 text = "Ingrese las observaciones medicas (No es obligatorio).",
@@ -51,5 +53,11 @@ fun Textarea(symptomsViewModel: SymptomsViewModel) {
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent
         )
+    )
+    Text(
+        text = "${observations.length}/150",
+        modifier = Modifier.fillMaxWidth().padding(end = 10.dp),
+        style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.W400),
+        textAlign = TextAlign.End,
     )
 }

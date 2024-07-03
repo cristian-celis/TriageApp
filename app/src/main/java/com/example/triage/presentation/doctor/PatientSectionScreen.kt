@@ -1,6 +1,7 @@
 package com.example.triage.presentation.doctor
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -90,10 +91,10 @@ fun PatientSectionScreen(doctorViewModel: DoctorViewModel, modifier: Modifier = 
                 color = Color(0xFFDADADA),
                 thickness = 1.dp
             )
-            Observations(
-                modifier = Modifier.padding(horizontal = 10.dp),
-                doctorViewModel = doctorViewModel
-            )
+                Observations(
+                    modifier = Modifier,
+                    doctorViewModel = doctorViewModel
+                )
         }
     }
 }
@@ -103,14 +104,14 @@ fun Observations(modifier: Modifier = Modifier, doctorViewModel: DoctorViewModel
     val observations by doctorViewModel.patientData.collectAsState()
     Text(
         text = "Observaciones",
-        style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.SemiBold),
+        style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.SemiBold),
         textAlign = TextAlign.Start,
         modifier = modifier
             .fillMaxWidth()
-            .padding(bottom = 5.dp, top = 8.dp)
+            .padding(start = 20.dp, bottom = 5.dp, top = 8.dp)
     )
     if (observations.priorityPatient.observations.isNotEmpty()) {
-        Text(text = observations.priorityPatient.observations)
+        Text(text = observations.priorityPatient.observations, modifier = Modifier.padding(start = 30.dp))
     } else {
         RoundedBoxTextMessage(
             message = "No tiene observaciones",
