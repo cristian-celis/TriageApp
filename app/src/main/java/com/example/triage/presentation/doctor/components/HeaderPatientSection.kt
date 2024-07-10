@@ -52,26 +52,31 @@ fun HeaderPatientSection(modifier: Modifier = Modifier, doctorViewModel: DoctorV
                 DataLabels(label = StringResources.NAME, data = "${patient.name.uppercase()} ${patient.lastname.uppercase()}")
                 DataLabels(label = StringResources.ID_NUMBER, data = patient.idNumber)
                 DataLabels(label = StringResources.AGE, data = patient.age)
-                DataLabels(label = StringResources.PREGNANCY, data = if(patient.pregnancy == 1) StringResources.YES_TEXT else StringResources.NOT_TEXT)
-            }
-
-            Surface(color = Color(
-                when(patient.triage){
-                    1 -> 0xFFB51B13
-                    2 -> 0xFFCB3721
-                    3 -> 0xFFC24616
-                    4 -> 0xFFE7740F
-                    5 -> 0xFFE49610
-                    else -> 0xFFF0F2F5
-                }),
-                shape = RoundedCornerShape(18.dp),
-                modifier = Modifier.padding(end = 40.dp)
-            ) {
-                Column (modifier = Modifier.padding(15.dp), horizontalAlignment = Alignment.CenterHorizontally){
-                    Text(text = "Triage", style = TextStyle(fontSize = 16.sp, color = Color.White))
-                    Text(text = patient.triage.toString(), style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.SemiBold, color = Color.White))
+                if(patient.sex == "Femenino"){
+                    DataLabels(label = StringResources.PREGNANCY, data = if(patient.pregnancy == 1) StringResources.YES_TEXT else StringResources.NOT_TEXT)
                 }
             }
+
+
+                Column (modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally){
+                    Surface(color = Color(
+                        when(patient.triage){
+                            1 -> 0xFFB51B13
+                            2 -> 0xFFCB3721
+                            3 -> 0xFFC24616
+                            4 -> 0xFFE7740F
+                            5 -> 0xFFE49610
+                            else -> 0xFFF0F2F5
+                        }),
+                        shape = RoundedCornerShape(18.dp)
+                    ){
+                        Column(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(text = "Triage", style = TextStyle(fontSize = 16.sp, color = Color.White))
+                            Text(text = patient.triage.toString(), style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.SemiBold, color = Color.White))
+                        }
+                    }
+                }
+
         } else {
             RoundedBoxTextMessage(message = StringResources.NO_PATIENT_MESSAGE, topPadding = 5.dp, bottomPadding = 5.dp)
         }
