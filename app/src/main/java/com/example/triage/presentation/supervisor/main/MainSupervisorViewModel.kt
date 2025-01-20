@@ -7,8 +7,8 @@ import com.example.triage.domain.models.APIResult
 import com.example.triage.domain.models.GlobalObjects
 import com.example.triage.domain.models.dto.PatientsDto
 import com.example.triage.domain.models.dto.StaffMemberAccount
-import com.example.triage.domain.usecases.PatientRepository
-import com.example.triage.domain.usecases.StaffRepositoryImpl
+import com.example.triage.data.remote.repositoriesImpl.PatientRepositoryImpl
+import com.example.triage.data.remote.repositoriesImpl.StaffRepositoryImpl
 import com.example.triage.utils.Errors
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -19,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainSupervisorViewModel @Inject constructor(
-    private val patientRepository: PatientRepository,
+    private val patientRepositoryImpl: PatientRepositoryImpl,
     private val staffRepositoryImpl: StaffRepositoryImpl
 ) : ViewModel() {
 
@@ -55,7 +55,7 @@ class MainSupervisorViewModel @Inject constructor(
     fun getPatientList() {
         _fetchingPatients.value = true
         viewModelScope.launch {
-            patientRepository.getPatientList().let {
+            patientRepositoryImpl.getPatientList().let {
                 when (it) {
                     is APIResult.Success -> {
                         _patientList.value = it.data
@@ -84,7 +84,7 @@ class MainSupervisorViewModel @Inject constructor(
     private suspend fun getPatientsWaitingCount() {
         while (_waitListUpdateEnabled.value) {
             viewModelScope.launch {
-                patientRepository.getPatientsWaitingCount().let {
+                patientRepositoryImpl.getPatientsWaitingCount().let {
                     when (it) {
                         is APIResult.Success -> {
                             _successCall.value = true

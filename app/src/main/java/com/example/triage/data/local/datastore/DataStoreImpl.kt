@@ -1,4 +1,4 @@
-package com.example.triage.domain.datastore
+package com.example.triage.data.local.datastore
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -26,18 +26,6 @@ class DataStoreImpl constructor(
     suspend fun writeSaveLogin(userPage: UserPage) {
         appContext.dataStore.edit { settings ->
             settings[SAVE_LOGIN] = userPage.toString()
-        }
-    }
-
-    private val EXAMPLE_COUNTER = intPreferencesKey("example_counter")
-    val exampleCounterFlow: Flow<Int> = appContext.dataStore.data
-        .map { preferences ->
-            preferences[EXAMPLE_COUNTER] ?: 0
-        }
-    suspend fun incrementCounter() {
-        appContext.dataStore.edit { settings ->
-            val currentCounterValue = settings[EXAMPLE_COUNTER] ?: 0
-            settings[EXAMPLE_COUNTER] = currentCounterValue + 1
         }
     }
 }

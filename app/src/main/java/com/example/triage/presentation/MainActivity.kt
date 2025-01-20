@@ -1,4 +1,4 @@
-package com.example.triage
+package com.example.triage.presentation
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.triage.domain.models.dto.AddPatientRequest
 import com.example.triage.domain.models.APIResult
 import com.example.triage.domain.models.GlobalObjects.PatientRequestInit
-import com.example.triage.domain.usecases.PatientRepository
+import com.example.triage.data.remote.repositoriesImpl.PatientRepositoryImpl
 import com.example.triage.utils.Errors
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PatientViewModel @Inject constructor(
-    private val patientRepository: PatientRepository
+    private val patientRepositoryImpl: PatientRepositoryImpl
 ) : ViewModel() {
 
     private val _idPatient = MutableStateFlow("")
@@ -101,7 +101,7 @@ class PatientViewModel @Inject constructor(
         if (!_isSavingData.value) {
             _isSavingData.value = true
             viewModelScope.launch {
-                patientRepository.savePatientData(_patient.value).let {
+                patientRepositoryImpl.savePatientData(_patient.value).let {
                     when (it) {
                         is APIResult.Success -> {
                             _idPatient.value = it.data.message

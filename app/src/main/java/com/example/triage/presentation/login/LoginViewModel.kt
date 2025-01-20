@@ -8,7 +8,7 @@ import com.example.triage.domain.models.dto.LoginModel
 import com.example.triage.domain.models.dto.toStaffMemberDto
 import com.example.triage.domain.models.APIResult
 import com.example.triage.domain.models.GlobalObjects.StaffMemberInit
-import com.example.triage.domain.usecases.LoginRepository
+import com.example.triage.data.remote.repositoriesImpl.LoginRepositoryImpl
 import com.example.triage.presentation.navigation.AppScreens
 import com.example.triage.utils.Errors
 import com.example.triage.utils.StringResources
@@ -20,7 +20,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val loginRepository: LoginRepository
+    private val loginRepositoryImpl: LoginRepositoryImpl
 ) : ViewModel() {
 
     private val _user = MutableStateFlow("")
@@ -61,7 +61,7 @@ class LoginViewModel @Inject constructor(
     fun login() {
         _authenticatingCredentials.value = true
         viewModelScope.launch {
-            loginRepository.login(LoginModel(_user.value, _password.value)).let {
+            loginRepositoryImpl.login(LoginModel(_user.value, _password.value)).let {
                 when (it) {
                     is APIResult.Success -> {
                         _userLoggedIn.value =

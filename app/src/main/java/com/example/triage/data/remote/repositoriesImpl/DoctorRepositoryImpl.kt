@@ -1,20 +1,21 @@
-package com.example.triage.domain.usecases
+package com.example.triage.data.remote.repositoriesImpl
 
-import com.example.triage.data.remote.APIServiceDoctor
+import com.example.triage.data.remote.apiServices.APIServiceDoctor
 import com.example.triage.domain.models.APIResult
 import com.example.triage.domain.models.ApiResponse
 import com.example.triage.domain.models.dto.StaffStatus
 import com.example.triage.domain.models.dto.PriorityPatientDto
+import com.example.triage.domain.repository.DoctorRepository
 import com.google.gson.Gson
 import retrofit2.Retrofit
 import java.net.UnknownHostException
 import javax.inject.Inject
 
-class DoctorRepository @Inject constructor(
+class DoctorRepositoryImpl @Inject constructor(
     private val retrofit: Retrofit
-) {
+): DoctorRepository {
 
-    suspend fun assignPatient(): APIResult<PriorityPatientDto> {
+    override suspend fun assignPatient(): APIResult<PriorityPatientDto> {
         return try {
             val call = retrofit.create(APIServiceDoctor::class.java).assignPatient()
 
@@ -33,7 +34,7 @@ class DoctorRepository @Inject constructor(
         }
     }
 
-    suspend fun updateDoctorStatus(staffStatus: StaffStatus): APIResult<ApiResponse> {
+    override suspend fun updateDoctorStatus(staffStatus: StaffStatus): APIResult<ApiResponse> {
         return try {
             val call = retrofit.create(APIServiceDoctor::class.java).updateDoctorStatus(staffStatus)
 
@@ -52,7 +53,7 @@ class DoctorRepository @Inject constructor(
         }
     }
 
-    suspend fun getPatientsWaitingCount(): APIResult<Int>{
+    override suspend fun getPatientsWaitingCount(): APIResult<Int>{
         return try {
             val call = retrofit.create(APIServiceDoctor::class.java).getPatientsWaitingCount()
             if(call.isSuccessful){

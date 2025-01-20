@@ -1,24 +1,23 @@
-package com.example.triage.domain.usecases
+package com.example.triage.data.remote.repositoriesImpl
 
-import android.util.Log
-import com.example.triage.data.remote.APIServiceLogin
+import com.example.triage.data.remote.apiServices.APIServiceLogin
 import com.example.triage.domain.models.APIResult
 import com.example.triage.domain.models.dto.LoginModel
 import com.example.triage.domain.models.ApiResponse
 import com.example.triage.domain.models.dto.UserDto
+import com.example.triage.domain.repository.LoginRepository
 import com.google.gson.Gson
 import retrofit2.Retrofit
 import java.net.UnknownHostException
 import javax.inject.Inject
 
-class LoginRepository @Inject constructor(
+class LoginRepositoryImpl @Inject constructor(
     private val retrofit: Retrofit
-) {
+): LoginRepository {
 
-    suspend fun login(infoLogin: LoginModel): APIResult<UserDto> {
+    override suspend fun login(infoLogin: LoginModel): APIResult<UserDto> {
         return try {
             val call = retrofit.create(APIServiceLogin::class.java).login(infoLogin)
-            Log.d("prueba", "Resultado Login: $call")
             if(call.isSuccessful){
                 APIResult.Success(call.body()!!)
             }else{

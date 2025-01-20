@@ -1,7 +1,9 @@
 package com.example.triage.utils
 
+import com.example.traigecol.BuildConfig
+
 object EndPointConstants {
-    const val BASE_URL = "https://triage-api.onrender.com/"
+    const val BASE_URL = BuildConfig.BASE_URL
 
     const val LOGIN = "iniciarSesion/"
 

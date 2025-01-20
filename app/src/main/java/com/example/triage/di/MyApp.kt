@@ -1,4 +1,4 @@
-package com.example.triage
+package com.example.triage.di
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

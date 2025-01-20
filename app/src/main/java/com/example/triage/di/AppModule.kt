@@ -1,11 +1,11 @@
 package com.example.triage.di
 
 import android.content.Context
-import com.example.triage.domain.usecases.StaffRepositoryImpl
-import com.example.triage.domain.datastore.DataStoreImpl
-import com.example.triage.domain.usecases.DoctorRepository
-import com.example.triage.domain.usecases.MainRepository
-import com.example.triage.domain.usecases.PatientRepository
+import com.example.triage.data.remote.repositoriesImpl.StaffRepositoryImpl
+import com.example.triage.data.local.datastore.DataStoreImpl
+import com.example.triage.data.remote.repositoriesImpl.DoctorRepositoryImpl
+import com.example.triage.data.remote.repositoriesImpl.MainRepositoryImpl
+import com.example.triage.data.remote.repositoriesImpl.PatientRepositoryImpl
 import com.example.triage.utils.EndPointConstants
 import dagger.Module
 import dagger.Provides
@@ -29,8 +29,8 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideMainRepository(retrofit: Retrofit): MainRepository{
-        return MainRepository(retrofit)
+    fun provideMainRepository(retrofit: Retrofit): MainRepositoryImpl {
+        return MainRepositoryImpl(retrofit)
     }
 
     @Singleton
@@ -47,13 +47,13 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun providePatientRepository(retrofit: Retrofit): PatientRepository{
-        return PatientRepository(retrofit)
+    fun providePatientRepository(retrofit: Retrofit): PatientRepositoryImpl {
+        return PatientRepositoryImpl(retrofit)
     }
 
     @Singleton
     @Provides
-    fun provideDoctorRepository(retrofit: Retrofit): DoctorRepository{
-        return DoctorRepository(retrofit)
+    fun provideDoctorRepository(retrofit: Retrofit): DoctorRepositoryImpl {
+        return DoctorRepositoryImpl(retrofit)
     }
 }

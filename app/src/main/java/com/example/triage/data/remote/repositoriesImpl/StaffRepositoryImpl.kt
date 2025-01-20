@@ -1,7 +1,6 @@
-package com.example.triage.domain.usecases
+package com.example.triage.data.remote.repositoriesImpl
 
-import android.util.Log
-import com.example.triage.data.remote.APIServiceStaff
+import com.example.triage.data.remote.apiServices.APIServiceStaff
 import com.example.triage.domain.models.APIResult
 import com.example.triage.domain.models.dto.StaffMember
 import com.example.triage.domain.models.ApiResponse
@@ -9,7 +8,7 @@ import com.example.triage.domain.models.dto.ReportsDto
 import com.example.triage.domain.models.dto.ReportsRequest
 import com.example.triage.domain.models.dto.StaffDto
 import com.example.triage.domain.models.dto.StaffMemberDto
-import com.example.triage.utils.Errors
+import com.example.triage.domain.repository.StaffRepository
 import com.google.gson.Gson
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -18,9 +17,9 @@ import javax.inject.Inject
 
 class StaffRepositoryImpl @Inject constructor(
     private val retrofit: Retrofit
-) {
+): StaffRepository {
 
-    suspend fun getStaff(): APIResult<StaffDto> {
+    override suspend fun getStaff(): APIResult<StaffDto> {
         return try {
             val call = retrofit.create(APIServiceStaff::class.java).getStaff()
             val userList = call.body()
@@ -39,10 +38,8 @@ class StaffRepositoryImpl @Inject constructor(
         }
     }
 
-    suspend fun addStaff(user: StaffMember): APIResult<ApiResponse?> {
+    override suspend fun addStaff(user: StaffMember): APIResult<ApiResponse?> {
         return try {
-            Log.d("prueba", "${user}")
-            Log.d("prueba", "Agregando nuevo usuario")
             val response: Response<ApiResponse> =
                 retrofit.create(APIServiceStaff::class.java).addStaff(user)
 
@@ -61,7 +58,7 @@ class StaffRepositoryImpl @Inject constructor(
         }
     }
 
-    suspend fun editStaff(user: StaffMember, userId: Int): APIResult<ApiResponse?> {
+    override suspend fun editStaff(user: StaffMember, userId: Int): APIResult<ApiResponse?> {
         return try {
             val response: Response<ApiResponse> = retrofit.create(APIServiceStaff::class.java)
                 .editStaffMember(userId.toString(), user)
@@ -81,7 +78,7 @@ class StaffRepositoryImpl @Inject constructor(
         }
     }
 
-    suspend fun deleteStaffMember(idUser: String): APIResult<ApiResponse?> {
+    override suspend fun deleteStaffMember(idUser: String): APIResult<ApiResponse?> {
         return try {
             val response: Response<ApiResponse> = retrofit.create(APIServiceStaff::class.java).deleteStaff(idUser)
             if (response.isSuccessful && response.body() != null) {
@@ -99,7 +96,7 @@ class StaffRepositoryImpl @Inject constructor(
         }
     }
 
-    suspend fun getStaffCount(): APIResult<Int>{
+    override suspend fun getStaffCount(): APIResult<Int>{
         return try {
             val call = retrofit.create(APIServiceStaff::class.java).getStaffCount()
             if(call.isSuccessful){
@@ -117,7 +114,7 @@ class StaffRepositoryImpl @Inject constructor(
         }
     }
 
-    suspend fun getStaffMember(id: String): APIResult<StaffMemberDto>{
+    override suspend fun getStaffMember(id: String): APIResult<StaffMemberDto>{
         return try{
             val call = retrofit.create(APIServiceStaff::class.java).getStaffMember(id.toInt())
             if(call.isSuccessful){
@@ -135,7 +132,7 @@ class StaffRepositoryImpl @Inject constructor(
         }
     }
 
-    suspend fun getReports(date: ReportsRequest): APIResult<ReportsDto>{
+    override suspend fun getReports(date: ReportsRequest): APIResult<ReportsDto>{
         return try {
             val call = retrofit.create(APIServiceStaff::class.java).getReports(date)
             if(call.isSuccessful){

@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -22,6 +24,14 @@ android {
         }
     }
 
+    val localProperties = Properties()
+    val localPropertiesFile = File(rootDir, "local.properties")
+    if(localPropertiesFile.exists() && localPropertiesFile.isFile){
+        localPropertiesFile.inputStream().use {
+            localProperties.load(it)
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -31,6 +41,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("String", "BASE_URL", localProperties.getProperty("BASE_URL"))
+        }
+        debug {
+            buildConfigField("String", "BASE_URL", localProperties.getProperty("BASE_URL"))
         }
     }
     compileOptions {
@@ -43,6 +57,8 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
+        resValues = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.4.3"

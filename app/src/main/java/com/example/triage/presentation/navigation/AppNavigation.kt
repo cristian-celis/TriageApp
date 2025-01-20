@@ -12,10 +12,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.triage.MainViewModel
+import com.example.triage.presentation.MainViewModel
 import com.example.triage.presentation.admin.AdminViewModel
 import com.example.triage.domain.UserPage
-import com.example.triage.presentation.SplashScreen
+import com.example.triage.presentation.splash.SplashScreen
 import com.example.triage.presentation.admin.AdminMainScreen
 import com.example.triage.presentation.admin.detailsScreen.DetailCard
 import com.example.triage.presentation.admin.detailsScreen.DetailCardViewModel

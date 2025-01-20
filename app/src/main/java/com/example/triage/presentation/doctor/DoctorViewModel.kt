@@ -9,8 +9,8 @@ import com.example.triage.domain.models.GlobalObjects.PatientInit
 import com.example.triage.domain.models.dto.StaffStatus
 import com.example.triage.domain.models.dto.PriorityPatientDto
 import com.example.triage.domain.models.dto.StaffMemberAccount
-import com.example.triage.domain.usecases.DoctorRepository
-import com.example.triage.domain.usecases.StaffRepositoryImpl
+import com.example.triage.data.remote.repositoriesImpl.DoctorRepositoryImpl
+import com.example.triage.data.remote.repositoriesImpl.StaffRepositoryImpl
 import com.example.triage.utils.Errors
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -21,7 +21,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DoctorViewModel @Inject constructor(
-    private val doctorRepository: DoctorRepository,
+    private val doctorRepositoryImpl: DoctorRepositoryImpl,
     private val staffRepositoryImpl: StaffRepositoryImpl
 ) : ViewModel() {
 
@@ -71,7 +71,7 @@ class DoctorViewModel @Inject constructor(
     fun assignPatient() {
         _isFetchingPatients.value = true
         viewModelScope.launch {
-            doctorRepository.assignPatient().let {
+            doctorRepositoryImpl.assignPatient().let {
                 when (it) {
                     is APIResult.Success -> {
                         _patientData.value = it.data
@@ -98,7 +98,7 @@ class DoctorViewModel @Inject constructor(
         _updatingDocStatus.value = true
 
         viewModelScope.launch {
-            doctorRepository.updateDoctorStatus(
+            doctorRepositoryImpl.updateDoctorStatus(
                 StaffStatus(
                     _doctorAccount.value.id,
                     getDoctorStatus(state = doctorOnline)
@@ -132,7 +132,7 @@ class DoctorViewModel @Inject constructor(
     private suspend fun getPatientsWaitingCount() {
         while (!_doctorInConsultation.value && _isDoctorOnline.value) {
             viewModelScope.launch {
-                doctorRepository.getPatientsWaitingCount().let {
+                doctorRepositoryImpl.getPatientsWaitingCount().let {
                     when (it) {
                         is APIResult.Success -> {
                             _successCall.value = true

@@ -1,4 +1,4 @@
-package com.example.triage.data.remote
+package com.example.triage.data.remote.apiServices
 
 import com.example.triage.domain.models.dto.StaffMember
 import com.example.triage.domain.models.ApiResponse

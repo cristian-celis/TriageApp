@@ -1,4 +1,4 @@
-package com.example.triage.data.remote
+package com.example.triage.data.remote.apiServices
 
 import com.example.triage.domain.models.dto.LoginModel
 import com.example.triage.domain.models.dto.UserDto
@@ -8,8 +8,6 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 
 interface APIServiceLogin {
-
-    // LOGIN METHODS
 
     @POST(EndPointConstants.LOGIN)
     suspend fun login(@Body login: LoginModel): Response<UserDto>

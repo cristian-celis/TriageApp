@@ -1,20 +1,18 @@
-package com.example.triage.domain.usecases
+package com.example.triage.data.remote.repositoriesImpl
 
-import android.util.Log
-import com.example.triage.data.remote.APIServiceMain
+import com.example.triage.data.remote.apiServices.APIServiceMain
 import com.example.triage.domain.models.APIResult
-import com.example.triage.utils.Errors
+import com.example.triage.domain.repository.MainRepository
 import retrofit2.Retrofit
 import java.net.UnknownHostException
 import javax.inject.Inject
 
-class MainRepository @Inject constructor(
+class MainRepositoryImpl @Inject constructor(
     private val retrofit: Retrofit
-) {
+): MainRepository {
 
-    suspend fun initApi() {
+    override suspend fun initApi() {
         try {
-            Log.d(Errors.TAG, "Iniciando Back")
             retrofit.create(APIServiceMain::class.java).initBack()
         }catch (e:UnknownHostException){
             APIResult.Error(Exception("Error de conexión: Asegurate de tener acceso a internet"))

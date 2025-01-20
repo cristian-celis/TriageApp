@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.triage.domain.models.APIResult
 import com.example.triage.domain.models.InitSymptoms
 import com.example.triage.domain.models.SymptomsAdd
-import com.example.triage.domain.usecases.PatientRepository
+import com.example.triage.data.remote.repositoriesImpl.PatientRepositoryImpl
 import com.example.triage.utils.Errors
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SymptomsViewModel @Inject constructor(
-    private val patientRepository: PatientRepository
+    private val patientRepositoryImpl: PatientRepositoryImpl
 ): ViewModel() {
 
     private val _idPatient = MutableStateFlow("")
@@ -90,7 +90,7 @@ class SymptomsViewModel @Inject constructor(
             val symptomsList = createSymptomsList()
             _isSavingSymptoms.value = true
             viewModelScope.launch {
-                patientRepository.saveSymptomsPat(
+                patientRepositoryImpl.saveSymptomsPat(
                     _idPatient.value,
                     symptomsList,
                     _symptoms.value.pregnancy,
@@ -119,7 +119,7 @@ class SymptomsViewModel @Inject constructor(
     fun deletePatient(){
         _deleting.value = true
         viewModelScope.launch {
-            patientRepository.deletePatient(_idPatient.value).let {
+            patientRepositoryImpl.deletePatient(_idPatient.value).let {
                 when(it){
                     is APIResult.Success -> {
                         _successDeletion.value = true

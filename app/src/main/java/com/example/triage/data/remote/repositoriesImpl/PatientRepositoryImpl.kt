@@ -1,24 +1,25 @@
-package com.example.triage.domain.usecases
+package com.example.triage.data.remote.repositoriesImpl
 
 import android.util.Log
-import com.example.triage.data.remote.APIServiceDoctor
-import com.example.triage.data.remote.APIServicePatient
+import com.example.triage.data.remote.apiServices.APIServiceDoctor
+import com.example.triage.data.remote.apiServices.APIServicePatient
 import com.example.triage.domain.models.APIResult
 import com.example.triage.domain.models.dto.AddPatientRequest
 import com.example.triage.domain.models.dto.AddSymptoms
 import com.example.triage.domain.models.ApiResponse
 import com.example.triage.domain.models.dto.PatientsDto
+import com.example.triage.domain.repository.PatientRepository
 import com.example.triage.utils.Errors
 import com.google.gson.Gson
 import retrofit2.Retrofit
 import java.net.UnknownHostException
 import javax.inject.Inject
 
-class PatientRepository @Inject constructor(
+class PatientRepositoryImpl @Inject constructor(
     private val retrofit: Retrofit
-) {
+): PatientRepository {
 
-    suspend fun savePatientData(patientData: AddPatientRequest): APIResult<ApiResponse> {
+    override suspend fun savePatientData(patientData: AddPatientRequest): APIResult<ApiResponse> {
         return try {
             val call = retrofit.create(APIServicePatient::class.java).addPatient(patientData)
             if (call.isSuccessful)
@@ -34,7 +35,7 @@ class PatientRepository @Inject constructor(
         }
     }
 
-    suspend fun saveSymptomsPat(
+    override suspend fun saveSymptomsPat(
         idNumberPat: String,
         symptomsList: ArrayList<Int>,
         pregnancy: Boolean,
@@ -57,7 +58,7 @@ class PatientRepository @Inject constructor(
         }
     }
 
-    suspend fun getPatientList(): APIResult<PatientsDto>{
+    override suspend fun getPatientList(): APIResult<PatientsDto>{
         return try {
             val call = retrofit.create(APIServicePatient::class.java).getPatientList()
 
@@ -74,7 +75,7 @@ class PatientRepository @Inject constructor(
         }
     }
 
-    suspend fun getPatientsWaitingCount(): APIResult<Int>{
+    override suspend fun getPatientsWaitingCount(): APIResult<Int>{
         return try {
             val call = retrofit.create(APIServiceDoctor::class.java).getPatientsWaitingCount()
             if(call.isSuccessful){
@@ -90,7 +91,7 @@ class PatientRepository @Inject constructor(
         }
     }
 
-    suspend fun deletePatient(id: String): APIResult<ApiResponse>{
+    override suspend fun deletePatient(id: String): APIResult<ApiResponse>{
         return try{
             val call = retrofit.create(APIServicePatient::class.java).deletePatient(id.toInt())
             if(call.isSuccessful){

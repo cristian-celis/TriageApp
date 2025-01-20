@@ -3,7 +3,7 @@ package com.example.triage.presentation.admin.detailsScreen
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.triage.domain.usecases.StaffRepositoryImpl
+import com.example.triage.data.remote.repositoriesImpl.StaffRepositoryImpl
 import com.example.triage.domain.models.dto.StaffMember
 import com.example.triage.domain.models.dto.StaffMemberDto
 import com.example.triage.domain.models.APIResult

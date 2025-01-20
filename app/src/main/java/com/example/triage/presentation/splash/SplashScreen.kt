@@ -1,4 +1,4 @@
-package com.example.triage.presentation
+package com.example.triage.presentation.splash
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -12,7 +12,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.traigecol.R
-import com.example.triage.MainViewModel
+import com.example.triage.presentation.MainViewModel
 import com.example.triage.presentation.navigation.AppScreens
 import kotlinx.coroutines.delay
 
